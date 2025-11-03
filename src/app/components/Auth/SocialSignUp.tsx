@@ -8,7 +8,7 @@ const SocialSignUp = () => {
         <button
           onClick={() => signIn('google')}
           className='flex w-full items-center justify-center gap-2.5 rounded-lg p-3.5 border border-gray-200 text-black hover:bg-neutral-100 hover:cursor-pointer'>
-          Sign Up
+          Google
           <svg
             width='23'
             height='22'
@@ -49,7 +49,7 @@ const SocialSignUp = () => {
         <button
           onClick={() => signIn('github')}
           className='flex w-full items-center justify-center gap-2.5 rounded-lg p-3.5 border border-gray-200 text-black hover:bg-neutral-100 hover:cursor-pointer'>
-          Sign Up
+          GitHub
           <svg
             width='22'
             height='22'

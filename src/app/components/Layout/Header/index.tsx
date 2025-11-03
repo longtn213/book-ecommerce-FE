@@ -98,7 +98,7 @@ const Header: React.FC = () => {
               onClick={() => {
                 setIsSignInOpen(true)
               }}>
-              Sign In
+              Đăng nhập
             </button>
             {isSignInOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
               onClick={() => {
                 setIsSignUpOpen(true)
               }}>
-              Sign Up
+              Tạo tài khoản
             </button>
             {isSignUpOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
@@ -192,7 +192,7 @@ const Header: React.FC = () => {
                   setIsSignInOpen(true)
                   setNavbarOpen(false)
                 }}>
-                Sign In
+                Đăng nhập
               </button>
               <button
                 className='bg-primary text-white px-4 py-2 rounded-lg border  border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'
@@ -200,7 +200,7 @@ const Header: React.FC = () => {
                   setIsSignUpOpen(true)
                   setNavbarOpen(false)
                 }}>
-                Sign Up
+                Tạo tài khoản
               </button>
             </div>
           </nav>

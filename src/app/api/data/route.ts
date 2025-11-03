@@ -4,270 +4,216 @@ import { HeaderItem } from '@/app/types/menu'
 import { CourseType } from '@/app/types/course'
 import { Hourtype } from '@/app/types/hour'
 import { CourseDetailType } from '@/app/types/coursedetail'
-import { MentorType } from '@/app/types/mentor'
 import { TestimonialType } from '@/app/types/testimonial'
 import { FooterLinkType } from '@/app/types/footerlinks'
 
 const HeaderData: HeaderItem[] = [
-  { label: 'Home', href: '/#Home' },
-  { label: 'Courses', href: '/#Courses' },
-  { label: 'Mentors', href: '/#mentors-section' },
-  { label: 'Testimonial', href: '/#testimonial-section' },
-  { label: 'Join', href: '/#join-section' },
-  { label: 'Contact Us', href: '/#contact' },
-  { label: 'Docs', href: '/documentation' },
+  { label: 'Trang chủ', href: '/#home' },
+  { label: 'Danh mục sách', href: '/#catalog' },
+  { label: 'Bản đồ API', href: '/#api-overview' },
+  { label: 'Hành trình khách hàng', href: '/#journey' },
+  { label: 'Góc cộng đồng', href: '/#testimonial-section' },
+  { label: 'Liên hệ', href: '/#contact' },
+  { label: 'Tài liệu', href: '/documentation' },
 ]
 
 const CourseData: CourseType[] = [
-  { name: 'Mobile Development' },
-  { name: 'Web Development' },
-  { name: 'Data Science' },
-  { name: 'Cloud Computing' },
+  { name: 'Tất cả sách' },
+  { name: 'Tiểu thuyết' },
+  { name: 'Kinh doanh' },
+  { name: 'Công nghệ' },
+  { name: 'Thiếu nhi' },
 ]
 
 const HourData: Hourtype[] = [
-  { name: '20hrs in a Month' },
-  { name: '30hrs in a Month' },
-  { name: '40hrs in a Month' },
-  { name: '50hrs in a Month' },
+  { name: 'Gợi ý thông minh từ AI' },
+  { name: 'Sách bán chạy' },
+  { name: 'Mới phát hành' },
+  { name: 'Đánh giá cao nhất' },
 ]
 
-const Companiesdata: { imgSrc: string }[] = [
+const Companiesdata: { imgSrc: string; name: string }[] = [
   {
-    imgSrc: '/images/slickCompany/airbnb.svg',
+    name: 'Penguin Random House',
+    imgSrc: '/images/publishers/penguin.svg',
   },
   {
-    imgSrc: '/images/slickCompany/hubspot.svg',
+    name: 'HarperCollins',
+    imgSrc: '/images/publishers/harper.svg',
   },
   {
-    imgSrc: '/images/slickCompany/microsoft.svg',
+    name: 'Simon & Schuster',
+    imgSrc: '/images/publishers/simon.svg',
   },
   {
-    imgSrc: '/images/slickCompany/google.svg',
+    name: 'Macmillan',
+    imgSrc: '/images/publishers/macmillan.svg',
   },
   {
-    imgSrc: '/images/slickCompany/walmart.svg',
+    name: 'Hachette Livre',
+    imgSrc: '/images/publishers/hachette.svg',
   },
   {
-    imgSrc: '/images/slickCompany/fedex.svg',
+    name: 'Scholastic',
+    imgSrc: '/images/publishers/scholastic.svg',
   },
 ]
 
 const CourseDetailData: CourseDetailType[] = [
   {
-    course: 'HTML, CSS, JS',
-    imageSrc: '/images/courses/coursesOne.svg',
-    profession: 'HTML, CSS, Javascript Development',
-    price: '40',
-    category: 'webdevelopment',
+    title: 'The Midnight Library',
+    imageSrc:
+      'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=800&q=80',
+    author: 'Matt Haig',
+    description:
+      'Hành trình xuyên qua vô số thực tại giúp độc giả suy ngẫm về những lựa chọn của chính mình.',
+    price: '189.000₫',
+    category: 'fiction',
+    endpoints: ['/api/books', '/api/reviews/book/{bookId}'],
   },
   {
-    course: 'Node.js',
-    imageSrc: '/images/courses/coursesTwo.svg',
-    profession: 'Backend with Node.js and Express.js',
-    price: '21',
-    category: 'webdevelopment',
+    title: 'Atomic Habits',
+    imageSrc:
+      'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=700&q=70',
+    author: 'James Clear',
+    description:
+      'Bí kíp xây dựng thói quen nhỏ nhưng bền vững, kết nối trực tiếp với trải nghiệm người dùng trong app.',
+    price: '215.000₫',
+    category: 'selfhelp',
+    endpoints: ['/api/user/wishlist', '/api/orders/checkout'],
   },
   {
-    course: 'Database',
-    imageSrc: '/images/courses/coursesThree.svg',
-    profession: 'Learn Mongodb with Mongoose',
-    price: '21',
-    category: 'webdevelopment',
+    title: 'No Rules Rules',
+    imageSrc:
+      'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=800&q=80',
+    author: 'Reed Hastings',
+    description:
+      'Câu chuyện Netflix đổi mới mô hình quản trị, phù hợp với nhóm sách kinh doanh hiện đại.',
+    price: '245.000₫',
+    category: 'business',
+    endpoints: ['/api/books/featured', '/api/orders/{orderId}'],
   },
   {
-    course: 'React.js',
-    imageSrc: '/images/courses/coursesFour.svg',
-    profession: 'Learn React with Redux toolkit',
-    price: '99',
-    category: 'webdevelopment',
+    title: 'Clean Architecture',
+    imageSrc:
+      'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=800&q=80',
+    author: 'Robert C. Martin',
+    description:
+      'Định hình kiến trúc phần mềm bền vững dành cho kỹ sư công nghệ.',
+    price: '399.000₫',
+    category: 'technology',
+    endpoints: ['/api/books/search', '/api/admin/books'],
   },
   {
-    course: 'React Native',
-    imageSrc: '/images/courses/coursesOne.svg',
-    profession: 'Learn React Native with Node.js',
-    price: '89',
-    category: 'mobiledevelopment',
+    title: 'The Very Hungry Caterpillar',
+    imageSrc:
+      'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80',
+    author: 'Eric Carle',
+    description:
+      'Truyện tranh thiếu nhi với hình ảnh sinh động, phù hợp cho chương trình thành viên gia đình.',
+    price: '129.000₫',
+    category: 'kids',
+    endpoints: ['/api/cart/add', '/api/notifications'],
   },
   {
-    course: 'Swift',
-    imageSrc: '/images/courses/coursesThree.svg',
-    profession: 'Learn Swift from Scratch',
-    price: '89',
-    category: 'mobiledevelopment',
+    title: 'Deep Work',
+    imageSrc:
+      'https://images.unsplash.com/photo-1457694587812-e8bf29a43845?auto=format&fit=crop&w=800&q=80',
+    author: 'Cal Newport',
+    description:
+      'Xây dựng khả năng tập trung sâu giúp độc giả tối ưu thời gian đọc và học.',
+    price: '205.000₫',
+    category: 'selfhelp',
+    endpoints: ['/api/user/notifications', '/api/coupons/apply'],
   },
   {
-    course: 'Flutter',
-    imageSrc: '/images/courses/coursesFour.svg',
-    profession: 'Flutter App Development',
-    price: '69',
-    category: 'mobiledevelopment',
+    title: 'The Lean Startup',
+    imageSrc:
+      'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80',
+    author: 'Eric Ries',
+    description:
+      'Bộ công cụ xây dựng sản phẩm tinh gọn, phù hợp với doanh nhân trẻ.',
+    price: '275.000₫',
+    category: 'business',
+    endpoints: ['/api/user/orders', '/api/orders/{orderId}/cancel'],
   },
   {
-    course: 'Onsen UI',
-    imageSrc: '/images/courses/coursesTwo.svg',
-    profession: 'Learn Onsen Ui with HTML, CSS',
-    price: '69',
-    category: 'mobiledevelopment',
+    title: 'Coding for Kids',
+    imageSrc:
+      'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=800&q=80',
+    author: 'Adrienne Tacke',
+    description:
+      'Bộ sách lập trình dành cho trẻ em với bài tập tương tác phong phú.',
+    price: '185.000₫',
+    category: 'kids',
+    endpoints: ['/api/user/wishlist', '/api/orders/checkout'],
   },
   {
-    course: 'TensorFlow',
-    imageSrc: '/images/courses/coursesTwo.svg',
-    profession: 'Learn TensorFlow with SQL',
-    price: '99',
-    category: 'datascience',
-  },
-  {
-    course: 'AWS',
-    imageSrc: '/images/courses/coursesFour.svg',
-    profession: 'AWS Deep Learning AMI',
-    price: '99',
-    category: 'datascience',
-  },
-  {
-    course: 'Bokeh',
-    imageSrc: '/images/courses/coursesOne.svg',
-    profession: 'Learn Bokeh with Python',
-    price: '99',
-    category: 'datascience',
-  },
-  {
-    course: 'Scikit',
-    imageSrc: '/images/courses/coursesThree.svg',
-    profession: 'Scikit with Python Development',
-    price: '89',
-    category: 'datascience',
-  },
-  {
-    course: 'Laas',
-    imageSrc: '/images/courses/coursesThree.svg',
-    profession: 'Infra-as-a-Service',
-    price: '21',
-    category: 'cloudcomputing',
-  },
-  {
-    course: 'Iaas',
-    imageSrc: '/images/courses/coursesFour.svg',
-    profession: 'Info-as-a-Service',
-    price: '29',
-    category: 'cloudcomputing',
-  },
-  {
-    course: 'Paas',
-    imageSrc: '/images/courses/coursesOne.svg',
-    profession: 'Platform-as-a-Service',
-    price: '99',
-    category: 'cloudcomputing',
-  },
-  {
-    course: 'Saas',
-    imageSrc: '/images/courses/coursesTwo.svg',
-    profession: 'Software-as-a-Service',
-    price: '58',
-    category: 'cloudcomputing',
-  },
-]
-
-const MentorData: MentorType[] = [
-  {
-    name: 'Senior UX Designer',
-    href: '#',
-    imageSrc: '/images/mentor/boy1.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Shoo Thar Mein',
-  },
-  {
-    name: 'Photoshop Instructor',
-    href: '#',
-    imageSrc: '/images/mentor/boy2.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Cristian Doru Barin',
-  },
-  {
-    name: 'SEO Expert',
-    href: '#',
-    imageSrc: '/images/mentor/boy3.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Tanzeel Ur Rehman',
-  },
-  {
-    name: 'UI/UX Designer',
-    href: '#',
-    imageSrc: '/images/mentor/boy4.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Andrew Williams',
-  },
-  {
-    name: 'Web Development / Web Design',
-    href: '#',
-    imageSrc: '/images/mentor/boy5.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Brad Schiff',
-  },
-  {
-    name: 'Adobe Certified Instructor',
-    href: '#',
-    imageSrc: '/images/mentor/girl1.svg',
-    imageAlt: "Front of men's Basic Tee in black.",
-    color: 'Daniel Walter Scott',
+    title: 'AI 2041',
+    imageSrc:
+      'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=700&q=70',
+    author: 'Kai-Fu Lee',
+    description:
+      'Viễn cảnh tương lai của trí tuệ nhân tạo kết hợp giữa khoa học và giả tưởng.',
+    price: '289.000₫',
+    category: 'technology',
+    endpoints: ['/api/ai/chat', '/api/ai/feedback'],
   },
 ]
 
 const TestimonialData: TestimonialType[] = [
   {
-    profession: 'UX/UI Designer',
-    name: 'Andrew Williams',
+    profession: 'Product Manager tại Readify',
+    name: 'Lan Anh',
     imgSrc: '/images/testimonial/user-1.jpg',
     starimg: '/images/testimonial/stars.png',
     detail:
-      "I have been a Junior Graphic Designer for more then 10 years. Some things are problem that I had and teach how to solve them. That's why this course is so great!",
+      '“BookVerse giúp đội ngũ của tôi thử nghiệm UX mới nhanh chóng nhờ mô phỏng rõ ràng cách các endpoint vận hành.”',
   },
   {
-    profession: 'UX/UI Designer',
-    name: 'Cristian Doru Barin',
+    profession: 'Lead Engineer tại Sách Xanh',
+    name: 'Nam Phan',
     imgSrc: '/images/testimonial/user-2.jpg',
     starimg: '/images/testimonial/stars.png',
     detail:
-      "I have been a Junior Graphic Designer for more then 10 years. Some things are problem that I had and teach how to solve them. That's why this course is so great!",
+      '“API giỏ hàng và đơn hàng rõ ràng, dễ dàng tích hợp với hệ thống thanh toán của chúng tôi chỉ trong vài ngày.”',
   },
   {
-    profession: 'UX/UI Designer',
-    name: 'Tanzeel Ur Rehman',
+    profession: 'Growth Marketer tại Mọt Sách',
+    name: 'Thảo Trần',
     imgSrc: '/images/testimonial/user-3.jpg',
     starimg: '/images/testimonial/stars.png',
     detail:
-      "I have been a Junior Graphic Designer for more then 10 years. Some things are problem that I had and teach how to solve them. That's why this course is so great!",
-  },
-  {
-    profession: 'UX/UI Designer',
-    name: 'Andrew Williams',
-    imgSrc: '/images/testimonial/user-1.jpg',
-    starimg: '/images/testimonial/stars.png',
-    detail:
-      "I have been a Junior Graphic Designer for more then 10 years. Some things are problem that I had and teach how to solve them. That's why this course is so great!",
+      '“Hệ thống thông báo và mã giảm giá giúp chúng tôi tăng 32% tỷ lệ quay lại trong chiến dịch hè.”',
   },
 ]
 
 const FooterLinkData: FooterLinkType[] = [
   {
-    section: 'Company',
+    section: 'Khám phá',
     links: [
-      { label: 'Home', href: '/#Home' },
-      { label: 'Courses', href: '/#Courses' },
-      { label: 'Mentors', href: '/#mentors-section' },
-      { label: 'Testimonial', href: '/#testimonial-section' },
-      { label: 'Join', href: '/#join-section' },
-      { label: 'Contact Us', href: '/#contact' },
+      { label: 'Trang chủ', href: '/#home' },
+      { label: 'Danh mục sách', href: '/#catalog' },
+      { label: 'Bản đồ API', href: '/#api-overview' },
+      { label: 'Ưu đãi & newsletter', href: '/#join-section' },
     ],
   },
   {
-    section: 'Support',
+    section: 'Tài khoản',
     links: [
-      { label: 'Help center', href: '/' },
-      { label: 'Terms of service', href: '/' },
-      { label: 'Legal', href: '/' },
-      { label: 'Privacy Policy', href: '/' },
-      { label: 'Status', href: '/' },
+      { label: 'Đăng nhập', href: '/#home' },
+      { label: 'Đơn hàng của tôi', href: '/#journey' },
+      { label: 'Danh sách yêu thích', href: '/#catalog' },
+      { label: 'Thông báo', href: '/#journey' },
+    ],
+  },
+  {
+    section: 'Hỗ trợ',
+    links: [
+      { label: 'Trung tâm trợ giúp', href: '/documentation' },
+      { label: 'Điều khoản dịch vụ', href: '/' },
+      { label: 'Chính sách bảo mật', href: '/' },
+      { label: 'Liên hệ', href: '/#contact' },
     ],
   },
 ]
@@ -279,7 +225,6 @@ export const GET = () => {
     HourData,
     Companiesdata,
     CourseDetailData,
-    MentorData,
     TestimonialData,
     FooterLinkData,
   })

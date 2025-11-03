@@ -30,15 +30,15 @@ const Footer = () => {
           <div className='col-span-4 flex flex-col gap-5'>
             <div>
               <Image
-                src='/images/logo/logo2.svg'
-                alt='Logo'
-                width={48}
-                height={64}
+                src='/images/logo/bookverse.svg'
+                alt='BookVerse Commerce'
+                width={160}
+                height={48}
               />
             </div>
             <p className='text-white text-lg font-medium leading-7'>
               {' '}
-              Level up your skills, and get dream <br /> job with passion.{' '}
+              BookVerse Commerce mang đến hành trình mua sách hiện đại với trải nghiệm API-first cho cả độc giả và quản trị viên.{' '}
             </p>
             <div className='flex gap-4'>
               <Link
@@ -103,14 +103,14 @@ const Footer = () => {
 
           <div className='col-span-4'>
             <h3 className='text-white text-xl font-semibold mb-6'>
-              Stay up to date
+              Đăng ký để nhận roadmap mới nhất
             </h3>
             <div className='relative text-white focus-within:text-white flex flex-row-reverse w-[50%] lg:w-full'>
               <input
-                type='Email address'
+                type='email'
                 name='q'
                 className='py-4 text-sm w-full text-white bg-white/15 rounded-md pl-4 focus:outline-hidden bg-emailbg focus:text-white'
-                placeholder='Your email address'
+                placeholder='Email của bạn'
                 autoComplete='off'
               />
               <div className='absolute inset-y-0 right-0 flex items-center pr-2'>
@@ -129,14 +129,7 @@ const Footer = () => {
       </div>
       <div className='py-3'>
         <h3 className='text-center text-white/60'>
-          @2025 - All Rights Reserved by{' '}
-          <Link
-            href='https://adminmart.com/'
-            target='_blank'
-            className='hover:text-white'>
-            {' '}
-            GetNextJs Templates.com
-          </Link>
+          ©2025 BookVerse Commerce. Thiết kế bởi đội ngũ trải nghiệm số dành cho ngành sách.
         </h3>
       </div>
     </div>

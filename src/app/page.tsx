@@ -7,8 +7,12 @@ import Testimonial from '@/app/components/Home/Testimonial'
 import Newsletter from '@/app/components/Home/Newsletter'
 import { Metadata } from 'next'
 import ContactForm from './components/Contact/Form'
+import ApiOverview from './components/Home/ApiOverview'
+
 export const metadata: Metadata = {
-  title: 'Si Educational',
+  title: 'BookVerse Commerce',
+  description:
+    'BookVerse Commerce giúp bạn trải nghiệm toàn bộ quy trình mua sách với các API hiện đại: từ xác thực, giỏ hàng, thanh toán tới gợi ý AI.',
 }
 
 export default function Home() {
@@ -16,6 +20,7 @@ export default function Home() {
     <main>
       <Hero />
       <Companies />
+      <ApiOverview />
       <NamesList />
       <Mentor />
       <Testimonial />
