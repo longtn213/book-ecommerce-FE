@@ -1,19 +1,19 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image'
+import Link from 'next/link'
 
 const Logo: React.FC = () => {
   return (
-    <Link href="/">
+    <Link href='/'>
       <Image
-        src="/images/logo/logo.svg"
-        alt="logo"
+        src='/images/logo/bookverse.svg'
+        alt='BookVerse Commerce'
         width={160}
-        height={50}
-        style={{ width: "auto", height: "auto" }}
+        height={48}
+        style={{ width: 'auto', height: 'auto' }}
         quality={100}
       />
     </Link>
-  );
-};
+  )
+}
 
-export default Logo;
+export default Logo

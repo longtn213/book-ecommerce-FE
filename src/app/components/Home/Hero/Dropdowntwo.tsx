@@ -31,7 +31,7 @@ const Dropdown = () => {
 
   return (
     <div className='w-full'>
-      <p className='text-lg text-gray-500'>Hours you going to invest?</p>
+      <p className='text-lg text-gray-500'>Chế độ khám phá phù hợp với bạn</p>
       <Listbox value={selected} onChange={setSelected}>
         <div className='relative mt-1'>
           <ListboxButton className='relative w-full cursor-default rounded-lg bg-white text-xl py-2 pr-10 text-left focus:outline-hidden focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm hover:cursor-pointer'>

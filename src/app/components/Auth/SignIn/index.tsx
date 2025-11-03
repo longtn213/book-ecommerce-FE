@@ -84,7 +84,7 @@ const Signin = () => {
             onClick={loginUser}
             type='submit'
             className='bg-primary w-full py-3 rounded-lg text-18 font-medium border text-white border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'>
-            Sign In {loading && <Loader />}
+            Đăng nhập {loading && <Loader />}
           </button>
         </div>
       </form>
@@ -92,12 +92,12 @@ const Signin = () => {
       <Link
         href='/'
         className='mb-2 inline-block text-base text-primary hover:underline'>
-        Forgot Password?
+        Quên mật khẩu?
       </Link>
       <p className='text-body-secondary text-black text-base'>
-        Not a member yet?{' '}
+        Chưa có tài khoản?{' '}
         <Link href='/' className='text-primary hover:underline'>
-          Sign Up
+          Đăng ký ngay
         </Link>
       </p>
     </>

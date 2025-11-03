@@ -57,17 +57,16 @@ const Testimonial = () => {
       <div className='container'>
         <div className='flex flex-col sm:flex-row gap-5 justify-between sm:items-center mb-6'>
           <h2 className='font-bold tracking-tight'>
-            What Our Happy <br /> Students Says
+            Cộng đồng BookVerse nói gì?
           </h2>
           <div>
             <button className='bg-transparent cursor-pointer hover:bg-primary text-primary font-semibold hover:text-white py-3 px-4 border border-primary hover:border-transparent rounded-sm duration-300'>
-              Give Your Review
+              Gửi phản hồi
             </button>
           </div>
         </div>
-        <p className='text-lg font-medium mb-6'>
-          Build skills with our courses and mentor <br /> from world-class
-          companies.
+        <p className='text-lg font-medium mb-6 text-black/70 max-w-3xl'>
+          Các đội ngũ sản phẩm và marketing sử dụng bộ API này để dựng prototype thương mại điện tử cho sách chỉ trong vài ngày – từ đăng nhập đến giao hàng.
         </p>
         <Slider {...settings}>
           {loading

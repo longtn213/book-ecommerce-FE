@@ -1,27 +1,29 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import Image from 'next/image'
 import { CourseDetailType } from '@/app/types/coursedetail'
 import CourseDetailSkeleton from '../../Skeleton/CourseDetail'
-import Link from 'next/link'
 
-interface Name {
-  imageSrc: string
-  course: string
-  price: string
-  profession: string
-  category:
-  | 'webdevelopment'
-  | 'mobiledevelopment'
-  | 'datascience'
-  | 'cloudcomputing'
-}
+const categories: {
+  id: 'all' | 'fiction' | 'business' | 'technology' | 'selfhelp' | 'kids'
+  label: string
+  icon: string
+}[] = [
+  { id: 'all', label: 'Tất cả', icon: 'solar:bookshelf-bold-duotone' },
+  { id: 'fiction', label: 'Tiểu thuyết', icon: 'mdi:book-open-page-variant' },
+  { id: 'business', label: 'Kinh doanh', icon: 'solar:chart-square-bold-duotone' },
+  { id: 'technology', label: 'Công nghệ', icon: 'solar:cpu-bolt-bold-duotone' },
+  { id: 'selfhelp', label: 'Phát triển bản thân', icon: 'solar:sun-2-bold-duotone' },
+  { id: 'kids', label: 'Thiếu nhi', icon: 'mdi:toy-brick' },
+]
 
 const NamesList = () => {
-  // -------------------------------------------------------------
   const [courseDetail, setCourseDetail] = useState<CourseDetailType[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<
+    (typeof categories)[number]['id']
+  >('all')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,209 +40,87 @@ const NamesList = () => {
     }
     fetchData()
   }, [])
-  // -------------------------------------------------------------
 
-  const [selectedButton, setSelectedButton] = useState<
-    | 'mobiledevelopment'
-    | 'webdevelopment'
-    | 'datascience'
-    | 'cloudcomputing'
-    | 'all'
-    | null
-  >('webdevelopment')
-  const mobileDevelopment = courseDetail.filter(
-    (name) => name.category === 'mobiledevelopment'
-  )
-  const webDevelopment = courseDetail.filter(
-    (name) => name.category === 'webdevelopment'
-  )
-  const dataScience = courseDetail.filter(
-    (name) => name.category === 'datascience'
-  )
-  const cloudComputing = courseDetail.filter(
-    (name) => name.category === 'cloudcomputing'
-  )
-
-  let selectedNames: Name[] = []
-  if (selectedButton === 'mobiledevelopment') {
-    selectedNames = mobileDevelopment
-  } else if (selectedButton === 'webdevelopment') {
-    selectedNames = webDevelopment
-  } else if (selectedButton === 'datascience') {
-    selectedNames = dataScience
-  } else if (selectedButton === 'cloudcomputing') {
-    selectedNames = cloudComputing
-  }
-
-  const nameElements = selectedNames.map((name, index) => (
-    <div id='Courses' key={index} className='shadow-lg rounded-xl group flex'>
-      <div className='py-5 lg:py-0 flex flex-col'>
-        <div className='overflow-hidden rounded-lg bg-gray-100'>
-          <Image
-            src={name.imageSrc}
-            alt={name.course}
-            width={700}
-            height={700}
-            className='h-full w-full object-cover object-center group-hover:scale-125 transition duration-300 ease-in-out'
-          />
-        </div>
-        <div className='p-4 flex flex-col justify-between gap-5 flex-1'>
-          <div className="flex flex-col gap-5">
-            <div className='flex items-center justify-between'>
-              <p className='block font-normal text-gray-900'>{name.course}</p>
-              <div className='block text-lg font-semibold text-success border-solid border-2 border-success rounded-md px-1'>
-                <p>${name.price}</p>
-              </div>
-            </div>
-            <Link href={'/'}>
-              <p
-                aria-hidden='true'
-                className='text-xl font-semibold group-hover:text-primary group-hover:cursor-pointer'>
-                {name.profession}
-              </p>
-            </Link>
-          </div>
-          <div className='flex justify-between border-solid border-2 rounded-md p-2'>
-            <p>12 Classes</p>
-            <div className='flex flex-row space-x-4'>
-              <div className='flex'>
-                <Image
-                  src={'/images/courses/account.svg'}
-                  width={18}
-                  height={20}
-                  alt='circle'
-                />
-                <p className='text-lightgrey ml-1'>120</p>
-              </div>
-              <div className='flex'>
-                <Image
-                  src={'/images/courses/Star.svg'}
-                  width={18}
-                  height={20}
-                  alt='star'
-                />
-                <p className='ml-1'>4.5</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ))
+  const filteredBooks = useMemo(() => {
+    if (selectedCategory === 'all') return courseDetail
+    return courseDetail.filter((book) => book.category === selectedCategory)
+  }, [courseDetail, selectedCategory])
 
   return (
-    <section id='courses-section'>
+    <section id='catalog'>
       <div className='container mx-auto max-w-7xl px-4'>
-        <div className='flex flex-col sm:flex-row justify-between sm:items-center gap-5 mb-4'>
-          <h2 className='font-bold tracking-tight'>Popular Courses</h2>
+        <div className='flex flex-col lg:flex-row justify-between lg:items-center gap-6 mb-8'>
           <div>
-            <button className='bg-transparent cursor-pointer hover:bg-primary text-primary font-medium hover:text-white py-3 px-4 border border-primary hover:border-transparent rounded-sm duration-300'>
-              Explore Classes
-            </button>
+            <h2 className='font-bold tracking-tight'>Danh mục sách nổi bật</h2>
+            <p className='text-black/60 mt-3 max-w-2xl'>
+              Chọn nhóm sách để xem trước giao diện danh sách sản phẩm kết nối trực tiếp tới các endpoint /api/books và hệ thống đánh giá.
+            </p>
           </div>
+          <button className='bg-transparent cursor-pointer hover:bg-primary text-primary font-medium hover:text-white py-3 px-4 border border-primary hover:border-transparent rounded-sm duration-300'>
+            Tải danh mục đầy đủ
+          </button>
         </div>
-        <div className='flex nowhitespace space-x-5 rounded-xl bg-white p-1 overflow-x-auto mb-4'>
-          {/* FOR DESKTOP VIEW */}
-          <button
-            onClick={() => setSelectedButton('webdevelopment')}
-            className={
-              'bg-white' +
-              (selectedButton === 'webdevelopment'
-                ? 'text-black border-b-2 border-yellow-200'
-                : 'text-black/40') +
-              ' pb-2 text-lg hidden sm:block hover:cursor-pointer'
-            }>
-            Web Development
-          </button>
-          <button
-            onClick={() => setSelectedButton('mobiledevelopment')}
-            className={
-              'bg-white ' +
-              (selectedButton === 'mobiledevelopment'
-                ? 'text-black border-b-2 border-yellow-200'
-                : 'text-black/40') +
-              ' pb-2 text-lg hidden sm:block hover:cursor-pointer'
-            }>
-            Mobile Development
-          </button>
-          <button
-            onClick={() => setSelectedButton('datascience')}
-            className={
-              'bg-white ' +
-              (selectedButton === 'datascience'
-                ? 'text-black border-b-2 border-yellow-200'
-                : 'text-black/40') +
-              ' pb-2 text-lg hidden sm:block hover:cursor-pointer'
-            }>
-            Data Science
-          </button>
-          <button
-            onClick={() => setSelectedButton('cloudcomputing')}
-            className={
-              'bg-white ' +
-              (selectedButton === 'cloudcomputing'
-                ? 'text-black border-b-2 border-yellow-200'
-                : 'text-black/40') +
-              ' pb-2 text-lg hidden sm:block hover:cursor-pointer'
-            }>
-            Cloud Computing
-          </button>
-
-          {/* FOR MOBILE VIEW */}
-          <Icon
-            icon='solar:global-line-duotone'
-            onClick={() => setSelectedButton('webdevelopment')}
-            className={
-              'text-5xl sm:hidden block ' +
-              (selectedButton === 'webdevelopment'
-                ? 'border-b-2 border-yellow-200'
-                : 'text-gray-400')
-            }
-          />
-
-          <Icon
-            icon='solar:smartphone-line-duotone'
-            onClick={() => setSelectedButton('mobiledevelopment')}
-            className={
-              'text-5xl sm:hidden block ' +
-              (selectedButton === 'mobiledevelopment'
-                ? 'border-b-2 border-yellow-200'
-                : 'text-gray-400')
-            }
-          />
-
-          <Icon
-            icon='solar:database-line-duotone'
-            onClick={() => setSelectedButton('datascience')}
-            className={
-              'text-5xl sm:hidden block ' +
-              (selectedButton === 'datascience'
-                ? 'border-b-2 border-yellow-200'
-                : 'text-gray-400')
-            }
-          />
-
-          <Icon
-            icon='solar:cloud-line-duotone'
-            onClick={() => setSelectedButton('cloudcomputing')}
-            className={
-              'text-5xl sm:hidden block ' +
-              (selectedButton === 'cloudcomputing'
-                ? 'border-b-2 border-yellow-200'
-                : 'text-gray-400')
-            }
-          />
+        <div className='flex nowhitespace space-x-4 rounded-xl bg-white/90 p-2 overflow-x-auto mb-6 shadow-sm'>
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm sm:text-base transition ${
+                selectedCategory === category.id
+                  ? 'bg-primary text-white shadow'
+                  : 'text-black/50 hover:text-primary'
+              }`}>
+              <Icon icon={category.icon} className='text-lg sm:text-xl' />
+              {category.label}
+            </button>
+          ))}
         </div>
         <div>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <CourseDetailSkeleton key={i} />
               ))
-            ) : nameElements.length > 0 ? (
-              nameElements
+            ) : filteredBooks.length > 0 ? (
+              filteredBooks.map((book) => (
+                <article
+                  key={book.title}
+                  className='group flex flex-col overflow-hidden rounded-2xl border border-primary/10 bg-white shadow-lg shadow-primary/5 transition hover:-translate-y-1 hover:shadow-primary/20'>
+                  <div className='overflow-hidden rounded-t-2xl bg-gray-100'>
+                    <Image
+                      src={book.imageSrc}
+                      alt={book.title}
+                      width={600}
+                      height={420}
+                      className='h-56 w-full object-cover transition duration-500 ease-in-out group-hover:scale-110'
+                    />
+                  </div>
+                  <div className='flex flex-1 flex-col gap-4 p-5'>
+                    <div className='flex items-start justify-between gap-3'>
+                      <span className='rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary uppercase tracking-wide'>
+                        {categories.find((c) => c.id === book.category)?.label}
+                      </span>
+                      <span className='text-sm font-semibold text-success'>{book.price}</span>
+                    </div>
+                    <div className='space-y-2'>
+                      <h3 className='text-xl font-semibold text-black'>{book.title}</h3>
+                      <p className='text-sm font-medium text-black/60'>Tác giả: {book.author}</p>
+                      <p className='text-sm text-black/70 leading-6'>{book.description}</p>
+                    </div>
+                    <div className='flex flex-wrap gap-2'>
+                      {book.endpoints.map((endpoint) => (
+                        <span
+                          key={endpoint}
+                          className='rounded-md bg-cream px-2 py-1 text-xs font-mono text-primary border border-primary/20'>
+                          {endpoint}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))
             ) : (
-              <p>No data to show</p>
+              <p className='text-black/60'>Hiện chưa có sách cho danh mục này.</p>
             )}
           </div>
         </div>

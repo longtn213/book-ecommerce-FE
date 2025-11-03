@@ -1,11 +1,9 @@
 export type CourseDetailType = {
-  course: string
+  title: string
   imageSrc: string
-  profession: string
+  author: string
+  description: string
   price: string
-  category:
-    | 'mobiledevelopment'
-    | 'webdevelopment'
-    | 'datascience'
-    | 'cloudcomputing'
+  category: 'fiction' | 'business' | 'technology' | 'selfhelp' | 'kids'
+  endpoints: string[]
 }

@@ -73,14 +73,14 @@ const ContactForm = () => {
     <section id='contact'>
       <div className='container'>
         <div className='relative'>
-          <h2 className='mb-9 font-bold tracking-tight'>Get in Touch</h2>
+          <h2 className='mb-9 font-bold tracking-tight'>Kết nối với BookVerse</h2>
           <form
             onSubmit={handleSubmit}
             className='flex flex-wrap w-full m-auto justify-between'>
             <div className='sm:flex gap-3 w-full'>
               <div className='mx-0 my-2.5 flex-1'>
                 <label htmlFor='fname' className='pb-3 inline-block text-base'>
-                  First Name
+                  Họ
                 </label>
                 <input
                   id='fname'
@@ -88,13 +88,13 @@ const ContactForm = () => {
                   name='firstname'
                   value={formData.firstname}
                   onChange={handleChange}
-                  placeholder='John'
+                  placeholder='Nguyen'
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
               </div>
               <div className='mx-0 my-2.5 flex-1'>
                 <label htmlFor='lname' className='pb-3 inline-block text-base'>
-                  Last Name
+                  Tên
                 </label>
                 <input
                   id='lname'
@@ -102,7 +102,7 @@ const ContactForm = () => {
                   name='lastname'
                   value={formData.lastname}
                   onChange={handleChange}
-                  placeholder='Doe'
+                  placeholder='An'
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
               </div>
@@ -110,7 +110,7 @@ const ContactForm = () => {
             <div className='sm:flex gap-3 w-full'>
               <div className='mx-0 my-2.5 flex-1'>
                 <label htmlFor='email' className='pb-3 inline-block text-base'>
-                  Email address
+                  Email
                 </label>
                 <input
                   id='email'
@@ -126,7 +126,7 @@ const ContactForm = () => {
                 <label
                   htmlFor='Phnumber'
                   className='pb-3 inline-block text-base'>
-                  Phone Number
+                  Số điện thoại
                 </label>
                 <input
                   id='Phnumber'
@@ -141,7 +141,7 @@ const ContactForm = () => {
             </div>
             <div className='w-full mx-0 my-2.5 flex-1'>
               <label htmlFor='message' className='text-base inline-block'>
-                Message
+                Lời nhắn
               </label>
               <textarea
                 id='message'
@@ -149,7 +149,7 @@ const ContactForm = () => {
                 value={formData.Message}
                 onChange={handleChange}
                 className='w-full mt-2 rounded-2xl px-5 py-3 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
-                placeholder='Anything else you wanna communicate'></textarea>
+                placeholder='Chia sẻ nhu cầu tích hợp hoặc câu hỏi của bạn'></textarea>
             </div>
             <div className='mx-0 my-2.5 w-full'>
               <button
@@ -161,7 +161,7 @@ const ContactForm = () => {
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-primary border-primary text-white hover:bg-transparent hover:text-primary cursor-pointer'
                     }`}>
-                Submit
+                Gửi thông tin
               </button>
             </div>
           </form>

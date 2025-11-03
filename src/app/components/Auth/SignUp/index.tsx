@@ -55,7 +55,7 @@ const SignUp = () => {
         <div className='mb-[22px]'>
           <input
             type='text'
-            placeholder='Name'
+            placeholder='Họ và tên'
             name='name'
             required
             className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
@@ -64,7 +64,7 @@ const SignUp = () => {
         <div className='mb-[22px]'>
           <input
             type='email'
-            placeholder='Email'
+            placeholder='Email công việc'
             name='email'
             required
             className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
@@ -73,7 +73,7 @@ const SignUp = () => {
         <div className='mb-[22px]'>
           <input
             type='password'
-            placeholder='Password'
+            placeholder='Mật khẩu'
             name='password'
             required
             className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
@@ -83,26 +83,26 @@ const SignUp = () => {
           <button
             type='submit'
             className='flex w-full items-center text-18 font-medium justify-center rounded-md  text-white bg-primary px-5 py-3 text-darkmode transition duration-300 ease-in-out hover:bg-transparent hover:text-primary border-primary border hover:cursor-pointer'>
-            Sign Up {loading && <Loader />}
+            Tạo tài khoản {loading && <Loader />}
           </button>
         </div>
       </form>
 
       <p className='text-body-secondary mb-4 text-black text-base'>
-        By creating an account you are agree with our{' '}
+        Khi đăng ký, bạn đồng ý với{' '}
         <Link href='/#' className='text-primary hover:underline'>
-          Privacy
+          Chính sách bảo mật
         </Link>{' '}
-        and{' '}
+        và{' '}
         <Link href='/#' className='text-primary hover:underline'>
-          Policy
+          Điều khoản sử dụng
         </Link>
       </p>
 
       <p className='text-body-secondary text-black text-base'>
-        Already have an account?
+        Đã có tài khoản?
         <Link href='/' className='pl-2 text-primary hover:underline'>
-          Sign In
+          Đăng nhập
         </Link>
       </p>
     </>
