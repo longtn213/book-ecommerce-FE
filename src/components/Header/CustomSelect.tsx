@@ -1,60 +1,92 @@
 import React, { useState, useEffect } from "react";
 
-const CustomSelect = ({ options }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(options[0]);
+interface Option {
+    label: string;
+    value: string;
+}
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+interface CustomSelectProps {
+    options?: Option[];
+}
 
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
-    toggleDropdown();
-  };
+const CustomSelect: React.FC<CustomSelectProps> = ({ options = [] }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
-  useEffect(() => {
-    // closing modal while clicking outside
-    function handleClickOutside(event) {
-      if (!event.target.closest(".dropdown-content")) {
-        toggleDropdown();
-      }
-    }
+    // ✅ Set giá trị mặc định (All Categories)
+    useEffect(() => {
+        if (options.length > 0) {
+            setSelectedOption(options[0]);
+        }
+    }, [options]);
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    // ✅ Toggle dropdown
+    const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+    // ✅ Khi chọn 1 option
+    const handleOptionClick = (option: Option) => {
+        setSelectedOption(option);
+        setIsOpen(false);
     };
-  }, []);
 
-  return (
-    <div className="dropdown-content custom-select relative" style={{ width: "200px" }}>
-      <div
-        className={`select-selected whitespace-nowrap ${
-          isOpen ? "select-arrow-active" : ""
-        }`}
-        onClick={toggleDropdown}
-      >
-        {selectedOption.label}
-      </div>
-      <div className={`select-items ${isOpen ? "" : "select-hide"}`}>
-        {options.slice(1, -1).map((option, index) => (
-          <div
-            key={index}
-            onClick={() => handleOptionClick(option)}
-            className={`select-item ${
-              selectedOption === option ? "same-as-selected" : ""
-            }`}
-          >
-            {option.label}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    // ✅ Đóng dropdown khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!(event.target as HTMLElement)?.closest(".custom-select-container")) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div
+            className="custom-select-container relative inline-block w-[200px]"
+        >
+            {/* Hiển thị lựa chọn */}
+            <div
+                onClick={toggleDropdown}
+                className={`select-selected flex items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer 
+        ${isOpen ? "border-blue-500" : "border-gray-300"}`}
+            >
+        <span className="truncate">
+          {selectedOption?.label || "Select category"}
+        </span>
+                <svg
+                    className={`w-4 h-4 ml-2 transform transition-transform ${
+                        isOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                >
+                    <path d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+
+            {/* Dropdown items */}
+            {isOpen && (
+                <div
+                    className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg
+          max-h-[250px] overflow-y-auto z-50"
+                >
+                    {options.map((option, index) => (
+                        <div
+                            key={index}
+                            onClick={() => handleOptionClick(option)}
+                            className={`px-3 py-2 cursor-pointer text-gray-700 hover:bg-blue-50 hover:text-blue-600 
+              ${selectedOption?.value === option.value ? "bg-blue-100 text-blue-600 font-medium" : ""}`}
+                        >
+                            {option.label}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default CustomSelect;

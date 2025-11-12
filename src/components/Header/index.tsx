@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import CustomSelect from "./CustomSelect";
 import { menuData } from "./menuData";
 import Dropdown from "./Dropdown";
@@ -8,44 +9,42 @@ import { useAppSelector } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { selectTotalPrice } from "@/redux/features/cart-slice";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
-import Image from "next/image";
+import {fetchCategories} from "@/services/categoryService";
+
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [navigationOpen, setNavigationOpen] = useState(false);
-  const [stickyMenu, setStickyMenu] = useState(false);
-  const { openCartModal } = useCartModalContext();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [navigationOpen, setNavigationOpen] = useState(false);
+    const [stickyMenu, setStickyMenu] = useState(false);
+    const [categories, setCategories] = useState<{ label: string; value: string }[]>([]);
 
-  const product = useAppSelector((state) => state.cartReducer.items);
-  const totalPrice = useSelector(selectTotalPrice);
+    const { openCartModal } = useCartModalContext();
+    const product = useAppSelector((state) => state.cartReducer.items);
+    const totalPrice = useSelector(selectTotalPrice);
 
-  const handleOpenCartModal = () => {
-    openCartModal();
-  };
+    // Sticky menu
+    const handleStickyMenu = () => setStickyMenu(window.scrollY >= 80);
 
-  // Sticky menu
-  const handleStickyMenu = () => {
-    if (window.scrollY >= 80) {
-      setStickyMenu(true);
-    } else {
-      setStickyMenu(false);
-    }
-  };
+    useEffect(() => {
+        window.addEventListener("scroll", handleStickyMenu);
+        return () => window.removeEventListener("scroll", handleStickyMenu);
+    }, []);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleStickyMenu);
-  });
+    // Fetch categories
+    useEffect(() => {
+        const getCategories = async () => {
+            const data = await fetchCategories();
+            const formatted = data.map((c: any) => ({
+                label: c.name,
+                value: c.id.toString(),
+            }));
+            setCategories([{ label: "All Categories", value: "0" }, ...formatted]);
+        };
 
-  const options = [
-    { label: "All Categories", value: "0" },
-    { label: "Desktop", value: "1" },
-    { label: "Laptop", value: "2" },
-    { label: "Monitor", value: "3" },
-    { label: "Phone", value: "4" },
-    { label: "Watch", value: "5" },
-    { label: "Mouse", value: "6" },
-    { label: "Tablet", value: "7" },
-  ];
+        getCategories();
+    }, []);
+
+    const handleOpenCartModal = () => openCartModal();
 
   return (
     <header
@@ -74,7 +73,7 @@ const Header = () => {
             <div className="max-w-[475px] w-full">
               <form>
                 <div className="flex items-center">
-                  <CustomSelect options={options} />
+                  <CustomSelect options={categories} />
 
                   <div className="relative max-w-[333px] sm:min-w-[333px] w-full">
                     {/* <!-- divider --> */}
@@ -148,7 +147,7 @@ const Header = () => {
                   24/7 SUPPORT
                 </span>
                 <p className="font-medium text-custom-sm text-dark">
-                  (+965) 7492-3477
+                  036 360 9262
                 </p>
               </div>
             </div>
