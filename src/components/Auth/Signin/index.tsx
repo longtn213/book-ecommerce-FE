@@ -132,12 +132,12 @@ const Signin = () => {
                 </div>
 
                 <p className="text-center mt-6">
-                  Don&apos;t have an account?
+                  Bạn&apos;chưa có tài khoản?
                   <Link
                     href="/signup"
                     className="text-dark ease-out duration-200 hover:text-blue pl-2"
                   >
-                    Sign Up Now!
+                    Đăng kí ngay!
                   </Link>
                 </p>
               </form>

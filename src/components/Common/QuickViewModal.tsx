@@ -137,12 +137,18 @@ const QuickViewModal = () => {
                       </svg>
                     </button>
 
-                    <Image
-                      src={product?.imgs?.previews?.[activePreview]}
-                      alt="products-details"
-                      width={400}
-                      height={400}
-                    />
+                      {product?.imgs?.previews?.[activePreview] ? (
+                          <Image
+                              src={product.imgs.previews[activePreview]}
+                              alt="products-details"
+                              width={400}
+                              height={400}
+                          />
+                      ) : (
+                          <div className="w-[400px] h-[400px] flex items-center justify-center bg-gray-100 text-gray-400">
+                              No image
+                          </div>
+                      )}
                   </div>
                 </div>
               </div>

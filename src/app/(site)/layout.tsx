@@ -17,42 +17,44 @@ import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
 
 export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
+                                       children,
+                                   }: {
+    children: React.ReactNode;
 }) {
-  const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
-  return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body>
+    return (
+        <html lang="en" suppressHydrationWarning>
+        <body
+            data-new-gr-c-s-check-loaded="14.1261.0"
+            data-gr-ext-installed=""
+        >
         {loading ? (
-          <PreLoader />
+            <PreLoader />
         ) : (
-          <>
             <ReduxProvider>
-              <CartModalProvider>
-                <ModalProvider>
-                  <PreviewSliderProvider>
-                    <Header />
-                    {children}
+                <CartModalProvider>
+                    <ModalProvider>
+                        <PreviewSliderProvider>
+                            <Header />
+                            {children}
 
-                    <QuickViewModal />
-                    <CartSidebarModal />
-                    <PreviewSliderModal />
-                  </PreviewSliderProvider>
-                </ModalProvider>
-              </CartModalProvider>
+                            <QuickViewModal />
+                            <CartSidebarModal />
+                            <PreviewSliderModal />
+                        </PreviewSliderProvider>
+                    </ModalProvider>
+                </CartModalProvider>
+                <ScrollToTop />
+                <Footer />
             </ReduxProvider>
-            <ScrollToTop />
-            <Footer />
-          </>
         )}
-      </body>
-    </html>
-  );
+        </body>
+        </html>
+    );
 }
