@@ -1,9 +1,9 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser } from "@/services/authService";
 import { getUserCart } from "@/services/cartService";
 import {router} from "next/client";
+import {getCurrentUser} from "@/services/userService";
 
 interface AuthContextType {
     user: any;

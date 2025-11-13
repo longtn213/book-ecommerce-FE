@@ -33,7 +33,10 @@ export default function RootLayout({
 
     return (
         <html lang="en" suppressHydrationWarning>
-        <body>
+        <body
+            data-new-gr-c-s-check-loaded="14.1261.0"
+            data-gr-ext-installed=""
+        >
 
         {/* ---------------- AUTH PROVIDER LUÔN BAO TOÀN BỘ APP ---------------- */}
         <AuthProvider>

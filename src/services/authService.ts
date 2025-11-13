@@ -21,7 +21,3 @@ export const register = async (data: {
         throw error;
     }
 };
-export const getCurrentUser = async () => {
-    const res = await axiosInstance.get("/user");
-    return res.data.data;
-};
