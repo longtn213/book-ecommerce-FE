@@ -2,7 +2,7 @@ import axiosInstance from "@/services/axiosInstance";
 
 export const getCurrentUser = async () => {
     const res = await axiosInstance.get("/user");
-    return res.data;
+    return res.data.data;
 };
 export const updateUserProfile = async (data) => {
     const res = await axiosInstance.put("/user/update", data);
