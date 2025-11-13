@@ -62,7 +62,9 @@ const MyAccount = () => {
 
 
     // PROFILE INPUT CHANGE
-    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleProfileChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
