@@ -4,14 +4,16 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import { login } from "@/services/authService";
+import { loginApi } from "@/services/authService";
 import { notification } from "antd";
+import {useAuth} from "@/hook/useAuth";
 
 const Signin = () => {
     const router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
 
     // ✅ Ant Design notification hook
     const [api, contextHolder] = notification.useNotification();
@@ -21,15 +23,11 @@ const Signin = () => {
         setLoading(true);
 
         try {
-            const res = await login(username, password);
+            const res = await loginApi(username, password);
 
             if (res.success && res.data?.token) {
-                // Lưu token và user info
-                localStorage.setItem("token", res.data.token);
-                localStorage.setItem("username", res.data.username);
-                localStorage.setItem("email", res.data.email);
+                await login(res.data.token);
 
-                // ✅ Hiển thị notification thành công (dùng api từ hook)
                 api.success({
                     message: "Đăng nhập thành công 🎉",
                     description: `Chào mừng ${res.data.username}!`,
@@ -42,8 +40,10 @@ const Signin = () => {
                     },
                 });
 
-                // Redirect về trang chủ
-                setTimeout(() => router.push("/"), 3000);
+                setTimeout(() => {
+                    router.push("/");
+                }, 800);
+
             } else {
                 api.error({
                     message: "Đăng nhập thất bại",
