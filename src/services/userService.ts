@@ -29,4 +29,7 @@ export const uploadAvatarApi = async (file) => {
 
     return res.data;
 };
-
+export const getUserOrders = async () => {
+    const res = await axiosInstance.get("/user/orders");
+    return res.data.data;
+};

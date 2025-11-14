@@ -317,8 +317,7 @@ const MyAccount = () => {
                                                     ? "text-white bg-blue"
                                                     : "text-dark-2 bg-gray-1"
                                             }`}
-                                        >
-                                            Account Details
+                                        > Thông tin cá nhân
                                         </button>
 
                                         <button
@@ -330,17 +329,16 @@ const MyAccount = () => {
                                                     : "text-dark-2 bg-gray-1"
                                             }`}
                                         >
-                                            Orders
+                                            Đơn hàng
                                         </button>
 
                                         <button
                                             onClick={() => {
-                                                localStorage.removeItem("token");
-                                                window.location.href = "/";
+                                                logout()
                                             }}
                                             className="flex items-center rounded-md gap-2.5 py-3 px-4.5 text-dark-2 bg-gray-1 hover:bg-blue hover:text-white transition"
                                         >
-                                            Logout
+                                            Đăng xuất
                                         </button>
                                     </div>
                                 </div>
