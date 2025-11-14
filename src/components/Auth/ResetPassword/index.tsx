@@ -28,9 +28,9 @@ export default function ResetPassword() {
                 message: "Liên kết không hợp lệ",
                 description: "Token đặt lại mật khẩu không tồn tại.",
             });
-            router.push("/login");
+            router.push("/signin");
         }
-    }, [token]);
+    }, [api, router, token]);
 
     const validate = () => {
         let err = false;
