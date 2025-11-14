@@ -21,3 +21,19 @@ export const register = async (data: {
         throw error;
     }
 };
+export const forgotPasswordApi = async (data: { email: string, domain: string }) => {
+    try {
+        const res = await axiosInstance.post("/auth/forgot-password", data);
+        return res.data;
+    } catch (error: any) {
+        throw error.response?.data || error;
+    }
+};
+export const resetPasswordApi = async (data: { token: string; newPassword: string }) => {
+    try {
+        const res = await axiosInstance.post("/auth/reset-password", data);
+        return res.data;
+    } catch (err: any) {
+        throw err.response?.data || err;
+    }
+};

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, {useState} from "react";
+import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import { loginApi } from "@/services/authService";
-import { notification } from "antd";
+import {forgotPasswordApi, loginApi} from "@/services/authService";
+import {notification} from "antd";
 import {useAuth} from "@/hook/useAuth";
 
 const Signin = () => {
@@ -13,13 +13,93 @@ const Signin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const {login} = useAuth();
+    const [loginUsernameError, setLoginUsernameError] = useState("");
+    const [loginPasswordError, setLoginPasswordError] = useState("");
 
     // ✅ Ant Design notification hook
     const [api, contextHolder] = notification.useNotification();
+    const [openForgot, setOpenForgot] = useState(false);
+    const [forgotEmail, setForgotEmail] = useState("");
+    const [sending, setSending] = useState(false);
+    const [forgotEmailError, setForgotEmailError] = useState("");
+    const validateEmail = (email: string) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+    const resetForgotState = () => {
+        setForgotEmail("");
+        setForgotEmailError("");
+        setSending(false);
+    };
+    const handleForgot = async () => {
+        setForgotEmailError("");
+
+        if (!forgotEmail) {
+            setForgotEmailError("Vui lòng nhập email");
+            return;
+        }
+
+        if (!validateEmail(forgotEmail)) {
+            setForgotEmailError("Email không hợp lệ");
+            return;
+        }
+
+        setSending(true);
+
+        try {
+            const domain = typeof window !== "undefined" ? window.location.origin : "";
+            const email = forgotEmail.trim();
+            const res = await forgotPasswordApi({email, domain});
+
+            if (res.success) {
+                api.success({
+                    message: "Đã gửi email khôi phục",
+                    description: `Vui lòng kiểm tra ${forgotEmail}`,
+                    placement: "topRight",
+                });
+                resetForgotState();
+                setOpenForgot(false);
+                setForgotEmail("");
+            } else {
+                api.error({
+                    message: "Gửi thất bại",
+                    description: res.message || "Không thể gửi email",
+                    placement: "topRight",
+                });
+            }
+        } catch (error) {
+            api.error({
+                message: "Lỗi máy chủ",
+                description: "Không thể gửi email khôi phục",
+                placement: "topRight",
+            });
+        } finally {
+            setSending(false);
+        }
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Reset lỗi cũ
+        setLoginUsernameError("");
+        setLoginPasswordError("");
+
+        let hasError = false;
+
+        if (!username.trim()) {
+            setLoginUsernameError("Vui lòng nhập tên đăng nhập");
+            hasError = true;
+        }
+
+        if (!password.trim()) {
+            setLoginPasswordError("Vui lòng nhập mật khẩu");
+            hasError = true;
+        }
+
+        if (hasError) return;
         setLoading(true);
 
         try {
@@ -68,7 +148,7 @@ const Signin = () => {
             {/* ✅ ContextHolder phải nằm ngay sau open tag */}
             {contextHolder}
 
-            <Breadcrumb title="Signin" pages={["Signin"]} />
+            <Breadcrumb title="Đăng nhập" pages={["Đăng nhập"]}/>
 
             <section className="overflow-hidden py-20 bg-gray-2">
                 <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -90,10 +170,25 @@ const Signin = () => {
                                     id="username"
                                     placeholder="Tên đăng nhập"
                                     value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                    className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                    onChange={(e) => {
+                                        setUsername(e.target.value);
+                                        if (loginUsernameError) setLoginUsernameError("");
+                                    }}
+                                    className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border
+        ${loginUsernameError ? "input-error" : "border-gray-300 bg-gray-100"}`}
+                                    style={{
+                                        borderRadius: "8px",
+                                        borderColor: loginUsernameError ? "#ef4444" : "#d1d5db",
+                                        backgroundColor: loginUsernameError ? "#fef2f2" : "#f3f4f6",
+                                    }}
                                 />
+
+                                {loginUsernameError && (
+                                    <p className="text-error">
+                                        <span style={{ fontSize: "14px" }}>⚠️</span>
+                                        {loginUsernameError}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="mb-5">
@@ -105,10 +200,25 @@ const Signin = () => {
                                     id="password"
                                     placeholder="Nhập mật khẩu"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                    onChange={(e) => {
+                                        setPassword(e.target.value);
+                                        if (loginPasswordError) setLoginPasswordError("");
+                                    }}
+                                    className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border
+        ${loginPasswordError ? "input-error" : "border-gray-300 bg-gray-100"}`}
+                                    style={{
+                                        borderRadius: "8px",
+                                        borderColor: loginPasswordError ? "#ef4444" : "#d1d5db",
+                                        backgroundColor: loginPasswordError ? "#fef2f2" : "#f3f4f6",
+                                    }}
                                 />
+
+                                {loginPasswordError && (
+                                    <p className="text-error">
+                                        <span style={{ fontSize: "14px" }}>⚠️</span>
+                                        {loginPasswordError}
+                                    </p>
+                                )}
                             </div>
 
                             <button
@@ -120,8 +230,8 @@ const Signin = () => {
                             </button>
 
                             <a
-                                href="#"
-                                className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
+                                onClick={() => setOpenForgot(true)}
+                                className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark cursor-pointer"
                             >
                                 Bạn quên mật khẩu?
                             </a>
@@ -139,6 +249,67 @@ const Signin = () => {
                     </div>
                 </div>
             </section>
+            {openForgot && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-xl animate-fadeIn">
+                        <h2 className="text-xl font-semibold text-dark mb-4 text-center">
+                            Quên mật khẩu
+                        </h2>
+
+                        <p className="text-center text-dark-5 mb-5">
+                            Nhập email của bạn để nhận liên kết đặt lại mật khẩu.
+                        </p>
+
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleForgot();
+                            }}
+                        >
+                            <input
+                                type="email"
+                                placeholder="Nhập email của bạn"
+                                value={forgotEmail}
+                                onChange={(e) => {
+                                    setForgotEmail(e.target.value);
+                                    if (forgotEmailError) setForgotEmailError("");
+                                }}
+                                className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border ${forgotEmailError ? "input-error" : ""}`}
+                                style={{
+                                    borderRadius: "8px",
+                                    borderColor: forgotEmailError ? "#ef4444" : "#d1d5db",
+                                    backgroundColor: forgotEmailError ? "#fef2f2" : "#f3f4f6",
+                                }}
+                            />
+
+                            {forgotEmailError && (
+                                <p className="text-error">⚠️ {forgotEmailError}</p>
+                            )}
+
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        resetForgotState();
+                                        setOpenForgot(false);
+                                    }}
+                                    className="flex-1 py-3 rounded-lg border border-gray-3 text-dark hover:bg-gray-2"
+                                >
+                                    Hủy
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={sending}
+                                    className="flex-1 py-3 rounded-lg bg-dark text-white hover:bg-blue duration-150"
+                                >
+                                    {sending ? "Đang gửi..." : "Gửi email"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
