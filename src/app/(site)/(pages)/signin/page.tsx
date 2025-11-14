@@ -2,7 +2,7 @@ import Signin from "@/components/Auth/Signin";
 import React from "react";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Signin Page | Book ecommerce template",
+    title: "BookCommerce | Book E-commerce",
   description: "This is Signin Page for E-Book Template",
   // other metadata
 };

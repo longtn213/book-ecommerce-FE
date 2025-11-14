@@ -222,3 +222,39 @@ input[type='search']::-webkit-search-results-decoration {
     align-items: center;
     gap: 6px;
 }
+/* Giống input: rounded-md border border-gray-300 bg-gray-100 py-2.5 px-5 */
+.my-input-picker.ant-picker {
+    width: 100%;
+    border-radius: 0.375rem;          /* rounded-md */
+    border: 1px solid #606882;        /* border-gray-300 */
+    background-color: #f3f4f6;        /* bg-gray-100 */
+    font-size: 100%;
+    padding: 0;                       /* bỏ padding default của ant */
+    height: 44px;                     /* gần với py-2.5 của input */
+    display: flex;
+    align-items: center;
+}
+
+/* input bên trong cho giống padding của input text */
+.my-input-picker .ant-picker-input > input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0 1.25rem;               /* px-5 */
+    height: 100%;
+    font-size: 0.95rem;
+}
+
+/* icon calendar canh phải giống nhau */
+.my-input-picker .ant-picker-suffix {
+    margin-right: 1rem;
+    color: #9ca3af;                   /* text-gray-400 */
+}
+
+/* state hover / focus giống input focus:ring */
+.my-input-picker.ant-picker-focused,
+.my-input-picker.ant-picker:hover {
+    border-color: #3b82f6;            /* blue-500 */
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+    background-color: #eef2ff;        /* nhẹ giống focus */
+}

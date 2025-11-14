@@ -3,7 +3,7 @@ import {Metadata} from "next";
 import ResetPassword from "@/components/Auth/ResetPassword";
 
 export const metadata: Metadata = {
-    title: "Reset Password Page | Book ecommerce template",
+    title: "BookCommerce | Book E-commerce",
     description: "This is Reset Password Page for E-Book Template",
     // other metadata
 };
