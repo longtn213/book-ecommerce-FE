@@ -63,7 +63,7 @@ const MyAccount = () => {
             }
         }
         fetchUser();
-    }, []);
+    }, [api, setUser]);
 
     // PROFILE INPUT CHANGE
     const handleProfileChange = (
