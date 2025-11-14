@@ -13,12 +13,18 @@ import {
 import { notification, DatePicker } from "antd";
 import dayjs from "dayjs";
 import {useAuthContext} from "@/context/AuthContext";
+import {EyeIcon} from "@/utils/helper";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState("account-details");
-    const { user, setUser } = useAuthContext();
+    const { user, setUser,logout } = useAuthContext();
     // Notification
     const [api, contextHolder] = notification.useNotification();
+    const [showPassword, setShowPassword] = useState({
+        old: false,
+        new: false,
+        confirm: false,
+    });
 
     // FORM UPDATE PROFILE
     const [formData, setFormData] = useState({
@@ -29,6 +35,37 @@ const MyAccount = () => {
         birthDate: null as dayjs.Dayjs | null,
         avatarUrl: "",
     });
+
+    const [passwordErrors, setPasswordErrors] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const validatePasswords = () => {
+        const errors: any = {};
+
+        if (!passwords.oldPassword.trim()) {
+            errors.oldPassword = "Vui lòng nhập mật khẩu cũ";
+        }
+
+        if (!passwords.newPassword.trim()) {
+            errors.newPassword = "Vui lòng nhập mật khẩu mới";
+        } else if (passwords.newPassword.length < 6) {
+            errors.newPassword = "Mật khẩu mới phải ít nhất 6 ký tự";
+        }
+
+        if (!passwords.confirmPassword.trim()) {
+            errors.confirmPassword = "Vui lòng xác nhận mật khẩu mới";
+        } else if (passwords.newPassword !== passwords.confirmPassword) {
+            errors.confirmPassword = "Xác nhận mật khẩu không khớp";
+        }
+
+        setPasswordErrors(errors);
+
+        return Object.keys(errors).length === 0;
+    };
+
 
     // FORM CHANGE PASSWORD
     const [passwords, setPasswords] = useState({
@@ -124,12 +161,7 @@ const MyAccount = () => {
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (passwords.newPassword !== passwords.confirmPassword) {
-            return api.error({
-                message: "Mật khẩu không khớp",
-                description: "Vui lòng kiểm tra lại mật khẩu mới.",
-            });
-        }
+        if (!validatePasswords()) return;
 
         try {
             await changePasswordApi({
@@ -139,19 +171,35 @@ const MyAccount = () => {
 
             api.success({
                 message: "Đổi mật khẩu thành công",
-                description: "Mật khẩu đã được cập nhật.",
+                description: "Bạn sẽ được đăng xuất để bảo vệ tài khoản.",
             });
 
+            // Reset form
             setPasswords({
                 oldPassword: "",
                 newPassword: "",
                 confirmPassword: "",
             });
-        } catch (err) {
+
+            setPasswordErrors({
+                oldPassword: "",
+                newPassword: "",
+                confirmPassword: "",
+            });
+
+            // 🔥 GỌI LOGOUT TỪ AUTH PROVIDER
+            logout();
+
+        } catch (err: any) {
             api.error({
                 message: "Đổi mật khẩu thất bại",
-                description: "Mật khẩu cũ sai hoặc có lỗi xảy ra.",
+                description: err?.response?.data?.message || "Mật khẩu cũ sai hoặc có lỗi xảy ra.",
             });
+
+            setPasswordErrors((prev) => ({
+                ...prev,
+                oldPassword: "Mật khẩu cũ không đúng",
+            }));
         }
     };
 
@@ -409,37 +457,92 @@ const MyAccount = () => {
                                     {/* Old Password */}
                                     <div className="mb-5">
                                         <label className="block mb-2.5">Mật Khẩu Cũ</label>
-                                        <input
-                                            type="password"
-                                            name="oldPassword"
-                                            value={passwords.oldPassword}
-                                            onChange={handlePasswordChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword.old ? "text" : "password"}
+                                                name="oldPassword"
+                                                value={passwords.oldPassword}
+                                                onChange={handlePasswordChange}
+                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPassword({ ...showPassword, old: !showPassword.old })
+                                                }
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            >
+                                                <EyeIcon isOpen={showPassword.old} />
+                                            </button>
+                                        </div>
+
+                                        {passwordErrors.oldPassword && (
+                                            <p className="text-error">
+                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                                {passwordErrors.oldPassword}
+                                            </p>
+                                        )}
                                     </div>
+
 
                                     {/* New Password */}
                                     <div className="mb-5">
                                         <label className="block mb-2.5">Mật Khẩu Mới</label>
-                                        <input
-                                            type="password"
-                                            name="newPassword"
-                                            value={passwords.newPassword}
-                                            onChange={handlePasswordChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword.new ? "text" : "password"}
+                                                name="newPassword"
+                                                value={passwords.newPassword}
+                                                onChange={handlePasswordChange}
+                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPassword({ ...showPassword, new: !showPassword.new })
+                                                }
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            >
+                                                <EyeIcon isOpen={showPassword.new} />
+                                            </button>
+                                        </div>
+
+                                        {passwordErrors.newPassword && (
+                                            <p className="text-error">
+                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                                {passwordErrors.newPassword}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Confirm Password */}
                                     <div className="mb-5">
                                         <label className="block mb-2.5">Xác Nhận Mật Khẩu Mới</label>
-                                        <input
-                                            type="password"
-                                            name="confirmPassword"
-                                            value={passwords.confirmPassword}
-                                            onChange={handlePasswordChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword.confirm ? "text" : "password"}
+                                                name="confirmPassword"
+                                                value={passwords.confirmPassword}
+                                                onChange={handlePasswordChange}
+                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPassword({ ...showPassword, confirm: !showPassword.confirm })
+                                                }
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            >
+                                                <EyeIcon isOpen={showPassword.confirm} />
+                                            </button>
+                                        </div>
+
+                                        {passwordErrors.confirmPassword && (
+                                            <p className="text-error">
+                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                                {passwordErrors.confirmPassword}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <button

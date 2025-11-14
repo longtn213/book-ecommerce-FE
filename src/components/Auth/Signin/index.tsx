@@ -7,6 +7,7 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import {forgotPasswordApi, loginApi} from "@/services/authService";
 import {notification} from "antd";
 import {useAuth} from "@/hook/useAuth";
+import {EyeIcon} from "@/utils/helper";
 
 const Signin = () => {
     const router = useRouter();
@@ -16,6 +17,7 @@ const Signin = () => {
     const {login} = useAuth();
     const [loginUsernameError, setLoginUsernameError] = useState("");
     const [loginPasswordError, setLoginPasswordError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     // ✅ Ant Design notification hook
     const [api, contextHolder] = notification.useNotification();
@@ -195,23 +197,35 @@ const Signin = () => {
                                 <label htmlFor="password" className="block mb-2.5">
                                     Mật khẩu
                                 </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    placeholder="Nhập mật khẩu"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                        if (loginPasswordError) setLoginPasswordError("");
-                                    }}
-                                    className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border
-        ${loginPasswordError ? "input-error" : "border-gray-300 bg-gray-100"}`}
-                                    style={{
-                                        borderRadius: "8px",
-                                        borderColor: loginPasswordError ? "#ef4444" : "#d1d5db",
-                                        backgroundColor: loginPasswordError ? "#fef2f2" : "#f3f4f6",
-                                    }}
-                                />
+
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        placeholder="Nhập mật khẩu"
+                                        value={password}
+                                        onChange={(e) => {
+                                            setPassword(e.target.value);
+                                            if (loginPasswordError) setLoginPasswordError("");
+                                        }}
+                                        className={`rounded-lg w-full py-3 px-5 pr-12 outline-none duration-200 border
+                ${loginPasswordError ? "input-error" : "border-gray-300 bg-gray-100"}`}
+                                        style={{
+                                            borderRadius: "8px",
+                                            borderColor: loginPasswordError ? "#ef4444" : "#d1d5db",
+                                            backgroundColor: loginPasswordError ? "#fef2f2" : "#f3f4f6",
+                                        }}
+                                    />
+
+                                    {/* 👁 BUTTON SHOW/HIDE PASSWORD */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2"
+                                    >
+                                        <EyeIcon isOpen={showPassword} />
+                                    </button>
+                                </div>
 
                                 {loginPasswordError && (
                                     <p className="text-error">
@@ -220,6 +234,7 @@ const Signin = () => {
                                     </p>
                                 )}
                             </div>
+
 
                             <button
                                 type="submit"

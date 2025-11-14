@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getUserCart } from "@/services/cartService";
-import {router} from "next/client";
 import {getCurrentUser} from "@/services/userService";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
     user: any;
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<any>(null);
     const [cart, setCart] = useState<any>({ items: [], totalAmount: 0 });
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     // === Load user + cart khi mở ứng dụng ===
     useEffect(() => {
