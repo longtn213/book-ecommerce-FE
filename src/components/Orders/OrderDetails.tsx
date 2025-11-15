@@ -1,77 +1,83 @@
+"use client";
+
 import React from "react";
+import { Card, Divider } from "antd";
+
+const statusBadge: any = {
+    COMPLETED: { label: "Hoàn thành", icon: "✔️", class: "badge badge-green" },
+    PAID: { label: "Đã thanh toán", icon: "💸", class: "badge badge-blue" },
+    SHIPPING: { label: "Đang giao", icon: "🚚", class: "badge badge-orange" },
+    CANCELLED: { label: "Đã hủy", icon: "⛔", class: "badge badge-red" },
+    PENDING: { label: "Chờ xử lý", icon: "⏳", class: "badge badge-yellow" },
+};
 
 const OrderDetails = ({ orderItem }: any) => {
-  return (
-    <>
-      <div className="items-center justify-between py-4.5 px-7.5 hidden md:flex ">
-        <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Order</p>
-        </div>
-        <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Date</p>
-        </div>
+    const badge = statusBadge[orderItem.status];
+    const items = orderItem.raw?.items || [];
 
-        <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Status</p>
+    return (
+        <div className="space-y-4">
+
+            {/* Section 1 */}
+            <Card
+                title="CHI TIẾT ĐƠN HÀNG"
+                variant="borderless"
+                className="shadow-sm rounded-xl p-2"
+            >
+                <div className="space-y-3 text-[15px]">
+                    <p><b>Mã đơn:</b> <span></span> #{orderItem.orderCode}</p>
+                    <p><b>Ngày tạo:</b> {orderItem.createdAt?.slice(0,19).replace("T"," ")}</p>
+
+                    <div className="flex items-center gap-2">
+                        <b>Trạng thái:</b>
+                        <span className={badge.class}>{badge.icon} {badge.label}</span>
+                    </div>
+
+                    <p>
+                        <b>Thanh toán:</b>{" "}
+                        {!orderItem.paid ?
+                            <span className="text-red-500 font-medium">Chưa thanh toán</span>
+                            :
+                            <span className="text-green-600 font-medium">Đã thanh toán</span>
+                        }
+                    </p>
+
+                    <p>
+                        <b>Tổng tiền:</b>{" "}
+                        <span className="font-bold">{orderItem.totalAmount.toLocaleString()} đ</span>
+                    </p>
+
+                    <p>
+                        <b>Địa chỉ giao hàng:</b>{" "}
+                        {orderItem.raw?.shippingAddress}
+                    </p>
+                </div>
+            </Card>
+
+            {/* Section 2 */}
+            <Card
+                title="DANH SÁCH SẢN PHẨM"
+                variant="borderless"
+                className="shadow-sm rounded-xl p-2"
+            >
+                {items.map((i: any, idx: number) => (
+                    <div key={i.id}>
+                        <div className="flex justify-between py-2">
+                            <div>
+                                <p className="font-medium">{i.bookTitle}</p>
+                                <p className="text-gray-500 text-sm">{i.price.toLocaleString()} đ × {i.quantity}</p>
+                            </div>
+
+                            <p className="font-semibold">{i.total.toLocaleString()} đ</p>
+                        </div>
+
+                        {idx < items.length - 1 && <Divider />}
+                    </div>
+                ))}
+            </Card>
+
         </div>
-
-        {/* <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Title</p>
-        </div> */}
-
-        <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Total</p>
-        </div>
-
-        {/* <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">Action</p>
-        </div> */}
-      </div>
-
-      <div className="items-center justify-between border-t border-gray-3 py-5 px-7.5 hidden md:flex">
-        <div className="min-w-[111px]">
-          <p className="text-custom-sm text-red">
-            #{orderItem.orderId.slice(-8)}
-          </p>
-        </div>
-        <div className="min-w-[175px]">
-          <p className="text-custom-sm text-dark">
-            {orderItem.createdAt}
-          </p>
-        </div>
-
-        <div className="min-w-[128px]">
-          <p
-            className={`inline-block text-custom-sm  py-0.5 px-2.5 rounded-[30px] capitalize ${
-              orderItem.status === "delivered"
-                ? "text-green bg-green-light-6"
-                : orderItem.status === "on-hold"
-                ? "text-red bg-red-light-6"
-                : orderItem.status === "processing"
-                ? "text-yellow bg-yellow-light-4"
-                : "Unknown Status"
-            }`}
-          >
-            {orderItem.status}
-          </p>
-        </div>
-
-        {/* <div className="min-w-[213px]">
-          <p className="text-custom-sm text-dark">{orderItem.orderTitle}</p>
-        </div> */}
-
-        <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">
-            {orderItem.total}
-          </p>
-        </div>
-      </div>
-      <div className="px-7.5 w-full">
-        <p className="font-bold">Shipping Address:</p>{" "}
-        <p>942 Aspen Road Encino, CA 91316</p>
-      </div>
-    </>
-  );
+    );
 };
 
 export default OrderDetails;

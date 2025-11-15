@@ -258,3 +258,36 @@ input[type='search']::-webkit-search-results-decoration {
     box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
     background-color: #eef2ff;        /* nhẹ giống focus */
 }
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-green { background:#e8f7ed; color:#2f8a57; border:1px solid #b9e4ca; }
+.badge-blue { background:#e8f1ff; color:#3b6fcf; border:1px solid #bcd3ff; }
+.badge-orange { background:#fff1e0; color:#cf7b2a; border:1px solid #ffd9b5; }
+.badge-red { background:#ffe9e9; color:#d04545; border:1px solid #ffbaba; }
+.badge-yellow { background:#fff8d8; color:#c29a17; border:1px solid #ffe9a3; }
+/* Đảm bảo modal thật sự căn giữa */
+.order-modal .ant-modal {
+    top: auto !important;
+    margin: 0 auto;
+}
+
+/* làm modal đẹp hơn */
+.order-modal .ant-modal-content {
+    border-radius: 14px !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* button close đẹp hơn */
+.order-modal .ant-modal-close {
+    top: 12px !important;
+    right: 16px !important;
+}

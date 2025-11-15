@@ -14,6 +14,7 @@ import { notification, DatePicker } from "antd";
 import dayjs from "dayjs";
 import {useAuthContext} from "@/context/AuthContext";
 import {EyeIcon} from "@/utils/helper";
+import {useRouter, useSearchParams} from "next/navigation";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState("account-details");
@@ -25,6 +26,7 @@ const MyAccount = () => {
         new: false,
         confirm: false,
     });
+    const router = useRouter();
 
     // FORM UPDATE PROFILE
     const [formData, setFormData] = useState({
@@ -101,6 +103,15 @@ const MyAccount = () => {
         }
         fetchUser();
     }, [api, setUser]);
+    const searchParams = useSearchParams();
+    const tabFromURL = searchParams.get("tab");
+
+    useEffect(() => {
+        if (tabFromURL === "orders") {
+            setActiveTab("orders");
+        }
+    }, [tabFromURL]);
+
 
     // PROFILE INPUT CHANGE
     const handleProfileChange = (
@@ -310,20 +321,25 @@ const MyAccount = () => {
                                 <div className="p-4 sm:p-7.5 xl:p-9">
                                     <div className="flex flex-wrap xl:flex-nowrap xl:flex-col gap-4">
                                         <button
-                                            onClick={() => setActiveTab("account-details")}
-                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition 
-                                                hover:bg-blue hover:text-white ${
+                                            onClick={() => {
+                                                setActiveTab("account-details");
+                                                router.push("/my-account?tab=account-details");
+                                            }}
+                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition hover:bg-blue hover:text-white ${
                                                 activeTab === "account-details"
                                                     ? "text-white bg-blue"
                                                     : "text-dark-2 bg-gray-1"
                                             }`}
-                                        > Thông tin cá nhân
+                                        >
+                                            Thông tin cá nhân
                                         </button>
 
                                         <button
-                                            onClick={() => setActiveTab("orders")}
-                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition 
-                                                hover:bg-blue hover:text-white ${
+                                            onClick={() => {
+                                                setActiveTab("orders");
+                                                router.push("/my-account?tab=orders");
+                                            }}
+                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition hover:bg-blue hover:text-white ${
                                                 activeTab === "orders"
                                                     ? "text-white bg-blue"
                                                     : "text-dark-2 bg-gray-1"
@@ -332,14 +348,16 @@ const MyAccount = () => {
                                             Đơn hàng
                                         </button>
 
+
                                         <button
                                             onClick={() => {
-                                                logout()
+                                                logout();
                                             }}
                                             className="flex items-center rounded-md gap-2.5 py-3 px-4.5 text-dark-2 bg-gray-1 hover:bg-blue hover:text-white transition"
                                         >
                                             Đăng xuất
                                         </button>
+
                                     </div>
                                 </div>
 

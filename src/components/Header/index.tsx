@@ -28,11 +28,21 @@ const Header = () => {
 
     // Sticky menu
     useEffect(() => {
-        const handleStickyMenu = () => setStickyMenu(window.scrollY >= 80);
+        const handleStickyMenu = () => {
+            const isSticky = window.scrollY >= 80;
+            setStickyMenu(isSticky);
+
+            if (isSticky) {
+                document.body.classList.add("header-sticky");
+            } else {
+                document.body.classList.remove("header-sticky");
+            }
+        };
 
         window.addEventListener("scroll", handleStickyMenu);
         return () => window.removeEventListener("scroll", handleStickyMenu);
     }, []);
+
 
     // Fetch categories
     useEffect(() => {
@@ -246,7 +256,7 @@ const Header = () => {
                                                 <button
                                                     onClick={() => {
                                                         setDropdownOpen(false);
-                                                        router.push("/my-account")
+                                                        router.push("/my-account?tab=account-details");
                                                     }
                                                     }
                                                     className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
@@ -258,9 +268,8 @@ const Header = () => {
                                                 <button
                                                     onClick={() => {
                                                         setDropdownOpen(false);
-                                                        router.push("/orders");
-                                                    }
-                                                    }
+                                                        router.push("/my-account?tab=orders");
+                                                    }}
                                                     className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
                                                 >
                                                     <span className="text-lg">🛒</span>

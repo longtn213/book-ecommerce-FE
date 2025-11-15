@@ -30,6 +30,10 @@ export const uploadAvatarApi = async (file) => {
     return res.data;
 };
 export const getUserOrders = async () => {
-    const res = await axiosInstance.get("/user/orders");
+    const res = await axiosInstance.get("/orders");
     return res.data.data;
+};
+export const cancelOrderApi = async (orderId: number) => {
+    const res = await axiosInstance.put(`/orders/${orderId}/cancel`);
+    return res.data;
 };
