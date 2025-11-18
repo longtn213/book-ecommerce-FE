@@ -1,112 +1,113 @@
 "use client";
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
-
-// Import Swiper styles
-import "swiper/css/pagination";
-import "swiper/css";
-
 import Image from "next/image";
+import "swiper/css";
+import "swiper/css/pagination";
 
-const HeroCarousal = () => {
-  return (
-    <Swiper
-      spaceBetween={30}
-      centeredSlides={true}
-      autoplay={{
-        delay: 2500,
-        disableOnInteraction: false,
-      }}
-      pagination={{
-        clickable: true,
-      }}
-      modules={[Autoplay, Pagination]}
-      className="hero-carousel"
-    >
-      <SwiperSlide>
-        <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
-          <div className="max-w-[394px] py-10 sm:py-15 lg:py-24.5 pl-4 sm:pl-7.5 lg:pl-12.5">
-            <div className="flex items-center gap-4 mb-7.5 sm:mb-10">
-              <span className="block font-semibold text-heading-3 sm:text-heading-1 text-blue">
-                30%
-              </span>
-              <span className="block text-dark text-sm sm:text-custom-1 sm:leading-[24px]">
-                Sale
-                <br />
-                Off
-              </span>
-            </div>
+export default function HeroCarousel() {
+    return (
+        <Swiper
+            spaceBetween={40}
+            centeredSlides={true}
+            autoplay={{ delay: 3500 }}
+            pagination={{ clickable: true }}
+            modules={[Autoplay, Pagination]}
+            className="hero-carousel"
+        >
 
-            <h1 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
-              <a href="#">True Wireless Noise Cancelling Headphone</a>
-            </h1>
+            {/* SLIDE 1 — Nhà Giả Kim */}
+            <SwiperSlide>
+                <div className="
+                    flex flex-col md:flex-row items-center gap-14
+                    p-10 rounded-3xl bg-gradient-to-r from-[#e9f4ff] to-white
+                    border border-[#d2e6ff] shadow-md
+                ">
 
-            <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at ipsum at risus euismod lobortis in
-            </p>
+                    {/* LEFT TEXT */}
+                    <div className="flex flex-col max-w-[460px] flex-1">
 
-            <a
-              href="#"
-              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
-            >
-              Shop Now
-            </a>
-          </div>
+                        <span className="
+                            inline-block bg-[#007bff] text-white
+                            px-5 py-1.5 rounded-full text-xs font-semibold mb-3
+                        ">
+                            DEAL HOT • GIẢM 30%
+                        </span>
 
-          <div>
-            <Image
-              src="/images/hero/hero-01.png"
-              alt="headphone"
-              width={351}
-              height={358}
-            />
-          </div>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        {" "}
-        <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
-          <div className="max-w-[394px] py-10 sm:py-15 lg:py-26 pl-4 sm:pl-7.5 lg:pl-12.5">
-            <div className="flex items-center gap-4 mb-7.5 sm:mb-10">
-              <span className="block font-semibold text-heading-3 sm:text-heading-1 text-blue">
-                30%
-              </span>
-              <span className="block text-dark text-sm sm:text-custom-1 sm:leading-[24px]">
-                Sale
-                <br />
-                Off
-              </span>
-            </div>
+                        <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                            Bộ Sách “Nhà Giả Kim”
+                            <span className="text-[#007bff]"> – Bestseller Toàn Cầu</span>
+                        </h1>
 
-            <h1 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
-              <a href="#">True Wireless Noise Cancelling Headphone</a>
-            </h1>
+                        <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                            Quyển sách truyền cảm hứng mạnh mẽ giúp bạn hiểu mình hơn và theo đuổi ước mơ đến cùng.
+                        </p>
 
-            <p>
-              Lorem ipsum dolor sit, consectetur elit nunc suscipit non ipsum
-              nec suscipit.
-            </p>
+                        <button className="
+                            bg-[#007bff] hover:bg-[#0064d1] text-white
+                            px-10 py-3 text-lg rounded-xl shadow-md transition w-max
+                        ">
+                            Mua Ngay
+                        </button>
+                    </div>
 
-            <a
-              href="#"
-              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
-            >
-              Shop Now
-            </a>
-          </div>
+                    {/* IMAGE */}
+                    <Image
+                        src="/images/book/nha_gia_kim.jpg"
+                        alt="book"
+                        width={420}
+                        height={420}
+                        className="rounded-3xl shadow-xl border border-white/70 object-cover"
+                    />
+                </div>
+            </SwiperSlide>
 
-          <div>
-            <Image
-              src="/images/hero/hero-01.png"
-              alt="headphone"
-              width={351}
-              height={358}
-            />
-          </div>
-        </div>
-      </SwiperSlide>
-    </Swiper>
-  );
-};
+            {/* SLIDE 2 — Thói Quen Nguyên Tử */}
+            <SwiperSlide>
+                <div className="
+                    flex flex-col md:flex-row items-center gap-14
+                    p-10 rounded-3xl bg-gradient-to-r from-white to-[#e9f3ff]
+                    border border-[#d2e6ff] shadow-md
+                ">
 
-export default HeroCarousal;
+                    {/* TEXT */}
+                    <div className="flex flex-col max-w-[460px] flex-1">
+                        <span className="
+                            inline-block bg-[#ff7a00] text-white
+                            px-5 py-1.5 rounded-full text-xs font-semibold mb-3
+                        ">
+                            BESTSELLER
+                        </span>
+
+                        <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                            Thói Quen Nguyên Tử
+                            <span className="text-[#007bff]"> – Thành Công Bền Vững</span>
+                        </h1>
+
+                        <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                            Cuốn sách giúp thay đổi tư duy, hình thành thói quen tốt và nâng cao chất lượng cuộc sống.
+                        </p>
+
+                        <button className="
+                            bg-[#007bff] hover:bg-[#0064d1] text-white
+                            px-10 py-3 text-lg rounded-xl shadow-md transition w-max
+                        ">
+                            Xem Chi Tiết
+                        </button>
+                    </div>
+
+                    {/* IMAGE */}
+                    <Image
+                        src="/images/book/thoi-quen-nguyen-tu.jpg"
+                        alt="book"
+                        width={420}
+                        height={420}
+                        className="rounded-3xl shadow-xl border border-white/70 object-cover"
+                    />
+                </div>
+            </SwiperSlide>
+
+        </Swiper>
+    );
+}

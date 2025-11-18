@@ -9,6 +9,7 @@ import {useCartModalContext} from "@/app/context/CartSidebarModalContext";
 import {fetchCategories} from "@/services/categoryService";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hook/useAuth";
+import NotificationDropdown from "@/components/Header/markAllNotificationsRead";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -19,12 +20,9 @@ const Header = () => {
     const {openCartModal} = useCartModalContext();
     const router = useRouter();
 
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-
     // 👉 Dùng hook mới
-    const {user, cart, logout, loading} = useAuth();
-    const dropdownRef = useRef<HTMLDivElement | null>(null);
-
+    const {user, cart, logout} = useAuth();
+    const [activeDropdown, setActiveDropdown] = useState<"avatar" | "notification" | null>(null);
 
     // Sticky menu
     useEffect(() => {
@@ -61,24 +59,41 @@ const Header = () => {
 
         getCategories();
     }, []);
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (!dropdownRef.current) return;
-
-            // nếu click KHÔNG nằm trong dropdown → đóng
-            if (!dropdownRef.current.contains(e.target as Node)) {
-                setDropdownOpen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-
 
     const handleOpenCartModal = () => openCartModal();
+
+    const avatarRef = useRef<HTMLDivElement | null>(null);
+    // CLICK OUTSIDE -> CLOSE AVATAR DROPDOWN
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+                setActiveDropdown(null);
+            }
+        };
+
+        window.addEventListener("pointerdown", handleClickOutside);
+        return () => window.removeEventListener("pointerdown", handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        const header = document.querySelector("header");
+
+        if (!header) return;
+
+        const updateHeaderHeight = () => {
+            document.documentElement.style.setProperty(
+                "--header-height",
+                `${header.offsetHeight}px`
+            );
+        };
+
+        updateHeaderHeight();
+        window.addEventListener("resize", updateHeaderHeight);
+
+        return () => {
+            window.removeEventListener("resize", updateHeaderHeight);
+        };
+    }, []);
 
     return (
         <header
@@ -88,12 +103,9 @@ const Header = () => {
         >
             <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
                 {/* <!-- header top start --> */}
-                <div
-                    className={`flex flex-col lg:flex-row items-center justify-between gap-5 ${
-                        stickyMenu ? "py-4" : "py-6"
-                    }`}
-                >
-                    {/* <!-- header top left --> */}
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-5 py-6">
+
+                {/* <!-- header top left --> */}
                     <div className="flex w-full items-center gap-4 min-w-0">
                         <Link className="flex-shrink-0" href="/">
                             <Image
@@ -178,9 +190,9 @@ const Header = () => {
                             </svg>
 
                             <div>
-                <span className="block text-2xs text-dark-4 uppercase">
-                  24/7 SUPPORT
-                </span>
+                                <span className="block text-2xs text-dark-4 uppercase">
+                                  24/7 SUPPORT
+                                </span>
                                 <p className="font-medium text-custom-sm text-dark">
                                     036 360 9262
                                 </p>
@@ -218,9 +230,9 @@ const Header = () => {
                                             />
                                         </svg>
                                         <div>
-            <span className="block text-2xs text-dark-4 uppercase">
-                account
-            </span>
+                                            <span className="block text-2xs text-dark-4 uppercase">
+                                                account
+                                            </span>
                                             <p className="font-medium text-custom-sm text-dark">
                                                 Sign In
                                             </p>
@@ -230,66 +242,75 @@ const Header = () => {
                                     // ==================================
                                     // ĐÃ LOGIN → SHOW AVATAR + DROPDOWN
                                     // ==================================
-                                    <div className="relative" ref={dropdownRef}>
-                                        <button
-                                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                        >
-                                            <img
-                                                src={user.avatarUrl || "/images/profile/user-2.jpg"}
-                                                alt="avatar"
-                                                className="w-9 h-9 rounded-full object-cover border"
-                                            />
-                                            <span className="font-medium">{user.username}</span>
-                                        </button>
+                                    <div className="flex items-center gap-4" ref={avatarRef}>
+                                        <NotificationDropdown
+                                            user={user}
+                                            activeDropdown={activeDropdown}
+                                            setActiveDropdown={setActiveDropdown}
+                                        />
+                                        <div className="relative">
+                                            <button
+                                                onClick={() =>
+                                                    setActiveDropdown(activeDropdown === "avatar" ? null : "avatar")
+                                                }
+                                                className="flex items-center gap-2 cursor-pointer"
+                                            >
+                                                <img
+                                                    src={user.avatarUrl || "/images/profile/user-2.jpg"}
+                                                    alt="avatar"
+                                                    className="w-9 h-9 rounded-full object-cover border"
+                                                />
+                                                <span className="font-medium">{user.username}</span>
+                                            </button>
 
-                                        {dropdownOpen && (
-                                            <div
-                                                className="absolute right-0 mt-3 w-56 bg-white shadow-xl border rounded-xl p-3 z-50">
+                                            {activeDropdown === "avatar" && (
+                                                <div
+                                                    className="absolute right-0 mt-3 w-56 bg-white shadow-xl border rounded-xl p-3 z-50">
 
-                                                <p className="text-sm font-semibold text-gray-700 px-2 py-1">
-                                                    {user.email}
-                                                </p>
+                                                    <p className="text-sm font-semibold text-gray-700 px-2 py-1">
+                                                        {user.email}
+                                                    </p>
 
-                                                <div className="my-2 border-t"/>
+                                                    <div className="my-2 border-t"/>
 
-                                                <button
-                                                    onClick={() => {
-                                                        setDropdownOpen(false);
-                                                        router.push("/my-account?tab=account-details");
-                                                    }
-                                                    }
-                                                    className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-                                                >
-                                                    <span className="text-lg">👤</span>
-                                                    <span className="text-sm">Thông tin cá nhân</span>
-                                                </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setActiveDropdown(null);
+                                                            router.push("/my-account?tab=account-details");
+                                                        }
+                                                        }
+                                                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+                                                    >
+                                                        <span className="text-lg">👤</span>
+                                                        <span className="text-sm">Thông tin cá nhân</span>
+                                                    </button>
 
-                                                <button
-                                                    onClick={() => {
-                                                        setDropdownOpen(false);
-                                                        router.push("/my-account?tab=orders");
-                                                    }}
-                                                    className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-                                                >
-                                                    <span className="text-lg">🛒</span>
-                                                    <span className="text-sm">Đơn hàng của tôi</span>
-                                                </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setActiveDropdown(null);
+                                                            router.push("/my-account?tab=orders");
+                                                        }}
+                                                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+                                                    >
+                                                        <span className="text-lg">🛒</span>
+                                                        <span className="text-sm">Đơn hàng của tôi</span>
+                                                    </button>
 
-                                                <button
-                                                    onClick={() => {
-                                                        setDropdownOpen(false);
-                                                        logout()
-                                                        router.push("/signin");
-                                                    }}
-                                                    className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-red-500 transition"
-                                                >
-                                                    <span className="text-lg">🚪</span>
-                                                    <span className="text-sm">Đăng xuất</span>
-                                                </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setActiveDropdown(null);
+                                                            logout()
+                                                            router.push("/signin");
+                                                        }}
+                                                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-red-500 transition"
+                                                    >
+                                                        <span className="text-lg">🚪</span>
+                                                        <span className="text-sm">Đăng xuất</span>
+                                                    </button>
 
-                                            </div>
-                                        )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 
@@ -297,19 +318,18 @@ const Header = () => {
                                     <button
                                         onClick={handleOpenCartModal}
                                         className="flex items-center gap-2.5"
-                                    >
-                      <span className="inline-block relative">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                              d="M15.5433 9.5172C15.829 9.21725 15.8174 8.74252 15.5174 8.45686C15.2175 8.17119 14.7428 8.18277 14.4571 8.48272L12.1431 10.9125L11.5433 10.2827C11.2576 9.98277 10.7829 9.97119 10.483 10.2569C10.183 10.5425 10.1714 11.0173 10.4571 11.3172L11.6 12.5172C11.7415 12.6658 11.9378 12.75 12.1431 12.75C12.3483 12.75 12.5446 12.6658 12.6862 12.5172L15.5433 9.5172Z"
-                              fill="#3C50E0"
-                          />
+                                    ><span className="inline-block relative">
+                                        <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                              d="M15.5433 9.5172C15.829 9.21725 15.8174 8.74252 15.5174 8.45686C15.2175 8.17119 14.7428 8.18277 14.4571 8.48272L12.1431 10.9125L11.5433 10.2827C11.2576 9.98277 10.7829 9.97119 10.483 10.2569C10.183 10.5425 10.1714 11.0173 10.4571 11.3172L11.6 12.5172C11.7415 12.6658 11.9378 12.75 12.1431 12.75C12.3483 12.75 12.5446 12.6658 12.6862 12.5172L15.5433 9.5172Z"
+                                              fill="#3C50E0"
+                                          />
                           <path
                               fillRule="evenodd"
                               clipRule="evenodd"

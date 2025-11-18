@@ -37,3 +37,12 @@ export const cancelOrderApi = async (orderId: number) => {
     const res = await axiosInstance.put(`/orders/${orderId}/cancel`);
     return res.data;
 };
+
+export const getUserNotifications = async () => {
+    const res = await axiosInstance.get("/notifications");
+    return res.data.data;
+};
+
+export const markAllNotificationsRead = async () => {
+    return axiosInstance.put("/notifications/read-all");
+};
