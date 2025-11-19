@@ -1,10 +1,64 @@
-import React from "react";
+"use client"
+
+import React, {useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
+import {notification} from "antd";
+import {sendMessage} from "@/services/contactMessageService";
 
 const Contact = () => {
+    const [form, setForm] = useState({
+        firstName: "",
+        lastName: "",
+        subject: "",
+        phone: "",
+        message: "",
+        email: "",
+    });
+    const [api, contextHolder] = notification.useNotification();
+    const isFormValid =
+        form.firstName.trim() !== "" &&
+        form.lastName.trim() !== "" &&
+        form.phone.trim() !== "" &&
+        form.email.trim() !== "" &&
+        form.message.trim() !== "";
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const onSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!form.firstName || !form.lastName) {
+            api.error({message: "Vui lòng nhập đầy đủ họ và tên"});
+            return;
+        }
+
+        try {
+            const res = await sendMessage(form);
+
+            api.success({
+                message:res.message || "Gửi tin nhắn thành công!",
+            });
+
+            // Reset form
+            setForm({
+                firstName: "",
+                lastName: "",
+                subject: "",
+                phone: "",
+                message: "",
+                email: "",
+            });
+        } catch (err: any) {
+            api.error({message: err.message || "Gửi tin nhắn thất bại!"});
+        }
+    };
   return (
     <>
-      <Breadcrumb title={"Contact"} pages={["contact"]} />
+        {contextHolder}
+      <Breadcrumb title={"Thông tin"} pages={["contact"]} />
 
       <section className="overflow-hidden py-20 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -12,7 +66,7 @@ const Contact = () => {
             <div className="xl:max-w-[370px] w-full bg-white rounded-xl shadow-1">
               <div className="py-5 px-4 sm:px-7.5 border-b border-gray-3">
                 <p className="font-medium text-xl text-dark">
-                  Contact Information
+                  Thông tin liên lạc
                 </p>
               </div>
 
@@ -33,7 +87,7 @@ const Contact = () => {
                         fill="#3C50E0"
                       />
                     </svg>
-                    Name: James Septimus
+                      Tên cửa hàng: Book-Ecommerce
                   </p>
 
                   <p className="flex items-center gap-4">
@@ -61,7 +115,7 @@ const Contact = () => {
                         fill="#3C50E0"
                       />
                     </svg>
-                    Phone: 1234 567890
+                      Điện thoại: 1234 567890
                   </p>
 
                   <p className="flex gap-4">
@@ -80,96 +134,110 @@ const Contact = () => {
                         fill="#3C50E0"
                       />
                     </svg>
-                    Address: 7398 Smoke Ranch RoadLas Vegas, Nevada 89128
+                      Địa chỉ: 7398 Smoke Ranch Road, Las Vegas, Nevada 89128
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
-              <form>
-                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-                  <div className="w-full">
-                    <label htmlFor="firstName" className="block mb-2.5">
-                      First Name <span className="text-red">*</span>
-                    </label>
+              <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
+                  <form onSubmit={onSubmit}>
+                      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
 
-                    <input
-                      type="text"
-                      name="firstName"
-                      id="firstName"
-                      placeholder="Jhon"
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    />
-                  </div>
+                          {/* First Name */}
+                          <div className="w-full">
+                              <label className="block mb-2.5">
+                                  Họ <span className="text-red">*</span>
+                              </label>
+                              <input
+                                  type="text"
+                                  name="firstName"
+                                  value={form.firstName}
+                                  onChange={handleChange}
+                                  placeholder="Nhập họ của bạn"
+                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
+                              />
+                          </div>
 
-                  <div className="w-full">
-                    <label htmlFor="lastName" className="block mb-2.5">
-                      Last Name <span className="text-red">*</span>
-                    </label>
+                          {/* Last Name */}
+                          <div className="w-full">
+                              <label className="block mb-2.5">
+                                  Tên <span className="text-red">*</span>
+                              </label>
+                              <input
+                                  type="text"
+                                  name="lastName"
+                                  value={form.lastName}
+                                  onChange={handleChange}
+                                  placeholder="Nhập tên của bạn"
+                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
+                              />
+                          </div>
+                      </div>
 
-                    <input
-                      type="text"
-                      name="lastName"
-                      id="lastName"
-                      placeholder="Deo"
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    />
-                  </div>
-                </div>
+                      {/* Subject + Phone */}
+                      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
+                          <div className="w-full">
+                              <label className="block mb-2.5">Tiêu đề</label>
+                              <input
+                                  type="text"
+                                  name="subject"
+                                  value={form.subject}
+                                  onChange={handleChange}
+                                  placeholder="Nhập tiêu đề"
+                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
+                              />
+                          </div>
 
-                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-                  <div className="w-full">
-                    <label htmlFor="subject" className="block mb-2.5">
-                      Subject
-                    </label>
+                          <div className="w-full">
+                              <label className="block mb-2.5">Số điện thoại</label>
+                              <input
+                                  type="text"
+                                  name="phone"
+                                  value={form.phone}
+                                  onChange={handleChange}
+                                  placeholder="Nhập số điện thoại"
+                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
+                              />
+                          </div>
+                      </div>
 
-                    <input
-                      type="text"
-                      name="subject"
-                      id="subject"
-                      placeholder="Type your subject"
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    />
-                  </div>
+                      {/* Email */}
+                      <div className="mb-5">
+                          <label className="block mb-2.5">Email</label>
+                          <input
+                              type="text"
+                              name="email"
+                              value={form.email}
+                              onChange={handleChange}
+                              placeholder="Nhập email của bạn"
+                              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
+                          />
+                      </div>
 
-                  <div className="w-full">
-                    <label htmlFor="phone" className="block mb-2.5">
-                      Phone
-                    </label>
+                      {/* Message */}
+                      <div className="mb-7.5">
+                          <label className="block mb-2.5">Nội dung tin nhắn</label>
+                          <textarea
+                              name="message"
+                              value={form.message}
+                              onChange={handleChange}
+                              rows={5}
+                              placeholder="Nhập nội dung bạn muốn gửi..."
+                              className="rounded-md border border-gray-3 bg-gray-1 w-full p-5"
+                          />
+                      </div>
 
-                    <input
-                      type="text"
-                      name="phone"
-                      id="phone"
-                      placeholder="Enter your phone"
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    />
-                  </div>
-                </div>
+                      <button
+                          type="submit"
+                          disabled={!isFormValid}
+                          className={`inline-flex font-medium text-white py-3 px-7 rounded-md ${isFormValid ? "bg-blue hover:bg-blue-dark" : "bg-gray-400 cursor-not-allowed"} `}
+                      >
+                          Gửi tin nhắn
+                      </button>
 
-                <div className="mb-7.5">
-                  <label htmlFor="message" className="block mb-2.5">
-                    Message
-                  </label>
-
-                  <textarea
-                    name="message"
-                    id="message"
-                    rows={5}
-                    placeholder="Type your message"
-                    className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full p-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                  ></textarea>
-                </div>
-
-                <button
-                  type="submit"
-                  className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
-                >
-                  Send Message
-                </button>
-              </form>
-            </div>
+                  </form>
+              </div>
           </div>
         </div>
       </section>
