@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
-const CategoryItem = ({ category, selectedId, onSelect }) => {
-    const isSelected = selectedId === category.id;
+const PublisherItem = ({ publisher, selectedId, onSelect }) => {
+    const isSelected = selectedId === publisher.id;
 
     return (
         <button
             className={`${
                 isSelected && "text-blue"
             } group flex items-center justify-between ease-out duration-200 hover:text-blue`}
-            onClick={() => onSelect(category.id)}
+            onClick={() => onSelect(publisher.id)}
         >
             <div className="flex items-center gap-2">
-                {/* Circle checkbox */}
+                {/* Checkbox UI */}
                 <div
                     className={`cursor-pointer flex items-center justify-center rounded w-4 h-4 border ${
                         isSelected ? "border-blue bg-blue" : "bg-white border-gray-3"
@@ -37,33 +37,29 @@ const CategoryItem = ({ category, selectedId, onSelect }) => {
                     </svg>
                 </div>
 
-                <span>{category.name}</span>
+                <span>{publisher.name}</span>
             </div>
 
-            {/* Vì API không có số lượng nên bỏ badge */}
-            {/* <span className="bg-gray-2 text-xs px-2 rounded-full">12</span> */}
+            {/* API của bạn không có field products → bỏ badge */}
         </button>
     );
 };
 
-const CategoryDropdown = ({ categories, selectedId, onSelect }) => {
+const PublisherDropdown = ({ publishers, selectedId, onSelect }) => {
     const [toggleDropdown, setToggleDropdown] = useState(true);
 
     return (
         <div className="bg-white shadow-1 rounded-lg">
+            {/* Header */}
             <div
-                onClick={(e) => {
-                    e.preventDefault();
-                    setToggleDropdown(!toggleDropdown);
-                }}
+                onClick={() => setToggleDropdown(!toggleDropdown)}
                 className={`cursor-pointer flex items-center justify-between py-3 pl-6 pr-5.5 ${
                     toggleDropdown && "shadow-filter"
                 }`}
             >
-                <p className="text-dark">Category</p>
-
+                <p className="text-dark">Publisher</p>
                 <button
-                    aria-label="button for category dropdown"
+                    aria-label="button for publisher dropdown"
                     className={`text-dark ease-out duration-200 ${
                         toggleDropdown && "rotate-180"
                     }`}
@@ -84,15 +80,16 @@ const CategoryDropdown = ({ categories, selectedId, onSelect }) => {
                 </button>
             </div>
 
+            {/* Dropdown content */}
             <div
                 className={`flex-col gap-3 py-6 pl-6 pr-5.5 ${
                     toggleDropdown ? "flex" : "hidden"
                 }`}
             >
-                {categories.map((category) => (
-                    <CategoryItem
-                        key={category.id}
-                        category={category}
+                {publishers.map((publisher) => (
+                    <PublisherItem
+                        key={publisher.id}
+                        publisher={publisher}
                         selectedId={selectedId}
                         onSelect={onSelect}
                     />
@@ -102,4 +99,4 @@ const CategoryDropdown = ({ categories, selectedId, onSelect }) => {
     );
 };
 
-export default CategoryDropdown;
+export default PublisherDropdown;
