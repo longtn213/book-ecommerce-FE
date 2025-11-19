@@ -1,38 +1,34 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { getUserOrders } from "@/services/userService";
-import SingleOrder from "./SingleOrder";
+import React, {useEffect, useState} from "react";
+import {Table} from "antd";
+import {getUserOrders} from "@/services/userService";
+import {Actions, Badge} from "@/components/Orders/SingleOrder";
 
 const Orders = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const mapOrderResponse = (o: any) => {
-        const title = o.orderItemUserSummaryDtoList
-            ?.map((i: any) => `${i.bookTitleSnapshot} (x${i.quantity})`)
-            .join(", ");
-
-        return {
-            id: o.id,   // ⭐ cần id để cancel
-            orderCode: o.orderCode,
-            createdAt: o.createdAt,
-            status: o.status,
-            paid: o.paid,
-            title: title,
-            totalAmount: o.totalAmount,
-            raw: o
-        };
-    };
-
-    // ⭐ TẠO HÀM FETCH ĐỂ DÙNG CHO REFRESH
     const fetchOrders = async () => {
         try {
             const res = await getUserOrders();
-            const mapped = res.map(mapOrderResponse);
+
+            const mapped = res.map((o: any) => ({
+                key: o.id,
+                id: o.id,
+                orderCode: o.orderCode,
+                createdAt: o.createdAt?.slice(0, 19).replace("T", " "),
+                status: o.status,
+                totalAmount: o.totalAmount,
+                raw: o,
+
+                // ⭐ FIX: lấy đúng danh sách items từ API
+                title: o.items
+                    ?.map((i: any) => `${i.bookTitle} (x${i.quantity})`)
+                    .join(", "),
+            }));
+
             setOrders(mapped);
-        } catch (err) {
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -42,33 +38,70 @@ const Orders = () => {
         fetchOrders();
     }, []);
 
-    if (loading) return <p className="p-5">Đang tải...</p>;
+    const columns: any[] = [
+        {
+            title: "Mã đơn",
+            dataIndex: "orderCode",
+            width: 110,
+            render: (code: string) => (
+                <span className="font-semibold text-blue-600">
+                    #{code.slice(-7)}
+                </span>
+            ),
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            width: 150,
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "status",
+            width: 150,
+            render: (status) => <Badge status={status} />
+        },
+        {
+            title: "Sách",
+            dataIndex: "title",
+            width: 350,
+            render: (t: string) => (
+                <div className="whitespace-pre-line break-words text-gray-700 leading-relaxed">
+                    {t}
+                </div>
+            ),
+        },
+        {
+            title: "Tổng tiền",
+            dataIndex: "totalAmount",
+            width: 130,
+            render: (amount: number) => (
+                <span className="font-bold text-gray-900">
+                    {amount.toLocaleString()} đ
+                </span>
+            ),
+        },
+        {
+            title: "Thao tác",
+            dataIndex: "action",
+            width: 100,
+            fixed: "right",
+            render: (_, record) => (
+                <Actions orderItem={record} refreshOrders={fetchOrders} />
+            )
+
+        },
+    ];
 
     return (
-        <div className="w-full">
-            <table className="w-full border-collapse bg-white shadow-sm rounded-lg table-auto">
-            <thead>
-                <tr className="bg-gray-100 text-left text-gray-700">
-                    <th className="py-3 px-4 w-[90px]">Mã đơn</th>
-                    <th className="py-3 px-4 w-[130px]">Ngày tạo</th>
-                    <th className="py-3 px-4 w-[140px]">Trạng thái</th>
-                    <th className="py-3 px-4 w-[260px]">Sách</th>
-                    <th className="py-3 px-4 w-[120px]">Tổng tiền</th>
-                    <th className="py-3 px-4 w-[80px]">Thao tác</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {orders.map((order, idx) => (
-                    <SingleOrder
-                        key={idx}
-                        orderItem={order}
-                        refreshOrders={fetchOrders}
-                    />
-                ))}
-                </tbody>
-            </table>
-        </div>
+        <Table
+            columns={columns}
+            dataSource={orders}
+            loading={loading}
+            pagination={false}
+            scroll={{ y: 500 }}
+            bordered
+            sticky
+        />
     );
 };
 
