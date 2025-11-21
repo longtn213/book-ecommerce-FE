@@ -25,3 +25,36 @@ export const searchBooks = async ({
 
     return res.data.data;
 };
+export const fetchNewestBook = async () => {
+    try {
+        const res = await axiosInstance.get("/books/newest");
+        return res.data?.data || [];
+    } catch (error) {
+        console.error("Error fetching newest books:", error);
+        return [];
+    }
+};
+export const fetchFeatureBook = async (
+    type: string,
+    page: number = 0,
+    size: number = 12
+) => {
+    try {
+        const res = await axiosInstance.get(`/books/feature`,
+            {
+                params: { type, page, size }
+            }
+        );
+
+        return res.data.data; // TRẢ FULL PAGE
+    } catch (error) {
+        console.error("Error fetching feature books:", error);
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            size: size,
+        };
+    }
+};
+

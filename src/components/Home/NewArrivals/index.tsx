@@ -1,11 +1,35 @@
-import React from "react";
-import Image from "next/image";
+"use client"
+import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import ProductItem from "@/components/Common/ProductItem";
-import shopData from "@/components/Shop/shopData";
+import {fetchNewestBook} from "@/services/bookService";
 
 const NewArrival = () => {
-  return (
+    const [books, setBooks] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const getBooks = async () => {
+            const res = await fetchNewestBook();
+            setBooks(res);
+            setLoading(false);
+        };
+
+        getBooks();
+    }, []);
+
+    // Convert dữ liệu BACKEND → dữ liệu ProductItem cần
+    const convertBookToProduct = (b: any) => ({
+        id: b.id,
+        title: b.title,
+        price: b.price,
+        discountedPrice: b.price, // nếu có discount thì thay
+        reviews: b.rating || 0,
+        imgs: {
+            previews: b.images?.length ? b.images : ["/images/default-book.png"],
+        },
+    });
+    return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         {/* <!-- section title --> */}
@@ -39,19 +63,27 @@ const NewArrival = () => {
           </div>
 
           <Link
-            href="/shop-with-sidebar"
+            href="/shop"
             className="inline-flex font-medium text-custom-sm py-2.5 px-7 rounded-md border-gray-3 border bg-gray-1 text-dark ease-out duration-200 hover:bg-dark hover:text-white hover:border-transparent"
           >
             View All
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
-          {/* <!-- New Arrivals item --> */}
-          {shopData.map((item, key) => (
-            <ProductItem item={item} key={key} />
-          ))}
-        </div>
+          {/* Loading skeleton */}
+          {loading && <p>Đang tải sách mới...</p>}
+
+          {/* Render sách mới */}
+          {!loading && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
+                  {books.map((book) => (
+                      <ProductItem
+                          key={book.id}
+                          item={convertBookToProduct(book)}
+                      />
+                  ))}
+              </div>
+          )}
       </div>
     </section>
   );

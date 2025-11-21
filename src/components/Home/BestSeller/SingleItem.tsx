@@ -1,16 +1,15 @@
 "use client";
 import React from "react";
-import { Product } from "@/types/product";
-import { useModalContext } from "@/app/context/QuickViewModalContext";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
-import { updateQuickView } from "@/redux/features/quickView-slice";
-import { addItemToCart } from "@/redux/features/cart-slice";
+import {useModalContext} from "@/app/context/QuickViewModalContext";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "@/redux/store";
+import {updateQuickView} from "@/redux/features/quickView-slice";
+import {addItemToCart} from "@/redux/features/cart-slice";
 import Image from "next/image";
 import Link from "next/link";
-import { addItemToWishlist } from "@/redux/features/wishlist-slice";
+import {addItemToWishlist} from "@/redux/features/wishlist-slice";
 
-const SingleItem = ({ item }: { item: Product }) => {
+const SingleItem = ({ item }: { item: any }) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -91,7 +90,14 @@ const SingleItem = ({ item }: { item: Product }) => {
         </div>
 
         <div className="flex justify-center items-center">
-          <Image src={item.imgs.previews[0]} alt="" width={280} height={280} />
+            <Image
+                src={item.images?.[0] || "/images/placeholder.png"}
+                alt={item.title}
+                width={200}
+                height={280}
+                className="object-cover rounded-md"
+            />
+
         </div>
 
         <div className="absolute right-0 bottom-0 translate-x-full u-w-full flex flex-col gap-2 p-5.5 ease-linear duration-300 group-hover:translate-x-0">

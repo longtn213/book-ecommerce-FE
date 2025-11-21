@@ -1,29 +1,23 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CustomSelect from "./CustomSelect";
 
 import CategoryDropdown from "./CategoryDropdown";
 import AuthorsDropdown from "./AuthorsDropdown";
 import PublisherDropdown from "./PublisherDropdown";
-import ColorsDropdwon from "./ColorsDropdwon";
 import PriceDropdown from "./PriceDropdown";
 
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 
-import {
-    fetchCategories,
-    fetchAuthors,
-    fetchPublishers,
-} from "@/services/categoryService";
-
-import { searchBooks } from "@/services/bookService";
+import {fetchFeatureBook, searchBooks} from "@/services/bookService";
 
 const Shop = () => {
     const [productStyle, setProductStyle] = useState("grid");
     const [productSidebar, setProductSidebar] = useState(false);
     const [stickyMenu, setStickyMenu] = useState(false);
+    const [sortType, setSortType] = useState("0");
 
     // MASTER DATA
     const [categories, setCategories] = useState([]);
@@ -51,49 +45,54 @@ const Shop = () => {
     });
 
     // LOAD MASTER DATA
-    useEffect(() => {
-        async function loadMaster() {
-            try {
-                const [c, a, p] = await Promise.all([
-                    fetchCategories(),
-                    fetchAuthors(),
-                    fetchPublishers(),
-                ]);
-
-                setCategories(c);
-                setAuthors(a);
-                setPublishers(p);
-            } catch (e) {
-                console.error("LOAD MASTER FAILED", e);
-            }
-        }
-        loadMaster();
-    }, []);
-
-    // LOAD BOOK LIST
     const loadBooks = useCallback(async () => {
         try {
-            const res = await searchBooks({
-                page: pageInfo.page,
-                size: pageInfo.size,
-                keyword: filters.keyword,
-                categoryId: filters.categoryId,
-                authorId: filters.authorId,
-                publisherId: filters.publisherId,
-                minPrice: filters.minPrice,
-                maxPrice: filters.maxPrice,
-            });
+            let res;
 
-            setProducts(res.content);
+            if (sortType === "0") {
+                // 👉 Latest book → dùng searchBooks
+                res = await searchBooks({
+                    page: pageInfo.page,
+                    size: pageInfo.size,
+                    keyword: filters.keyword,
+                    categoryId: filters.categoryId,
+                    authorId: filters.authorId,
+                    publisherId: filters.publisherId,
+                    minPrice: filters.minPrice,
+                    maxPrice: filters.maxPrice,
+                });
 
-            setPageInfo((prev) => ({
-                ...prev,
-                totalPages: res.totalPages,
-            }));
+                setProducts(res.content);
+                setPageInfo((prev) => ({ ...prev, totalPages: res.totalPages }));
+            } else {
+                // 👉 Feature book (best-seller, top rating,…)
+                const mapType = {
+                    "1": "best-seller",
+                    "2": "top-rating",
+                };
+
+                const res = await fetchFeatureBook(
+                    mapType[sortType],
+                    pageInfo.page,
+                    pageInfo.size
+                );
+
+                setProducts(res.content);
+                setPageInfo(prev => ({
+                    ...prev,
+                    totalPages: res.totalPages
+                }));
+            }
+
         } catch (e) {
             console.error("LOAD BOOKS FAILED:", e);
         }
-    }, [filters, pageInfo.page, pageInfo.size]);
+    }, [
+        sortType,
+        filters,
+        pageInfo.page,
+        pageInfo.size,
+    ]);
 
     useEffect(() => {
         loadBooks();
@@ -112,9 +111,9 @@ const Shop = () => {
     }, []);
 
     const options = [
-        { label: "Latest Products", value: "0" },
+        { label: "Lastest Book", value: "0" },
         { label: "Best Selling", value: "1" },
-        { label: "Old Products", value: "2" },
+        { label: "Top Rating", value: "2" },
     ];
 
     return (
@@ -210,7 +209,13 @@ const Shop = () => {
                                 <div className="flex items-center justify-between">
 
                                     <div className="flex flex-wrap items-center gap-4">
-                                        <CustomSelect options={options} />
+                                        <CustomSelect
+                                            options={options}
+                                            onChange={(value: React.SetStateAction<string>) => {
+                                                setSortType(value);
+                                                setPageInfo((prev) => ({ ...prev, page: 0 })); // reset page
+                                            }}
+                                        />
                                         <p>
                                             Showing <span className="text-dark">{products.length}</span>{" "}
                                             Products

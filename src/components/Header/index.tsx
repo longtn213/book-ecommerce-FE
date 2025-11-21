@@ -51,7 +51,7 @@ const Header = () => {
                     label: c.name,
                     value: c.id.toString(),
                 }));
-                setCategories([{label: "All Categories", value: "0"}, ...formatted]);
+                setCategories([{label: "Tất cả", value: "0"}, ...formatted]);
             } catch (e) {
                 console.error("Failed to load categories", e);
             }

@@ -6,12 +6,12 @@ import { useModalContext } from "@/app/context/QuickViewModalContext";
 import { updateQuickView } from "@/redux/features/quickView-slice";
 import { addItemToCart } from "@/redux/features/cart-slice";
 import { addItemToWishlist } from "@/redux/features/wishlist-slice";
-import { updateproductDetails } from "@/redux/features/product-details";
+import { updateProductDetails } from "@/redux/features/product-details";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 
-const ProductItem = ({ item }: { item: Product }) => {
+const ProductItem = ({ item }: { item: any }) => {
   const { openModal } = useModalContext();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -42,7 +42,7 @@ const ProductItem = ({ item }: { item: Product }) => {
   };
 
   const handleProductDetails = () => {
-    dispatch(updateproductDetails({ ...item }));
+    dispatch(updateProductDetails({ ...item }));
   };
 
   return (
