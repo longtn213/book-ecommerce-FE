@@ -42,50 +42,31 @@ const SingleItem = ({ item }: { item: any }) => {
     <div className="group">
       <div className="relative overflow-hidden rounded-lg bg-[#F6F7FB] min-h-[403px]">
         <div className="text-center px-4 py-7.5">
-          <div className="flex items-center justify-center gap-2.5 mb-2">
-            <div className="flex items-center gap-1">
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
+            {/* RATING */}
+            <div className="flex items-center gap-2.5 mb-2">
+                <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <Image
+                            key={i}
+                            src="/images/icons/icon-star.svg"
+                            alt="star"
+                            width={14}
+                            height={14}
+                            className={i < Math.round(item.rating) ? "" : "opacity-30"}
+                        />
+                    ))}
+                </div>
+
+                <p className="text-custom-sm">({item.rating})</p>
             </div>
 
-            <p className="text-custom-sm">({item.reviews})</p>
-          </div>
-
-          <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
+            <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
             <Link href="/shop-details"> {item.title} </Link>
           </h3>
 
           <span className="flex items-center justify-center gap-2 font-medium text-lg">
-            <span className="text-dark">${item.discountedPrice}</span>
-            <span className="text-dark-4 line-through">${item.price}</span>
+            <span className="text-dark">{item.price.toLocaleString()}₫</span>
+            <span className="text-dark-4 line-through">{(item.price * 1.2).toLocaleString()}₫</span>
           </span>
         </div>
 

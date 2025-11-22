@@ -11,44 +11,38 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 
-const ProductItem = ({ item }: { item: any }) => {
-  const { openModal } = useModalContext();
+const ProductItem = ({ item }: { item: Product }) => {
+    const { openModal } = useModalContext();
+    const dispatch = useDispatch<AppDispatch>();
 
-  const dispatch = useDispatch<AppDispatch>();
+    // Quickview
+    const handleQuickViewUpdate = () => {
+        dispatch(updateQuickView({ ...item }));
+    };
 
-  // update the QuickView state
-  const handleQuickViewUpdate = () => {
-    dispatch(updateQuickView({ ...item }));
-  };
+    // // Add to cart
+    // const handleAddToCart = () => {
+    //     dispatch(addItemToCart({ ...item, quantity: 1 }));
+    // };
+    //
+    // const handleItemToWishList = () => {
+    //     dispatch(addItemToWishlist({ ...item, status: "available", quantity: 1 }));
+    // };
 
-  // add to cart
-  const handleAddToCart = () => {
-    dispatch(
-      addItemToCart({
-        ...item,
-        quantity: 1,
-      })
-    );
-  };
+    const handleProductDetails = () => {
+        dispatch(updateProductDetails(item));
+    };
 
-  const handleItemToWishList = () => {
-    dispatch(
-      addItemToWishlist({
-        ...item,
-        status: "available",
-        quantity: 1,
-      })
-    );
-  };
-
-  const handleProductDetails = () => {
-    dispatch(updateProductDetails({ ...item }));
-  };
-
-  return (
-    <div className="group">
-      <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-[#F6F7FB] min-h-[270px] mb-4">
-        <Image src={item.imgs.previews[0]} alt="" width={250} height={250} />
+    return (
+        <div className="group">
+            {/* IMAGE */}
+            <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-[#F6F7FB] min-h-[270px] mb-4">
+                <Image
+                    src={item.images?.[0] || "/images/default-book.png"}
+                    alt={item.title}
+                    width={250}
+                    height={250}
+                />
 
         <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
           <button
@@ -83,15 +77,15 @@ const ProductItem = ({ item }: { item: any }) => {
             </svg>
           </button>
 
-          <button
-            onClick={() => handleAddToCart()}
-            className="inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white ease-out duration-200 hover:bg-blue-dark"
-          >
-            Add to cart
-          </button>
+                    <button
+                        // onClick={handleAddToCart}
+                        className="inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white hover:bg-blue-dark"
+                    >
+                        Add to cart
+                    </button>
 
           <button
-            onClick={() => handleItemToWishList()}
+            // onClick={() => handleItemToWishList()}
             aria-label="button for favorite select"
             id="favOne"
             className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-blue"
@@ -115,56 +109,37 @@ const ProductItem = ({ item }: { item: any }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 mb-2">
-        <div className="flex items-center gap-1">
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-        </div>
+            {/* RATING */}
+            <div className="flex items-center gap-2.5 mb-2">
+                <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <Image
+                            key={i}
+                            src="/images/icons/icon-star.svg"
+                            alt="star"
+                            width={14}
+                            height={14}
+                            className={i < Math.round(item.rating) ? "" : "opacity-30"}
+                        />
+                    ))}
+                </div>
+                <p className="text-custom-sm">({item.rating})</p>
+            </div>
 
-        <p className="text-custom-sm">({item.reviews})</p>
-      </div>
+            {/* TITLE */}
+            <h3
+                className="font-medium text-dark hover:text-blue mb-1.5"
+                onClick={handleProductDetails}
+            >
+                <Link href="/shop-details">{item.title}</Link>
+            </h3>
 
-      <h3
-        className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5"
-        onClick={() => handleProductDetails()}
-      >
-        <Link href="/shop-details"> {item.title} </Link>
-      </h3>
-
-      <span className="flex items-center gap-2 font-medium text-lg">
-        <span className="text-dark">${item.discountedPrice}</span>
-        <span className="text-dark-4 line-through">${item.price}</span>
+            {/* PRICE */}
+            <span className="font-medium text-lg text-dark">
+        ${item.price}
       </span>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default ProductItem;

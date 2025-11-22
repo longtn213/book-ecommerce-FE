@@ -1,16 +1,30 @@
 "use client";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef, useEffect } from "react";
-import data from "./categoryData";
-import Image from "next/image";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {useCallback, useEffect, useRef, useState} from "react";
 
 // Import Swiper styles
 import "swiper/css/navigation";
 import "swiper/css";
 import SingleItem from "./SingleItem";
+import {fetchCategories} from "@/services/categoryService";
 
 const Categories = () => {
   const sliderRef = useRef(null);
+  const [categories, setCategories] = useState([]);
+
+useEffect(() => {
+    const loadCategories = async () => {
+        try {
+            const res = await fetchCategories();   // ⬅️ CHỜ API
+            setCategories(res || []);              // ⬅️ set đúng dữ liệu
+        } catch (error) {
+            console.error("Failed to load categories:", error);
+        }
+    };
+
+    loadCategories();
+}, []);
+
 
   const handlePrev = useCallback(() => {
     if (!sliderRef.current) return;
@@ -73,7 +87,7 @@ const Categories = () => {
                 Categories
               </span>
               <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-                Browse by Category
+                Các thể loại sách
               </h2>
             </div>
 
@@ -134,7 +148,7 @@ const Categories = () => {
               },
             }}
           >
-            {data.map((item, key) => (
+            {categories.map((item, key) => (
               <SwiperSlide key={key}>
                 <SingleItem item={item} />
               </SwiperSlide>

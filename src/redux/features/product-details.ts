@@ -1,36 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Product } from "@/types/product";
 
-type InitialState = {
-  value: Product;
+export interface ProductDetailsState {
+    product: Product | null;
+    activeIndex: number;
+}
+
+const initialState: ProductDetailsState = {
+    product: null,
+    activeIndex: 0,
 };
 
-const initialState = {
-  value: {
-    title: "",
-    reviews: 0,
-    price: 0,
-    discountedPrice: 0,
-    img: "",
-    images: [],
-    id: 0,
-    imgs: { thumbnails: [], previews: [] },
-  },
-} as InitialState;
-
 export const productDetails = createSlice({
-  name: "productDetails",
-  initialState,
-  reducers: {
-    updateproductDetails: (_, action) => {
-      return {
-        value: {
-          ...action.payload,
+    name: "productDetails",
+    initialState,
+    reducers: {
+        updateProductDetails: (state, action) => {
+            state.product = action.payload;
+            state.activeIndex = 0;
         },
-      };
+        setActiveIndex: (state, action) => {
+            state.activeIndex = action.payload;
+        }
     },
-  },
 });
 
-export const { updateproductDetails } = productDetails.actions;
+export const { updateProductDetails, setActiveIndex } = productDetails.actions;
 export default productDetails.reducer;

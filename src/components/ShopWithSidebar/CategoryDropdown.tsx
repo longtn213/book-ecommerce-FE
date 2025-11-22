@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const CategoryItem = ({ category, selectedId, onSelect }) => {
-    const isSelected = selectedId === category.id;
+    const isSelected = String(selectedId) === String(category.id);
 
     return (
         <button

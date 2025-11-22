@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import ProductItem from "@/components/Common/ProductItem";
 import {fetchNewestBook} from "@/services/bookService";
+import {convertBookToProduct} from "@/utils/helper";
 
 const NewArrival = () => {
     const [books, setBooks] = useState<any[]>([]);
@@ -18,17 +19,6 @@ const NewArrival = () => {
         getBooks();
     }, []);
 
-    // Convert dữ liệu BACKEND → dữ liệu ProductItem cần
-    const convertBookToProduct = (b: any) => ({
-        id: b.id,
-        title: b.title,
-        price: b.price,
-        discountedPrice: b.price, // nếu có discount thì thay
-        reviews: b.rating || 0,
-        imgs: {
-            previews: b.images?.length ? b.images : ["/images/default-book.png"],
-        },
-    });
     return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -66,7 +56,7 @@ const NewArrival = () => {
             href="/shop"
             className="inline-flex font-medium text-custom-sm py-2.5 px-7 rounded-md border-gray-3 border bg-gray-1 text-dark ease-out duration-200 hover:bg-dark hover:text-white hover:border-transparent"
           >
-            View All
+            Xem tất cả
           </Link>
         </div>
 

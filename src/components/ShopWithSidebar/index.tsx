@@ -12,12 +12,15 @@ import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 
 import {fetchFeatureBook, searchBooks} from "@/services/bookService";
+import {fetchAuthors, fetchCategories, fetchPublishers} from "@/services/categoryService";
+import {useSearchParams} from "next/navigation";
 
 const Shop = () => {
     const [productStyle, setProductStyle] = useState("grid");
     const [productSidebar, setProductSidebar] = useState(false);
     const [stickyMenu, setStickyMenu] = useState(false);
     const [sortType, setSortType] = useState("0");
+    const searchParams = useSearchParams();
 
     // MASTER DATA
     const [categories, setCategories] = useState([]);
@@ -45,58 +48,49 @@ const Shop = () => {
     });
 
     // LOAD MASTER DATA
-    const loadBooks = useCallback(async () => {
+    const loadBooks = async () => {
+        if (!sortType) return;
         try {
             let res;
 
             if (sortType === "0") {
-                // 👉 Latest book → dùng searchBooks
                 res = await searchBooks({
                     page: pageInfo.page,
                     size: pageInfo.size,
-                    keyword: filters.keyword,
-                    categoryId: filters.categoryId,
-                    authorId: filters.authorId,
-                    publisherId: filters.publisherId,
-                    minPrice: filters.minPrice,
-                    maxPrice: filters.maxPrice,
+                    ...filters
                 });
-
-                setProducts(res.content);
-                setPageInfo((prev) => ({ ...prev, totalPages: res.totalPages }));
-            } else {
-                // 👉 Feature book (best-seller, top rating,…)
-                const mapType = {
-                    "1": "best-seller",
-                    "2": "top-rating",
-                };
-
-                const res = await fetchFeatureBook(
-                    mapType[sortType],
-                    pageInfo.page,
-                    pageInfo.size
-                );
-
-                setProducts(res.content);
-                setPageInfo(prev => ({
-                    ...prev,
-                    totalPages: res.totalPages
-                }));
             }
+            else if (sortType === "1") {
+                res = await fetchFeatureBook("best-seller", pageInfo.page, pageInfo.size);
+            }
+            else if (sortType === "2") {
+                res = await fetchFeatureBook("top-rating", pageInfo.page, pageInfo.size);
+            }
+
+            setProducts(res.content);
+            setPageInfo(prev => ({
+                ...prev,
+                totalPages: res.totalPages
+            }));
 
         } catch (e) {
             console.error("LOAD BOOKS FAILED:", e);
         }
-    }, [
-        sortType,
-        filters,
-        pageInfo.page,
-        pageInfo.size,
-    ]);
+    };
+
+
+    useEffect(() => {
+        const categoryId = searchParams.get("categoryId");
+        if (categoryId) {
+            setFilters(f => ({ ...f, categoryId }));
+        }
+    }, [searchParams]);
+
 
     useEffect(() => {
         loadBooks();
-    }, [loadBooks]);
+    }, [sortType, JSON.stringify(filters), pageInfo.page]);
+
 
     useEffect(() => {
         setPageInfo((prev) => ({ ...prev, page: 0 }));
@@ -109,6 +103,33 @@ const Shop = () => {
 
         return () => window.removeEventListener("scroll", handleSticky);
     }, []);
+    useEffect(() => {
+        const loadMasterData = async () => {
+            try {
+                const [cRes, aRes, pRes] = await Promise.all([
+                    fetchCategories(),
+                    fetchAuthors(),
+                    fetchPublishers(),
+                ]);
+
+                setCategories(cRes || []);
+                setAuthors(aRes || []);
+                setPublishers(pRes || []);
+
+            } catch (error) {
+                console.error("Failed to load master data", error);
+            }
+        };
+
+        loadMasterData();
+    }, []);
+    useEffect(() => {
+        const sortParam = searchParams.get("sortType");
+        if (sortParam) {
+            setSortType(sortParam);
+            setPageInfo((prev) => ({ ...prev, page: 0 }));
+        }
+    }, [searchParams]);
 
     const options = [
         { label: "Lastest Book", value: "0" },
@@ -211,9 +232,10 @@ const Shop = () => {
                                     <div className="flex flex-wrap items-center gap-4">
                                         <CustomSelect
                                             options={options}
-                                            onChange={(value: React.SetStateAction<string>) => {
+                                            value={sortType}
+                                            onChange={(value) => {
                                                 setSortType(value);
-                                                setPageInfo((prev) => ({ ...prev, page: 0 })); // reset page
+                                                setPageInfo((prev) => ({ ...prev, page: 0 }));
                                             }}
                                         />
                                         <p>

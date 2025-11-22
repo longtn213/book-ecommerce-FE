@@ -24,3 +24,24 @@ export const EyeIcon = ({isOpen}: { isOpen: boolean }) => (
         </svg>
     )
 );
+
+export const convertBookToProduct = (b: any) => ({
+    id: b.id,
+    title: b.title,
+    slug: b.slug || "",
+    isbn: b.isbn || "",
+    description: b.description || "",
+    price: b.price,
+    stockQuantity: b.stockQuantity || 0,
+    pages: b.pages || 0,
+    language: b.language || "",
+    publishYear: b.publishYear || 0,
+    status: b.status || "",
+    publisherName: b.publisherName || "",
+    authors: b.authors?.map((a: any) => a.name) || [],
+    categories: b.categories?.map((c: any) => c.name) || [],
+    images: b.images?.length ? b.images : ["/images/default-book.png"],
+    rating: b.rating || 0,
+    reviewCount: b.reviewCount || 0,
+});
+
