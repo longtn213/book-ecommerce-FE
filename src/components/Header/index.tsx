@@ -19,6 +19,7 @@ const Header = () => {
 
     const {openCartModal} = useCartModalContext();
     const router = useRouter();
+    const [selectedCategory, setSelectedCategory] = useState("0");
 
     // 👉 Dùng hook mới
     const {user, cart, logout} = useAuth();
@@ -117,31 +118,47 @@ const Header = () => {
                         </Link>
 
                         <div className="flex-1 min-w-0">
-                            <form>
+                            <form onSubmit={(e) => e.preventDefault()}>
                                 <div className="flex items-center">
-                                    <CustomSelect options={categories}/>
+
+                                    <CustomSelect
+                                        options={categories}
+                                        value={selectedCategory}
+                                        onChange={(value) => setSelectedCategory(value)}
+                                    />
 
                                     <div className="relative w-full min-w-0">
-                                        {/* <!-- divider --> */}
-                                        <span
-                                            className="absolute left-0 top-1/2 -translate-y-1/2 inline-block w-px h-5.5 bg-gray-4"></span>
+                                        <span className="absolute left-0 top-1/2 -translate-y-1/2 inline-block w-px h-5.5 bg-gray-4"></span>
+
                                         <input
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            type="text"
                                             value={searchQuery}
-                                            type="search"
-                                            name="search"
-                                            id="search"
+                                            onChange={(e) => setSearchQuery(e.target.value)}
                                             placeholder="I am shopping for..."
-                                            autoComplete="off"
-                                            className="custom-search w-full rounded-r-[5px] bg-gray-1 !border-l-0 border border-gray-3 py-2.5 pl-4 pr-10 outline-none ease-in duration-200"
+                                            className="custom-search w-full rounded-r-[5px] bg-gray-1 !border-l-0 border border-gray-3 py-2.5 pl-4 pr-10"
                                         />
 
                                         <button
-                                            id="search-btn"
-                                            aria-label="Search"
-                                            className="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 ease-in duration-200 hover:text-blue"
+                                            type="button"
+                                            onClick={() => {
+                                                const params = new URLSearchParams();
+
+                                                params.set("sortType", "0");
+
+                                                if (searchQuery.trim() !== "") {
+                                                    params.set("keyword", searchQuery.trim());
+                                                }
+
+                                                // 👉 CHỈ GỬI categoryId nếu KHÔNG phải “Tất cả”
+                                                if (selectedCategory !== "0") {
+                                                    params.set("categoryId", selectedCategory);
+                                                }
+
+                                                router.push(`/shop?${params.toString()}`);
+                                            }}
+                                            className="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2"
                                         >
-                                            <svg
+                                        <svg
                                                 className="fill-current"
                                                 width="18"
                                                 height="18"

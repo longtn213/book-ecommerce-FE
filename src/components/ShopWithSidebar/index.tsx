@@ -81,9 +81,17 @@ const Shop = () => {
 
     useEffect(() => {
         const categoryId = searchParams.get("categoryId");
-        if (categoryId) {
-            setFilters(f => ({ ...f, categoryId }));
-        }
+        const keyword = searchParams.get("keyword");
+
+        setFilters(f => ({
+            ...f,
+            categoryId: categoryId || "",
+            keyword: keyword || ""
+        }));
+
+        // Reset page khi search mới
+        setPageInfo(prev => ({ ...prev, page: 0 }));
+
     }, [searchParams]);
 
 

@@ -6,30 +6,38 @@ interface Option {
 }
 
 interface CustomSelectProps {
-    options?: Option[];
+    options: Option[];
+    value?: string;               // ⭐ giá trị được truyền từ Header
+    onChange?: (value: string) => void; // ⭐ gửi value ra ngoài
 }
 
-const CustomSelect: React.FC<CustomSelectProps> = ({ options = [] }) => {
+const CustomSelect: React.FC<CustomSelectProps> = ({
+                                                       options = [],
+                                                       value,
+                                                       onChange,
+                                                   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
-    // ✅ Set giá trị mặc định (All Categories)
+    // ⭐ Cập nhật selectedOption khi props.value thay đổi
     useEffect(() => {
         if (options.length > 0) {
-            setSelectedOption(options[0]);
+            const found = options.find((o) => o.value === value) || options[0];
+            setSelectedOption(found);
         }
-    }, [options]);
+    }, [options, value]);
 
-    // ✅ Toggle dropdown
     const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-    // ✅ Khi chọn 1 option
     const handleOptionClick = (option: Option) => {
         setSelectedOption(option);
         setIsOpen(false);
+
+        // ⭐ BẮT BUỘC: Trả value ra ngoài để Header nhận được
+        onChange?.(option.value);
     };
 
-    // ✅ Đóng dropdown khi click ra ngoài
+    // Click ra ngoài → đóng menu
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (!(event.target as HTMLElement)?.closest(".custom-select-container")) {
@@ -42,18 +50,17 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options = [] }) => {
     }, []);
 
     return (
-        <div
-            className="custom-select-container relative inline-block w-[200px]"
-        >
-            {/* Hiển thị lựa chọn */}
+        <div className="custom-select-container relative inline-block w-[200px]">
             <div
                 onClick={toggleDropdown}
-                className={`select-selected flex items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer 
-        ${isOpen ? "border-blue-500" : "border-gray-300"}`}
+                className={`select-selected flex items-center justify-between px-3 py-2 bg-white 
+          border rounded-md cursor-pointer 
+          ${isOpen ? "border-blue-500" : "border-gray-300"}`}
             >
         <span className="truncate">
-          {selectedOption?.label || "Select category"}
+          {selectedOption?.label || "All Categories"}
         </span>
+
                 <svg
                     className={`w-4 h-4 ml-2 transform transition-transform ${
                         isOpen ? "rotate-180" : ""
@@ -67,18 +74,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options = [] }) => {
                 </svg>
             </div>
 
-            {/* Dropdown items */}
             {isOpen && (
                 <div
-                    className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg
-          max-h-[250px] overflow-y-auto z-50"
+                    className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200
+            rounded-md shadow-lg max-h-[250px] overflow-y-auto z-50"
                 >
                     {options.map((option, index) => (
                         <div
                             key={index}
                             onClick={() => handleOptionClick(option)}
-                            className={`px-3 py-2 cursor-pointer text-gray-700 hover:bg-blue-50 hover:text-blue-600 
-              ${selectedOption?.value === option.value ? "bg-blue-100 text-blue-600 font-medium" : ""}`}
+                            className={`px-3 py-2 cursor-pointer text-gray-700 
+                hover:bg-blue-50 hover:text-blue-600
+                ${
+                                selectedOption?.value === option.value
+                                    ? "bg-blue-100 text-blue-600 font-medium"
+                                    : ""
+                            }`}
                         >
                             {option.label}
                         </div>
