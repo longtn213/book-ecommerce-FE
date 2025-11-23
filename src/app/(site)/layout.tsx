@@ -38,8 +38,9 @@ export default function RootLayout({
         >
 
         {/* ---------------- AUTH PROVIDER LUÔN BAO TOÀN BỘ APP ---------------- */}
+        <ReduxProvider>
+
         <AuthProvider>
-            <ReduxProvider>
                 <CartModalProvider>
                     <ModalProvider>
                         <PreviewSliderProvider>
@@ -65,8 +66,8 @@ export default function RootLayout({
                     <Footer />
 
                 </CartModalProvider>
-            </ReduxProvider>
         </AuthProvider>
+        </ReduxProvider>
 
         </body>
         </html>

@@ -9,9 +9,10 @@ export const searchBooks = async ({
                                       publisherId = "",
                                       minPrice = "",
                                       maxPrice = "",
+                                      status = "ACTIVE",
                                   }) => {
 
-    const params: Record<string, any> = { page, size };
+    const params: Record<string, any> = { page, size,status };
 
     if (keyword) params.keyword = keyword;
     if (categoryId) params.categoryId = categoryId;

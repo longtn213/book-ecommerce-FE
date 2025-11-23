@@ -1,82 +1,37 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type InitialState = {
-  items: CartItem[];
+export type CartItem = {
+    bookId: number;
+    title: string;
+    quantity: number;
+    unitPriceSnapshot: number;
+    cartItemUrl: string[];
 };
 
-type CartItem = {
-  id: number;
-  title: string;
-  price: number;
-  discountedPrice: number;
-  quantity: number;
-  imgs?: {
-    thumbnails: string[];
-    previews: string[];
-  };
+export type CartState = {
+    items: CartItem[];
+    totalAmount: number;
 };
 
-const initialState: InitialState = {
-  items: [],
+const initialState: CartState = {
+    items: [],
+    totalAmount: 0,
 };
 
 export const cart = createSlice({
-  name: "cart",
-  initialState,
-  reducers: {
-    addItemToCart: (state, action: PayloadAction<CartItem>) => {
-      const { id, title, price, quantity, discountedPrice, imgs } =
-        action.payload;
-      const existingItem = state.items.find((item) => item.id === id);
-
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        state.items.push({
-          id,
-          title,
-          price,
-          quantity,
-          discountedPrice,
-          imgs,
-        });
-      }
+    name: "cart",
+    initialState,
+    reducers: {
+        setCart: (state, action: PayloadAction<CartState>) => {
+            state.items = action.payload.items;
+            state.totalAmount = action.payload.totalAmount;
+        },
+        clearCartState: (state) => {
+            state.items = [];
+            state.totalAmount = 0;
+        },
     },
-    removeItemFromCart: (state, action: PayloadAction<number>) => {
-      const itemId = action.payload;
-      state.items = state.items.filter((item) => item.id !== itemId);
-    },
-    updateCartItemQuantity: (
-      state,
-      action: PayloadAction<{ id: number; quantity: number }>
-    ) => {
-      const { id, quantity } = action.payload;
-      const existingItem = state.items.find((item) => item.id === id);
-
-      if (existingItem) {
-        existingItem.quantity = quantity;
-      }
-    },
-
-    removeAllItemsFromCart: (state) => {
-      state.items = [];
-    },
-  },
 });
 
-export const selectCartItems = (state: RootState) => state.cartReducer.items;
-
-export const selectTotalPrice = createSelector([selectCartItems], (items) => {
-  return items.reduce((total, item) => {
-    return total + item.discountedPrice * item.quantity;
-  }, 0);
-});
-
-export const {
-  addItemToCart,
-  removeItemFromCart,
-  updateCartItemQuantity,
-  removeAllItemsFromCart,
-} = cart.actions;
+export const { setCart, clearCartState } = cart.actions;
 export default cart.reducer;

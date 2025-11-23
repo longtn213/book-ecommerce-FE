@@ -1,63 +1,65 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type InitialState = {
-  items: WishListItem[];
+export type WishListItem = {
+    bookId: number;
+    title: string;
+    authorName: string;
+    price: number;
+    coverUrl: string;
 };
 
-type WishListItem = {
-  id: number;
-  title: string;
-  price: number;
-  discountedPrice: number;
-  quantity: number;
-  status?: string;
-  imgs?: {
-    thumbnails: string[];
-    previews: string[];
-  };
+type InitialState = {
+    items: WishListItem[];
 };
 
 const initialState: InitialState = {
-  items: [],
+    items: [],
 };
 
 export const wishlist = createSlice({
-  name: "wishlist",
-  initialState,
-  reducers: {
-    addItemToWishlist: (state, action: PayloadAction<WishListItem>) => {
-      const { id, title, price, quantity, imgs, discountedPrice, status } =
-        action.payload;
-      const existingItem = state.items.find((item) => item.id === id);
+    name: "wishlist",
+    initialState,
 
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        state.items.push({
-          id,
-          title,
-          price,
-          quantity,
-          imgs,
-          discountedPrice,
-          status,
-        });
-      }
-    },
-    removeItemFromWishlist: (state, action: PayloadAction<number>) => {
-      const itemId = action.payload;
-      state.items = state.items.filter((item) => item.id !== itemId);
-    },
+    reducers: {
+        /** Load full wishlist từ API */
+        setWishlist: (state, action: PayloadAction<WishListItem[]>) => {
+            state.items = action.payload;
+        },
 
-    removeAllItemsFromWishlist: (state) => {
-      state.items = [];
+        /** Toggle: nếu có → xoá. Không có → thêm */
+        toggleWishlist: (state, action: PayloadAction<WishListItem>) => {
+            const exists = state.items.find(
+                (item) => item.bookId === action.payload.bookId
+            );
+
+            if (exists) {
+                state.items = state.items.filter(
+                    (item) => item.bookId !== action.payload.bookId
+                );
+            } else {
+                state.items.push(action.payload);
+            }
+        },
+
+        /** Xoá 1 item (khi BE trả về xoá thành công) */
+        removeWishlistItem: (state, action: PayloadAction<number>) => {
+            state.items = state.items.filter(
+                (item) => item.bookId !== action.payload
+            );
+        },
+
+        /** Clear toàn bộ */
+        clearWishlist: (state) => {
+            state.items = [];
+        },
     },
-  },
 });
 
 export const {
-  addItemToWishlist,
-  removeItemFromWishlist,
-  removeAllItemsFromWishlist,
+    setWishlist,
+    toggleWishlist,
+    removeWishlistItem,
+    clearWishlist,
 } = wishlist.actions;
+
 export default wishlist.reducer;
