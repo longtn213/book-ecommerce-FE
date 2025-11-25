@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { useModalContext } from "@/app/context/QuickViewModalContext";
-import { AppDispatch, useAppSelector } from "@/redux/store";
-import { useDispatch } from "react-redux";
+import {useModalContext} from "@/app/context/QuickViewModalContext";
+import {useAppSelector} from "@/redux/store";
 import Image from "next/image";
 import {useAuthContext} from "@/context/AuthContext";
 import {useCart} from "@/hook/useCart";
