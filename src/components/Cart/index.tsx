@@ -14,7 +14,7 @@ const Cart = () => {
   const { clearCart,refresh } = useCart();
     useEffect(() => {
         refresh();   // <--- tải giỏ hàng từ BE
-    }, []);
+    }, [refresh]);
   return (
     <>
       {/* <!-- ===== Breadcrumb Section Start ===== --> */}

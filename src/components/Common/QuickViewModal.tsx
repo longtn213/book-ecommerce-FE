@@ -11,7 +11,6 @@ import {useCart} from "@/hook/useCart";
 const QuickViewModal = () => {
     const { isModalOpen, closeModal } = useModalContext();
     const [quantity, setQuantity] = useState(1);
-    const dispatch = useDispatch<AppDispatch>();
     const { user, requireLogin } = useAuthContext();
     const { addToCart } = useCart();
     // product từ quickViewReducer

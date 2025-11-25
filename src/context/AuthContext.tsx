@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
         }
         loadUserData();
-    }, []);
+    }, [loadUserData]);
 
     async function loadUserData() {
         try {

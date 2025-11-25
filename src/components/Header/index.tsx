@@ -281,9 +281,12 @@ const Header = () => {
                                                 }
                                                 className="flex items-center gap-2 cursor-pointer"
                                             >
-                                                <img
+                                                <Image
                                                     src={user.avatarUrl || "/images/profile/user-2.jpg"}
                                                     alt="avatar"
+                                                    width={36}
+                                                    height={36}
+                                                    unoptimized       // <— Dùng khi ảnh cloudinary không khai báo domain
                                                     className="w-9 h-9 rounded-full object-cover border"
                                                 />
                                                 <span className="font-medium">{user.username}</span>
