@@ -3,30 +3,22 @@ import React, { useEffect, useState } from "react";
 
 import { useModalContext } from "@/app/context/QuickViewModalContext";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { addItemToCart } from "@/redux/features/cart-slice";
 import { useDispatch } from "react-redux";
 import Image from "next/image";
+import {useAuthContext} from "@/context/AuthContext";
+import {useCart} from "@/hook/useCart";
 
 const QuickViewModal = () => {
     const { isModalOpen, closeModal } = useModalContext();
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch<AppDispatch>();
-
+    const { user, requireLogin } = useAuthContext();
+    const { addToCart } = useCart();
     // product từ quickViewReducer
     const product = useAppSelector((state) => state.quickViewReducer.value);
 
     const [activePreview, setActivePreview] = useState(0);
 
-    // add to cart
-    // const handleAddToCart = () => {
-    //     dispatch(
-    //         addItemToCart({
-    //             ...product,
-    //             quantity,
-    //         })
-    //     );
-    //     closeModal();
-    // };
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -104,7 +96,6 @@ const QuickViewModal = () => {
                             </div>
                         </div>
 
-                        {/* RIGHT INFO AREA */}
                         {/* RIGHT INFO AREA */}
                         <div className="max-w-[445px] w-full">
   <span className="inline-block text-custom-xs font-medium text-white py-1 px-3 bg-green mb-6.5">
@@ -222,6 +213,10 @@ const QuickViewModal = () => {
                                 className={`inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark ${
                                     product.status === "OUT_OF_STOCK" ? "opacity-50 cursor-not-allowed" : ""
                                 }`}
+                                onClick={() => {
+                                    if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
+                                    addToCart(product.id, quantity);
+                                }}
                             >
                                 Add to Cart
                             </button>

@@ -1,23 +1,16 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import {useCart} from "@/hook/useCart";
+import { useCart } from "@/hook/useCart";
 
-interface CartItemProps {
-    item: any,
-    removeItemFromCart?: () => Promise<void>
-}
+const CartItem = ({ item }) => {
+    const { updateQuantity, removeItems, loadingMap } = useCart();
 
-const CartItem = ({item, removeItemFromCart}: CartItemProps) => {
-    const {removeItems} = useCart();
-
-    const handleRemove = () => {
-        removeItems([item.bookId]);
-    };
+    const isLoading = loadingMap[item.bookId] === true;
 
     return (
-        <div
-            className="flex items-start justify-between gap-4 p-3 rounded-lg border border-gray-200 hover:shadow-md transition-all">
+        <div className="flex items-start justify-between gap-4 p-3 rounded-lg border border-gray-200 hover:shadow-md transition-all">
+
             {/* IMAGE */}
             <div className="w-[80px] h-[100px] flex-shrink-0 rounded-md overflow-hidden bg-gray-200 shadow-sm">
                 <Image
@@ -31,25 +24,54 @@ const CartItem = ({item, removeItemFromCart}: CartItemProps) => {
 
             {/* CONTENT */}
             <div className="flex flex-col flex-grow">
-                {/* TITLE */}
                 <h3 className="font-semibold text-dark text-[15px] leading-tight line-clamp-2 mb-1">
                     {item.title}
                 </h3>
 
                 {/* PRICE */}
-                <p className="text-[14px] text-gray-600">
-                    Price:{" "}
-                    <span className="font-semibold text-dark">
+                <p className="text-[14px] text-gray-600 mb-2">
+                    Price:
+                    <span className="font-semibold text-dark ml-1">
                         {item.unitPriceSnapshot.toLocaleString()} đ
                     </span>
                 </p>
+
+                {/* QUANTITY */}
+                <div className="flex items-center gap-2">
+                    <button
+                        disabled={item.quantity <= 1 || isLoading}
+                        onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
+                        className={`w-8 h-8 flex items-center justify-center border rounded 
+                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 border-gray-300"}
+                        `}
+                    >
+                        −
+                    </button>
+
+                    <span className="w-8 text-center font-medium">
+                        {isLoading ? "…" : item.quantity}
+                    </span>
+
+                    <button
+                        disabled={isLoading}
+                        onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
+                        className={`w-8 h-8 flex items-center justify-center border rounded 
+                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 border-gray-300"}
+                        `}
+                    >
+                        +
+                    </button>
+                </div>
             </div>
 
-            {/* DELETE BUTTON */}
+            {/* DELETE */}
             <button
-                onClick={handleRemove}
-                aria-label="Remove item from cart"
-                className="flex items-center justify-center w-10 h-10 rounded-md bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 hover:border-red-300 transition-all"
+                disabled={isLoading}
+                onClick={() => removeItems([item.bookId])}
+                className={`flex items-center justify-center w-10 h-10 rounded-md 
+                    bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 hover:border-red-300
+                    transition-all ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
+                `}
             >
                 <svg
                     className="fill-current"

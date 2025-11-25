@@ -15,9 +15,12 @@ const CartSidebarModal = () => {
     // ⭐ Redux state lấy từ BE
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
-
-    // ⭐ NEW: Cart actions
-    const { removeItems } = useCart();
+    const { refresh } = useCart();
+    useEffect(() => {
+        if (isCartModalOpen) {
+            refresh();   // ⭐ kéo lại giỏ hàng từ BE mỗi khi mở modal
+        }
+    }, [isCartModalOpen, refresh]);
 
     useEffect(() => {
         // closing modal while clicking outside
@@ -78,13 +81,8 @@ const CartSidebarModal = () => {
                     <div className="h-[66vh] overflow-y-auto no-scrollbar">
                         <div className="flex flex-col gap-6">
                             {cartItems.length > 0 ? (
-                                cartItems.map((item, key) => (
-                                    <CartItem
-                                        key={key}
-                                        item={item}
-                                        // ⭐ NEW: thay removeItemFromCart local → dùng removeItems API
-                                        removeItemFromCart={() => removeItems([item.bookId])}
-                                    />
+                                cartItems.map((item) => (
+                                    <CartItem key={item.bookId} item={item} />
                                 ))
                             ) : (
                                 <EmptyCart />

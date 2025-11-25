@@ -6,10 +6,8 @@
     import {updateQuickView} from "@/redux/features/quickView-slice";
     import {updateProductDetails} from "@/redux/features/product-details";
     import {useDispatch} from "react-redux";
-    import {AppDispatch, useAppSelector} from "@/redux/store";
+    import {AppDispatch} from "@/redux/store";
     import Link from "next/link";
-    import {toggleWishlist} from "@/redux/features/wishlist-slice";
-    import {toggleWishlistAPI} from "@/services/wishlistService";
     import {useAuthContext} from "@/context/AuthContext";
     import {useCart} from "@/hook/useCart";
     import {useWishlist} from "@/hook/useWishlist";
@@ -20,10 +18,6 @@
         const { user, requireLogin } = useAuthContext();
         const { addToCart } = useCart();
 
-        // 🎯 LẤY WISHLIST TỪ REDUX
-        const wishlist = useAppSelector((state) => state.wishlistReducer.items) || [];
-
-        // 🎯 KIỂM TRA SÁCH ĐÃ ĐƯỢC YÊU THÍCH CHƯA
 
         const handleQuickViewUpdate = () => {
             dispatch(updateQuickView({ ...item }));

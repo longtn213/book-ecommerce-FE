@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import { getUserCart } from "@/services/cartService";
 import { getCurrentUser } from "@/services/userService";
 import { usePathname, useRouter } from "next/navigation";
@@ -92,7 +92,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const closeAuthModal = () => setAuthModalOpen(false);
+    const modalRef = useRef<HTMLDivElement>(null);
 
+    // ⭐ Handle click outside modal
+    useEffect(() => {
+        if (!authModalOpen) return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+                setAuthModalOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [authModalOpen]);
     return (
         <AuthContext.Provider
             value={{ user, cart, loading, login, logout, setUser, setCart, requireLogin }}
@@ -102,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             {/* ⭐ MODAL YÊU CẦU ĐĂNG NHẬP */}
             {authModalOpen && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[99999]">
-                    <div className="bg-white rounded-xl p-6 w-[360px] shadow-xl">
+                    <div ref={modalRef} className="bg-white rounded-xl p-6 w-[360px] shadow-xl">
                         <h2 className="text-lg font-semibold mb-3">Yêu cầu đăng nhập</h2>
                         <p className="text-gray-600 mb-5">
                             Bạn cần đăng nhập để thực hiện {authActionText}.

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useWishlist } from "@/hook/useWishlist";
 import { useCart } from "@/hook/useCart";
+import {Trash2} from "lucide-react";
 
 const WishListSingleItem = ({ item }) => {
     const { toggle } = useWishlist();
@@ -23,9 +24,7 @@ const WishListSingleItem = ({ item }) => {
                     aria-label="remove wishlist"
                     className="flex items-center justify-center rounded-lg max-w-[38px] h-9.5 bg-gray-2 border border-gray-3 hover:bg-red-light-6 hover:border-red-light-4 hover:text-red"
                 >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M7 7L13 13M13 7L7 13" stroke="currentColor" strokeWidth="2"/>
-                    </svg>
+                    <Trash2 size={24} />
                 </button>
             </div>
 

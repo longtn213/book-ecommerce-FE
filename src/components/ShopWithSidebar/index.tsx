@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CustomSelect from "./CustomSelect";
 
@@ -14,123 +14,166 @@ import SingleListItem from "../Shop/SingleListItem";
 import {fetchFeatureBook, searchBooks} from "@/services/bookService";
 import {fetchAuthors, fetchCategories, fetchPublishers} from "@/services/categoryService";
 import {useSearchParams} from "next/navigation";
+type Filters = {
+    categoryId: string;
+    authorId: string;
+    publisherId: string;
+    keyword: string;
+    minPrice: string;
+    maxPrice: string;
+};
 
+const INITIAL_FILTERS: Filters = {
+    categoryId: "",
+    authorId: "",
+    publisherId: "",
+    keyword: "",
+    minPrice: "",
+    maxPrice: "",
+};
+
+type ProductStyle = "grid" | "list";
 const Shop = () => {
-    const [productStyle, setProductStyle] = useState("grid");
-    const [productSidebar, setProductSidebar] = useState(false);
-    const [stickyMenu, setStickyMenu] = useState(false);
-    const [sortType, setSortType] = useState("0");
     const searchParams = useSearchParams();
 
-    // MASTER DATA
-    const [categories, setCategories] = useState([]);
-    const [authors, setAuthors] = useState([]);
-    const [publishers, setPublishers] = useState([]);
+    /* ==========================
+     * VIEW STATE
+     * ======================== */
+    const [productStyle, setProductStyle] =
+        useState<ProductStyle>("grid");
+    const [productSidebar, setProductSidebar] =
+        useState(false);
+    const [stickyMenu, setStickyMenu] = useState(false);
 
-    // BOOK LIST
-    const [products, setProducts] = useState([]);
+    // 0: latest, 1: best seller, 2: top rating
+    const [sortType, setSortType] = useState("0");
 
-    // PAGINATION
+    /* ==========================
+     * MASTER DATA
+     * ======================== */
+    const [categories, setCategories] = useState<any[]>([]);
+    const [authors, setAuthors] = useState<any[]>([]);
+    const [publishers, setPublishers] = useState<any[]>([]);
+
+    /* ==========================
+     * BOOK LIST + PAGINATION
+     * ======================== */
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
     const [pageInfo, setPageInfo] = useState({
         page: 0,
         size: 9,
         totalPages: 0,
     });
 
-    // FILTERS
-    const [filters, setFilters] = useState({
-        categoryId: "",
-        authorId: "",
-        publisherId: "",
-        keyword: "",
-        minPrice: "",
-        maxPrice: "",
-    });
+    /* ==========================
+     * FILTERS
+     * ======================== */
+    const [filters, setFilters] =
+        useState<Filters>(INITIAL_FILTERS);
 
-    // LOAD MASTER DATA
-    const loadBooks = async () => {
-        if (!sortType) return;
-        try {
-            let res;
+    // helper: update filters + reset page
+    const updateFilters = useCallback(
+        (patch: Partial<Filters>) => {
+            setFilters((prev) => ({ ...prev, ...patch }));
+            setPageInfo((prev) => ({ ...prev, page: 0 }));
+        },
+        []
+    );
 
-            if (sortType === "0") {
-                res = await searchBooks({
-                    page: pageInfo.page,
-                    size: pageInfo.size,
-                    ...filters
-                });
-            }
-            else if (sortType === "1") {
-                res = await fetchFeatureBook("best-seller", pageInfo.page, pageInfo.size);
-            }
-            else if (sortType === "2") {
-                res = await fetchFeatureBook("top-rating", pageInfo.page, pageInfo.size);
-            }
-
-            setProducts(res.content);
-            setPageInfo(prev => ({
-                ...prev,
-                totalPages: res.totalPages
-            }));
-
-        } catch (e) {
-            console.error("LOAD BOOKS FAILED:", e);
-        }
-    };
-
-
-    useEffect(() => {
-        const categoryId = searchParams.get("categoryId");
-        const keyword = searchParams.get("keyword");
-
-        setFilters(f => ({
-            ...f,
-            categoryId: categoryId || "",
-            keyword: keyword || ""
-        }));
-
-        // Reset page khi search mới
-        setPageInfo(prev => ({ ...prev, page: 0 }));
-
-    }, [searchParams]);
-
-
-    useEffect(() => {
-        loadBooks();
-    }, [sortType, JSON.stringify(filters), pageInfo.page]);
-
-
-    useEffect(() => {
+    const resetFilters = useCallback(() => {
+        setFilters(INITIAL_FILTERS);
         setPageInfo((prev) => ({ ...prev, page: 0 }));
-    }, [filters]);
-
-    // Sticky sidebar
-    useEffect(() => {
-        const handleSticky = () => setStickyMenu(window.scrollY >= 80);
-        window.addEventListener("scroll", handleSticky);
-
-        return () => window.removeEventListener("scroll", handleSticky);
     }, []);
+
+    /* =========================================================
+     *  LOAD BOOKS – 1 useEffect duy nhất
+     * ======================================================= */
     useEffect(() => {
-        const loadMasterData = async () => {
+        let cancelled = false;
+
+        const doLoad = async () => {
             try {
-                const [cRes, aRes, pRes] = await Promise.all([
-                    fetchCategories(),
-                    fetchAuthors(),
-                    fetchPublishers(),
-                ]);
+                setLoading(true);
 
-                setCategories(cRes || []);
-                setAuthors(aRes || []);
-                setPublishers(pRes || []);
+                let res: any | undefined;
 
-            } catch (error) {
-                console.error("Failed to load master data", error);
+                if (sortType === "0") {
+                    // search bình thường với filters
+                    // tránh gửi param rỗng lên BE
+                    const params: any = {
+                        page: pageInfo.page,
+                        size: pageInfo.size,
+                    };
+
+                    Object.entries(filters).forEach(
+                        ([key, value]) => {
+                            if (value !== "" && value != null) {
+                                params[key] = value;
+                            }
+                        }
+                    );
+
+                    res = await searchBooks(params);
+                } else if (sortType === "1") {
+                    res = await fetchFeatureBook(
+                        "best-seller",
+                        pageInfo.page,
+                        pageInfo.size
+                    );
+                } else if (sortType === "2") {
+                    res = await fetchFeatureBook(
+                        "top-rating",
+                        pageInfo.page,
+                        pageInfo.size
+                    );
+                }
+
+                if (!res || cancelled) return;
+
+                setProducts(res.content || []);
+                setPageInfo((prev) => ({
+                    ...prev,
+                    totalPages: res.totalPages ?? 0,
+                }));
+            } catch (err) {
+                if (!cancelled) {
+                    console.error("LOAD BOOKS FAILED:", err);
+                }
+            } finally {
+                !cancelled && setLoading(false);
             }
         };
 
-        loadMasterData();
-    }, []);
+        doLoad();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [sortType, filters, pageInfo.page, pageInfo.size]);
+
+    /* =========================================================
+     *  SYNC FILTERS TỪ URL (?categoryId=&keyword=)
+     * ======================================================= */
+    useEffect(() => {
+        const categoryId =
+            searchParams.get("categoryId") || "";
+        const keyword =
+            searchParams.get("keyword") || "";
+
+        setFilters((prev) => ({
+            ...prev,
+            categoryId,
+            keyword,
+        }));
+
+        setPageInfo((prev) => ({ ...prev, page: 0 }));
+    }, [searchParams]);
+
+    /* =========================================================
+     *  SYNC sortType từ URL (nếu có ?sortType=)
+     * ======================================================= */
     useEffect(() => {
         const sortParam = searchParams.get("sortType");
         if (sortParam) {
@@ -138,6 +181,48 @@ const Shop = () => {
             setPageInfo((prev) => ({ ...prev, page: 0 }));
         }
     }, [searchParams]);
+
+    /* =========================================================
+     *  LOAD MASTER DATA (categories, authors, publishers)
+     * ======================================================= */
+    useEffect(() => {
+        const loadMasterData = async () => {
+            try {
+                const [cRes, aRes, pRes] =
+                    await Promise.all([
+                        fetchCategories(),
+                        fetchAuthors(),
+                        fetchPublishers(),
+                    ]);
+
+                setCategories(cRes || []);
+                setAuthors(aRes || []);
+                setPublishers(pRes || []);
+            } catch (error) {
+                console.error(
+                    "Failed to load master data",
+                    error
+                );
+            }
+        };
+
+        loadMasterData();
+    }, []);
+
+    /* =========================================================
+     *  STICKY SIDEBAR
+     * ======================================================= */
+    useEffect(() => {
+        const handleSticky = () =>
+            setStickyMenu(window.scrollY >= 80);
+
+        window.addEventListener("scroll", handleSticky);
+        return () =>
+            window.removeEventListener(
+                "scroll",
+                handleSticky
+            );
+    }, []);
 
     const options = [
         { label: "Lastest Book", value: "0" },
@@ -172,17 +257,9 @@ const Shop = () => {
                                         <div className="flex items-center justify-between">
                                             <p>Filters:</p>
                                             <button
+                                                type="button"
                                                 className="text-blue"
-                                                onClick={() =>
-                                                    setFilters({
-                                                        categoryId: "",
-                                                        authorId: "",
-                                                        publisherId: "",
-                                                        keyword: "",
-                                                        minPrice: "",
-                                                        maxPrice: "",
-                                                    })
-                                                }
+                                                onClick={resetFilters}
                                             >
                                                 Clean All
                                             </button>
@@ -194,7 +271,7 @@ const Shop = () => {
                                         categories={categories}
                                         selectedId={filters.categoryId}
                                         onSelect={(id) =>
-                                            setFilters((f) => ({ ...f, categoryId: id }))
+                                            updateFilters({ categoryId: id })
                                         }
                                     />
 
@@ -203,7 +280,7 @@ const Shop = () => {
                                         authors={authors}
                                         selectedId={filters.authorId}
                                         onSelect={(id) =>
-                                            setFilters((f) => ({ ...f, authorId: id }))
+                                            updateFilters({ authorId: id })
                                         }
                                     />
 
@@ -212,7 +289,7 @@ const Shop = () => {
                                         publishers={publishers}
                                         selectedId={filters.publisherId}
                                         onSelect={(id) =>
-                                            setFilters((f) => ({ ...f, publisherId: id }))
+                                            updateFilters({ publisherId: id })
                                         }
                                     />
 
@@ -221,11 +298,10 @@ const Shop = () => {
                                         minPrice={filters.minPrice}
                                         maxPrice={filters.maxPrice}
                                         onPriceChange={(min, max) =>
-                                            setFilters((f) => ({
-                                                ...f,
+                                            updateFilters({
                                                 minPrice: min,
                                                 maxPrice: max,
-                                            }))
+                                            })
                                         }
                                     />
                                 </div>

@@ -1,155 +1,146 @@
 "use client";
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import { useModalContext } from "@/app/context/QuickViewModalContext";
 import { updateQuickView } from "@/redux/features/quickView-slice";
-import { addItemToCart } from "@/redux/features/cart-slice";
-import { addItemToWishlist } from "@/redux/features/wishlist-slice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import Link from "next/link";
-import Image from "next/image";
+
+import { useAuthContext } from "@/context/AuthContext";
+import { useCart } from "@/hook/useCart";
+import { useWishlist } from "@/hook/useWishlist";
 
 const SingleListItem = ({ item }: any) => {
-    const { openModal } = useModalContext();
     const dispatch = useDispatch<AppDispatch>();
+    const { openModal } = useModalContext();
 
-    // === FIX IMAGE ===
+    const { user, requireLogin } = useAuthContext();
+    const { addToCart } = useCart();
+    const { isWishlisted, toggle } = useWishlist();
+
+    // IMAGE
     const previewImg =
-        item.images?.length > 0
-            ? item.images[0]
-            : "/images/placeholder/book-placeholder.png";
+        item.images?.[0] || "/images/placeholder/book-placeholder.png";
 
-    // === PRICE LOGIC ===
+    // PRICES
     const originalPrice = item.price ?? 0;
-    const discountedPrice = item.discountedPrice ?? item.price ?? 0;
+    const discountedPrice = item.discountedPrice ?? originalPrice;
 
-    // === REVIEWS (FALLBACK) ===
-    const reviews = item.reviews ?? 0;
-
-    // === Quick view ===
-    const handleQuickViewUpdate = () => {
+    // ⭐ QuickView
+    const handleQuickView = () => {
         dispatch(updateQuickView({ ...item }));
+        openModal();
     };
 
-    // === Add to cart ===
+    // 🛒 Add to Cart
     const handleAddToCart = () => {
-        dispatch(
-            addItemToCart({
-                ...item,
-                quantity: 1,
-            })
-        );
+        if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
+
+        addToCart(item.id, 1);
     };
 
-    // === Wishlist ===
-    const handleItemToWishList = () => {
-        dispatch(
-            addItemToWishlist({
-                ...item,
-                status: "available",
-                quantity: 1,
-            })
-        );
+    // ❤️ Wishlist Toggle
+    const handleToggleWishlist = () => {
+        toggle({
+            id: item.id,
+            title: item.title,
+            authorName: item.authors?.join(", ") || "",
+            price: item.price,
+            coverUrl: item.images?.[0] || "",
+        });
     };
 
     return (
         <div className="group rounded-lg bg-white shadow-1">
             <div className="flex">
+                {/* LEFT IMAGE */}
                 <div className="shadow-list relative overflow-hidden flex items-center justify-center max-w-[270px] w-full sm:min-h-[270px] p-4">
+                    <Image
+                        src={previewImg}
+                        alt={item.title}
+                        width={250}
+                        height={250}
+                        className="object-cover"
+                    />
 
-                    {/* FIXED IMAGE */}
-                    <Image src={previewImg} alt={item.title} width={250} height={250} />
-
-                    {/* Hover buttons */}
+                    {/* HOVER BUTTONS */}
                     <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
+
+                        {/* QUICK VIEW */}
                         <button
-                            onClick={() => {
-                                openModal();
-                                handleQuickViewUpdate();
-                            }}
-                            aria-label="button for quick view"
-                            className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-blue"
+                            onClick={handleQuickView}
+                            className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-blue"
                         >
-                            {/* ORIGINAL SVG - DO NOT CHANGE */}
                             <svg
-                                className="fill-current"
                                 width="16"
                                 height="16"
                                 viewBox="0 0 16 16"
-                                fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
                             >
-                                <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M8.00016 5.5C6.61945 5.5..."
-                                    fill=""
-                                />
+                                <path d="M8 3C4 3 1.3 6.1.5 7.3a1 1 0 000 1.4C1.3 9.9 4 13 8 13s6.7-3.1 7.5-4.3a1 1 0 000-1.4C14.7 6.1 12 3 8 3zm0 8c-2 0-3.5-1.7-3.5-3.5S6 4 8 4s3.5 1.7 3.5 3.5S10 11 8 11zm0-5A1.5 1.5 0 118 9a1.5 1.5 0 010-3z"/>
                             </svg>
                         </button>
 
+                        {/* ADD TO CART */}
                         <button
                             onClick={handleAddToCart}
-                            className="inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white ease-out duration-200 hover:bg-blue-dark"
+                            className="inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white hover:bg-blue-dark"
                         >
                             Add to cart
                         </button>
 
+                        {/* WISHLIST */}
                         <button
-                            onClick={handleItemToWishList}
-                            aria-label="button for favorite select"
-                            className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-blue"
+                            onClick={handleToggleWishlist}
+                            className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 bg-white 
+                            ${isWishlisted(item.id) ? "text-red-500" : "text-dark"} 
+                            hover:text-blue`}
                         >
-                            {/* ORIGINAL SVG - DO NOT CHANGE */}
-                            <svg
-                                className="fill-current"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M3.74949 2.94946..."
-                                    fill=""
-                                />
-                            </svg>
+                            {isWishlisted(item.id) ? (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="red">
+                                    <path d="M12 21s-6.2-4.3-9.3-8.6C-1.2 7.2 2 2 6.5 2 9 2 11 3.5 12 5.1 13 3.5 15 2 17.5 2 22 2 25.2 7.2 21.3 12.4 18.2 16.7 12 21 12 21z"/>
+                                </svg>
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                                    <path d="M12.1 8.64l-.1.1-.11-.1C10.14 6.6 7.11 6.6 5.17 8.54c-1.93 1.93-1.93 5.07 0 7L12 22l6.83-6.46c1.93-1.93 1.93-5.07 0-7C16.89 6.6 13.86 6.6 12.1 8.64z"/>
+                                </svg>
+                            )}
                         </button>
                     </div>
                 </div>
 
-                {/* RIGHT SECTION */}
+                {/* RIGHT CONTENT */}
                 <div className="w-full flex flex-col gap-5 sm:flex-row sm:items-center justify-center sm:justify-between py-5 px-4 sm:px-7.5 lg:pl-11 lg:pr-12">
                     <div>
-                        <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
+                        <h3 className="font-medium text-dark hover:text-blue mb-1.5">
                             <Link href={`/shop-details/${item.slug}`}>{item.title}</Link>
                         </h3>
 
+                        {/* PRICE */}
                         <span className="flex items-center gap-2 font-medium text-lg">
-              <span className="text-dark">
-                {discountedPrice.toLocaleString()}₫
-              </span>
+                            <span className="text-dark">
+                                {discountedPrice.toLocaleString()}₫
+                            </span>
 
                             {discountedPrice !== originalPrice && (
-                                <span className="text-dark-4 line-through">
-                  {originalPrice.toLocaleString()}₫
-                </span>
+                                <span className="text-gray-400 line-through">
+                                    {originalPrice.toLocaleString()}₫
+                                </span>
                             )}
-            </span>
+                        </span>
                     </div>
 
-                    {/* Reviews */}
+                    {/* RATING */}
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="flex items-center gap-1">
-
-                            {/* Tạo số sao từ rating */}
                             {Array.from({ length: 5 }).map((_, i) => (
                                 <Image
                                     key={i}
                                     src="/images/icons/icon-star.svg"
-                                    alt="star icon"
+                                    alt="star"
                                     width={15}
                                     height={15}
                                     className={i < Math.round(item.rating) ? "opacity-100" : "opacity-30"}
@@ -157,8 +148,7 @@ const SingleListItem = ({ item }: any) => {
                             ))}
                         </div>
 
-                        {/* Hiển thị số rating */}
-                        <p className="text-custom-sm">({item.rating.toFixed(1)})</p>
+                        <p className="text-custom-sm">({item.rating?.toFixed(1)})</p>
                     </div>
                 </div>
             </div>

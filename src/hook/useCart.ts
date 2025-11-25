@@ -11,58 +11,76 @@ import {
 } from "@/services/cartService";
 
 import { useAuthContext } from "@/context/AuthContext";
+import { useRef, useState, useCallback } from "react";
+import debounce from "lodash/debounce";
 
 export const useCart = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { setCart: setContextCart } = useAuthContext(); // ⭐ context sync
+    const { setCart: setContextCart } = useAuthContext();
 
-    // ------------------------------
-    // ⭐ LOAD CART TỪ BE
-    // ------------------------------
-    const refresh = async () => {
+    const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
+
+    /* ===================================================
+       LOAD CART (MEMOIZED)
+    =================================================== */
+    const refresh = useCallback(async () => {
         const cartData = await getUserCart();
         dispatch(setCart(cartData));
-        setContextCart(cartData); // ⭐ sync context
-    };
+        setContextCart(cartData);
+    }, [dispatch, setContextCart]);
 
-    // ------------------------------
-    // ⭐ ADD TO CART
-    // ------------------------------
-    const addToCart = async (bookId: number, quantity = 1) => {
+    /* ======================
+       ADD TO CART (NO DEBOUNCE)
+    ======================= */
+    const addToCart = async (bookId: number, quantity: number) => {
+        setLoadingMap(prev => ({ ...prev, [bookId]: true }));
+
         const cartData = await addUserCart(bookId, quantity);
 
         dispatch(setCart(cartData));
         setContextCart(cartData);
+
+        setLoadingMap(prev => ({ ...prev, [bookId]: false }));
     };
 
-    // ------------------------------
-    // ⭐ UPDATE QUANTITY
-    // ------------------------------
-    const updateQuantity = async (bookId: number, quantity: number) => {
-        const cartData = await updateUserCart(bookId, quantity);
 
-        dispatch(setCart(cartData));
-        setContextCart(cartData);
+    /* ======================
+       UPDATE QUANTITY (DEBOUNCE)
+    ======================= */
+    const updateQuantityDebounceRef = useRef(
+        debounce(async (bookId: number, quantity: number) => {
+            setLoadingMap(prev => ({ ...prev, [bookId]: true }));
+
+            const cartData = await updateUserCart(bookId, quantity);
+
+            dispatch(setCart(cartData));
+            setContextCart(cartData);
+
+            setLoadingMap(prev => ({ ...prev, [bookId]: false }));
+        }, 300)
+    ).current;
+
+    const updateQuantity = (bookId: number, quantity: number) => {
+        updateQuantityDebounceRef(bookId, quantity);
     };
 
-    // ------------------------------
-    // ⭐ REMOVE ITEMS
-    // ------------------------------
-    const removeItems = async (bookIds: number[]) => {
+    /* ===================================================
+       REMOVE ITEM
+    =================================================== */
+    const removeItems = useCallback(async (bookIds: number[]) => {
         const cartData = await removeUserCart(bookIds);
-
         dispatch(setCart(cartData));
         setContextCart(cartData);
-    };
+    }, [dispatch, setContextCart]);
 
-    // ------------------------------
-    // ⭐ CLEAR CART
-    // ------------------------------
-    const clearCart = async () => {
+    /* ===================================================
+       CLEAR CART
+    =================================================== */
+    const clearCart = useCallback(async () => {
         await clearUserCart();
         dispatch(clearCartState());
-        setContextCart({ items: [], totalAmount: 0 }); // sync context
-    };
+        setContextCart({ items: [], totalAmount: 0 });
+    }, [dispatch, setContextCart]);
 
     return {
         refresh,
@@ -70,5 +88,6 @@ export const useCart = () => {
         updateQuantity,
         removeItems,
         clearCart,
+        loadingMap,
     };
 };

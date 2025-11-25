@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import CustomSelect from "./CustomSelect";
 import {menuData} from "./menuData";
-import Dropdown from "./Dropdown";
 import {useCartModalContext} from "@/app/context/CartSidebarModalContext";
 import {fetchCategories} from "@/services/categoryService";
 import {useRouter} from "next/navigation";
@@ -95,6 +94,16 @@ const Header = () => {
             window.removeEventListener("resize", updateHeaderHeight);
         };
     }, []);
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1280) {
+                setNavigationOpen(false);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     return (
         <header
@@ -134,7 +143,7 @@ const Header = () => {
                                             type="text"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            placeholder="I am shopping for..."
+                                            placeholder="Tôi đang muốn tìm kiếm ...."
                                             className="custom-search w-full rounded-r-[5px] bg-gray-1 !border-l-0 border border-gray-3 py-2.5 pl-4 pr-10"
                                         />
 
@@ -377,9 +386,25 @@ const Header = () => {
                         <span className="block text-2xs text-dark-4 uppercase">
                           cart
                         </span>
-                                            <p className="font-medium text-custom-sm text-dark">
-                                                ${cart.totalAmount}
+                                            <p
+                                                className="
+        font-semibold
+        text-sm
+        text-[#3C50E0]
+        bg-white
+        border
+        border-[#3C50E0]
+        px-3
+        py-1
+        rounded-md
+        shadow-sm
+        whitespace-nowrap
+    "
+                                            >
+                                                {cart.totalAmount.toLocaleString()}₫
                                             </p>
+
+
                                         </div>
                                     </button>
                                 )}
@@ -436,72 +461,126 @@ const Header = () => {
                 <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
                     <div className="flex items-center justify-between">
                         {/* <!--=== Main Nav Start ===--> */}
+                        {/* === MAIN NAV START – TIKI STYLE === */}
                         <div
-                            className={`w-[288px] absolute right-4 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex items-center justify-between ${
-                                navigationOpen &&
-                                `!visible bg-white shadow-lg border border-gray-3 !h-auto max-h-[400px] overflow-y-scroll rounded-md p-5`
-                            }`}
+                            className={`
+    absolute right-4 top-full 
+    w-[290px] xl:w-auto xl:static 
+    bg-white xl:bg-transparent 
+    border border-gray-200 xl:border-none
+    shadow-lg xl:shadow-none 
+    rounded-lg xl:rounded-none 
+    overflow-hidden
+    duration-300 transition-all 
+    ${navigationOpen ? "max-h-[450px] opacity-100" : "max-h-0 opacity-0 xl:max-h-full xl:opacity-100"}
+  `}
                         >
-                            {/* <!-- Main Nav Start --> */}
-                            <nav>
-                                <ul className="flex xl:items-center flex-col xl:flex-row gap-5 xl:gap-6">
+                            <nav className="xl:flex">
+                                <ul className="flex flex-col xl:flex-row gap-1 xl:gap-4 p-4 xl:p-0">
+
                                     {menuData.map((menuItem, i) =>
                                         menuItem.submenu ? (
-                                            <Dropdown
-                                                key={i}
-                                                menuItem={menuItem}
-                                                stickyMenu={stickyMenu}
-                                            />
-                                        ) : (
-                                            <li
-                                                key={i}
-                                                className="group relative before:w-0 before:h-[3px] before:bg-blue before:absolute before:left-0 before:top-0 before:rounded-b-[3px] before:ease-out before:duration-200 hover:before:w-full "
-                                            >
-                                                <Link
-                                                    href={menuItem.path}
-                                                    className={`hover:text-blue text-custom-sm font-medium text-dark flex ${
-                                                        stickyMenu ? "xl:py-4" : "xl:py-6"
-                                                    }`}
+                                            <li key={i} className="group relative">
+                                                <button
+                                                    className="
+                w-full xl:w-auto flex items-center justify-between
+                text-[15px] font-semibold text-dark
+                py-3 xl:py-4 px-2
+                hover:text-blue transition
+              "
                                                 >
                                                     {menuItem.title}
+
+                                                    {/* ICON giống TIKI */}
+                                                    <svg
+                                                        width="16" height="16"
+                                                        className="ml-1 fill-current text-gray-500 group-hover:text-blue
+                transform xl:group-hover:rotate-180 transition"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M5.8 7.3a1 1 0 011.4 0L10 10.1l2.8-2.8a1 1 0 011.4 1.4l-3.5 3.5a1 1 0 01-1.4 0L5.8 8.7a1 1 0 010-1.4z" />
+                                                    </svg>
+                                                </button>
+
+                                                {/* === DROPDOWN TIKI STYLE === */}
+                                                <ul
+                                                    className="
+                flex flex-col
+                xl:absolute xl:left-0 xl:top-full
+                xl:w-[260px]
+                xl:bg-white xl:border xl:border-gray-200
+                xl:shadow-xl xl:rounded-xl
+                xl:opacity-0 xl:invisible
+                xl:group-hover:visible xl:group-hover:opacity-100
+                xl:translate-y-3 xl:group-hover:translate-y-0
+                transition-all duration-200
+                overflow-hidden
+              "
+                                                >
+                                                    {menuItem.submenu.map((item, j) => (
+                                                        <li key={j}>
+                                                            <Link
+                                                                href={item.path}
+                                                                className="
+                      block text-[14px] text-dark
+                      px-4 py-2.5
+                      hover:bg-blue/5 hover:text-blue
+                      border-b last:border-none border-gray-100
+                      transition
+                    "
+                                                            >
+                                                                {item.title}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        ) : (
+                                            <li key={i}>
+                                                <Link
+                                                    href={menuItem.path}
+                                                    className="
+    flex items-center gap-2
+    text-[15px] font-medium text-[#1D1F2C]
+    py-3 xl:py-4 px-2
+    transition-all duration-200
+    hover:text-blue
+    group
+  "
+                                                >
+                                                    {menuItem.icon && (
+                                                        <span
+                                                            className="
+        text-[#1D1F2C]
+        group-hover:text-blue
+        transition-all
+        flex items-center
+      "
+                                                        >
+      {menuItem.icon}
+    </span>
+                                                    )}
+
+                                                    <span className="tracking-wide">{menuItem.title}</span>
+
+                                                    {/* underline hiệu ứng đẹp hơn */}
+                                                    <span
+                                                        className="
+      absolute left-0 bottom-0
+      h-[2px] w-0 bg-blue
+      group-hover:w-full
+      transition-all duration-300
+    "
+                                                    ></span>
                                                 </Link>
                                             </li>
                                         )
                                     )}
                                 </ul>
                             </nav>
-                            {/* //   <!-- Main Nav End --> */}
                         </div>
-                        {/* // <!--=== Main Nav End ===--> */}
+                        {/* === MAIN NAV END === */}
 
-                        {/* // <!--=== Nav Right Start ===--> */}
-                        <div className="hidden xl:block">
-                            <ul className="flex items-center gap-5.5">
-
-                                <li className="py-4">
-                                    <Link
-                                        href="/wishlist"
-                                        className="flex items-center gap-1.5 font-medium text-custom-sm text-dark hover:text-blue"
-                                    >
-                                        <svg
-                                            className="fill-current"
-                                            width="16"
-                                            height="16"
-                                            viewBox="0 0 16 16"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M5.97441 12.6073L6.43872 12.0183L5.97441 12.6073ZM7.99992 3.66709L7.45955 4.18719C7.60094 4.33408 7.79604 4.41709 7.99992 4.41709C8.2038 4.41709 8.3989 4.33408 8.54028 4.18719L7.99992 3.66709ZM10.0254 12.6073L10.4897 13.1962L10.0254 12.6073ZM6.43872 12.0183C5.41345 11.21 4.33627 10.4524 3.47904 9.48717C2.64752 8.55085 2.08325 7.47831 2.08325 6.0914H0.583252C0.583252 7.94644 1.3588 9.35867 2.35747 10.4832C3.33043 11.5788 4.57383 12.4582 5.51009 13.1962L6.43872 12.0183ZM2.08325 6.0914C2.08325 4.75102 2.84027 3.63995 3.85342 3.17683C4.81929 2.73533 6.15155 2.82823 7.45955 4.18719L8.54028 3.14699C6.84839 1.38917 4.84732 1.07324 3.22983 1.8126C1.65962 2.53035 0.583252 4.18982 0.583252 6.0914H2.08325ZM5.51009 13.1962C5.84928 13.4636 6.22932 13.7618 6.61834 13.9891C7.00711 14.2163 7.47619 14.4167 7.99992 14.4167V12.9167C7.85698 12.9167 7.65939 12.8601 7.37512 12.694C7.0911 12.5281 6.79171 12.2965 6.43872 12.0183L5.51009 13.1962ZM10.4897 13.1962C11.426 12.4582 12.6694 11.5788 13.6424 10.4832C14.641 9.35867 15.4166 7.94644 15.4166 6.0914H13.9166C13.9166 7.47831 13.3523 8.55085 12.5208 9.48717C11.6636 10.4524 10.5864 11.21 9.56112 12.0183L10.4897 13.1962ZM15.4166 6.0914C15.4166 4.18982 14.3402 2.53035 12.77 1.8126C11.1525 1.07324 9.15145 1.38917 7.45955 3.14699L8.54028 4.18719C9.84828 2.82823 11.1805 2.73533 12.1464 3.17683C13.1596 3.63995 13.9166 4.75102 13.9166 6.0914H15.4166ZM9.56112 12.0183C9.20813 12.2965 8.90874 12.5281 8.62471 12.694C8.34044 12.8601 8.14285 12.9167 7.99992 12.9167V14.4167C8.52365 14.4167 8.99273 14.2163 9.3815 13.9891C9.77052 13.7618 10.1506 13.4636 10.4897 13.1962L9.56112 12.0183Z"
-                                                fill=""
-                                            />
-                                        </svg>
-                                        Wishlist
-                                    </Link>
-                                </li>
-                            </ul>
-                        </div>
-                        {/* <!--=== Nav Right End ===--> */}
                     </div>
                 </div>
             </div>
