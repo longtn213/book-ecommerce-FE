@@ -1,8 +1,8 @@
 import React from "react";
-import { Testimonial } from "@/types/testimonial";
+import { Review } from "@/types/review";
 import Image from "next/image";
 
-const ReviewSingleItem = ({ testimonial }: { testimonial: Testimonial }) => {
+const ReviewSingleItem = ({ testimonial }: { testimonial: Review }) => {
     // Format date tiếng Việt
     const formattedDate = testimonial.createdAt.toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -28,7 +28,7 @@ const ReviewSingleItem = ({ testimonial }: { testimonial: Testimonial }) => {
             </div>
 
             {/* Comment */}
-            <p className="text-dark mb-4 italic">{testimonial.review}</p>
+            <p className="text-dark mb-4 italic">{testimonial.comment}</p>
 
             {/* Date */}
             <p className="text-xs text-gray-500 mb-4">Ngày đánh giá: {formattedDate}</p>

@@ -139,7 +139,9 @@ const Header = () => {
         window.addEventListener("keydown", handleEsc);
         return () => window.removeEventListener("keydown", handleEsc);
     }, []);
-
+    const filteredMenu = user
+        ? menuData // User đăng nhập -> show full menu
+        : menuData.filter((item) => item.id <= 3);
 
     return (
         <header
@@ -507,105 +509,29 @@ const Header = () => {
                         >
                             <nav className="xl:flex">
                                 <ul className="flex flex-col xl:flex-row gap-1 xl:gap-4 p-4 xl:p-0">
-
-                                    {menuData.map((menuItem, i) =>
-                                        menuItem.submenu ? (
-                                            <li key={i} className="group relative">
-                                                <button
-                                                    className="
-                w-full xl:w-auto flex items-center justify-between
-                text-[15px] font-semibold text-dark
+                                    {filteredMenu.map((menuItem, i) => (
+                                        <li key={i}>
+                                            <Link
+                                                href={menuItem.path}
+                                                className="
+                flex items-center gap-2
+                text-[15px] font-medium text-[#1D1F2C]
                 py-3 xl:py-4 px-2
-                hover:text-blue transition
-              "
-                                                >
-                                                    {menuItem.title}
-
-                                                    {/* ICON giống TIKI */}
-                                                    <svg
-                                                        width="16" height="16"
-                                                        className="ml-1 fill-current text-gray-500 group-hover:text-blue
-                transform xl:group-hover:rotate-180 transition"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path d="M5.8 7.3a1 1 0 011.4 0L10 10.1l2.8-2.8a1 1 0 011.4 1.4l-3.5 3.5a1 1 0 01-1.4 0L5.8 8.7a1 1 0 010-1.4z" />
-                                                    </svg>
-                                                </button>
-
-                                                {/* === DROPDOWN TIKI STYLE === */}
-                                                <ul
-                                                    className="
-                flex flex-col
-                xl:absolute xl:left-0 xl:top-full
-                xl:w-[260px]
-                xl:bg-white xl:border xl:border-gray-200
-                xl:shadow-xl xl:rounded-xl
-                xl:opacity-0 xl:invisible
-                xl:group-hover:visible xl:group-hover:opacity-100
-                xl:translate-y-3 xl:group-hover:translate-y-0
                 transition-all duration-200
-                overflow-hidden
-              "
-                                                >
-                                                    {menuItem.submenu.map((item, j) => (
-                                                        <li key={j}>
-                                                            <Link
-                                                                href={item.path}
-                                                                className="
-                      block text-[14px] text-dark
-                      px-4 py-2.5
-                      hover:bg-blue/5 hover:text-blue
-                      border-b last:border-none border-gray-100
-                      transition
-                    "
-                                                            >
-                                                                {item.title}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </li>
-                                        ) : (
-                                            <li key={i}>
-                                                <Link
-                                                    href={menuItem.path}
-                                                    className="
-    flex items-center gap-2
-    text-[15px] font-medium text-[#1D1F2C]
-    py-3 xl:py-4 px-2
-    transition-all duration-200
-    hover:text-blue
-    group
-  "
-                                                >
-                                                    {menuItem.icon && (
-                                                        <span
-                                                            className="
-        text-[#1D1F2C]
-        group-hover:text-blue
-        transition-all
-        flex items-center
-      "
-                                                        >
-      {menuItem.icon}
-    </span>
-                                                    )}
+                hover:text-blue
+                group
+            "
+                                            >
+                                                {menuItem.icon && (
+                                                    <span className="text-[#1D1F2C] group-hover:text-blue transition-all flex items-center">
+                    {menuItem.icon}
+                </span>
+                                                )}
 
-                                                    <span className="tracking-wide">{menuItem.title}</span>
-
-                                                    {/* underline hiệu ứng đẹp hơn */}
-                                                    <span
-                                                        className="
-      absolute left-0 bottom-0
-      h-[2px] w-0 bg-blue
-      group-hover:w-full
-      transition-all duration-300
-    "
-                                                    ></span>
-                                                </Link>
-                                            </li>
-                                        )
-                                    )}
+                                                <span className="tracking-wide">{menuItem.title}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
                                 </ul>
                             </nav>
                         </div>

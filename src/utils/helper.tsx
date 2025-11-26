@@ -44,4 +44,38 @@ export const convertBookToProduct = (b: any) => ({
     rating: b.rating || 0,
     reviewCount: b.reviewCount || 0,
 });
+export const formatReviewDate = (dateString: Date | string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
 
+    const isToday =
+        date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
+
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+
+    const isYesterday =
+        date.getDate() === yesterday.getDate() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getFullYear() === yesterday.getFullYear();
+
+    const time = date.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+
+    if (isToday) return `Hôm nay, ${time}`;
+    if (isYesterday) return `Hôm qua, ${time}`;
+
+    if (date.getFullYear() === now.getFullYear()) {
+        return `${date.getDate().toString().padStart(2, "0")}/${
+            (date.getMonth() + 1).toString().padStart(2, "0")
+        } lúc ${time}`;
+    }
+
+    return `${date.getDate().toString().padStart(2, "0")}/${
+        (date.getMonth() + 1).toString().padStart(2, "0")
+    }/${date.getFullYear()} lúc ${time}`;
+};

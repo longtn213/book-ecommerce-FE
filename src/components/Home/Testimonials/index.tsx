@@ -7,13 +7,13 @@ import Image from "next/image";
 import "swiper/css/navigation";
 import "swiper/css";
 import ReviewSingleItem from "./ReviewSingleItem";
-import {Testimonial} from "@/types/testimonial";
+import {Review} from "@/types/review";
 import {fetchNewestReviews} from "@/services/reviewService";
 
 const Testimonials = () => {
     const sliderRef = useRef(null);
 
-    const [reviews, setReviews] = useState<Testimonial[]>([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch API review mới nhất
@@ -22,8 +22,8 @@ const Testimonials = () => {
             try {
                 const data = await fetchNewestReviews();
 
-                const mapped: Testimonial[] = data.map((r: any) => ({
-                    review: r.comment,
+                const mapped: Review[] = data.map((r: any) => ({
+                    comment: r.comment,
                     authorName: r.fullName,
                     authorRole: "Customer",
                     authorImg: r.avaUrl || "/images/user/default-avatar.png",

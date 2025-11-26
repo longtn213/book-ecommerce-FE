@@ -1,5 +1,6 @@
-export type Testimonial = {
-    review: string;        // comment
+export type Review = {
+    id : number;
+    comment: string;        // comment
     authorName: string;    // fullName
     authorRole: string;    // sẽ để Customer (FE tự set)
     authorImg: string;     // avaUrl

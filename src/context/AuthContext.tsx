@@ -1,6 +1,6 @@
 "use client";
 
-import React, {createContext, useContext, useEffect, useRef, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {getUserCart} from "@/services/cartService";
 import {getCurrentUser} from "@/services/userService";
 import {usePathname, useRouter} from "next/navigation";
@@ -40,17 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [pathname]);
 
-    // ⭐ Load user + cart + wishlist
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-        loadUserData();
-    }, [loadUserData]);
-
-    async function loadUserData() {
+// ⭐ Memo hoá để không gây rerender vô hạn
+    const loadUserData = useCallback(async () => {
         try {
             const userData = await getCurrentUser();
             const cartData = await getUserCart();
@@ -66,7 +57,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } finally {
             setLoading(false);
         }
-    }
+    }, [dispatch]);
+
+// ⭐ Load lần đầu khi có token
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+        loadUserData();
+    }, [loadUserData]);
 
     // LOGIN
     const login = async (token: string) => {

@@ -18,6 +18,8 @@ import {useWishlist} from "@/hook/useWishlist";
 import {Heart, Minus, Plus, ShoppingCart} from "lucide-react";
 import {useParams} from "next/navigation";
 import {fetchBookById} from "@/services/bookService";
+import ReviewSection from "@/app/(site)/(pages)/shop-details/ReviewSection";
+import UserReviewSection from "@/app/(site)/(pages)/shop-details/UserReviewSection";
 
 const ShopDetailsUI = () => {
         const params = useParams();
@@ -233,6 +235,8 @@ const ShopDetailsUI = () => {
                     </div>
                 </div>
             </section>
+            <UserReviewSection bookId={product.id}/>
+            <ReviewSection bookId={product.id} />
 
             <RelatedBookItems />
             <Newsletter />
