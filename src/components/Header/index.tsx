@@ -19,7 +19,7 @@ const Header = () => {
     const {openCartModal} = useCartModalContext();
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState("0");
-
+    const navRef = useRef<HTMLDivElement | null>(null);
     // 👉 Dùng hook mới
     const {user, cart, logout} = useAuth();
     const [activeDropdown, setActiveDropdown] = useState<"avatar" | "notification" | null>(null);
@@ -104,6 +104,42 @@ const Header = () => {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+
+        params.set("sortType", "0");
+
+        if (searchQuery.trim() !== "") {
+            params.set("keyword", searchQuery.trim());
+        }
+
+        if (selectedCategory !== "0") {
+            params.set("categoryId", selectedCategory);
+        }
+
+        router.push(`/shop?${params.toString()}`);
+    };
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (navRef.current && !navRef.current.contains(e.target as Node)) {
+                setNavigationOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setNavigationOpen(false);
+            }
+        };
+
+        window.addEventListener("keydown", handleEsc);
+        return () => window.removeEventListener("keydown", handleEsc);
+    }, []);
+
 
     return (
         <header
@@ -127,7 +163,12 @@ const Header = () => {
                         </Link>
 
                         <div className="flex-1 min-w-0">
-                            <form onSubmit={(e) => e.preventDefault()}>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSearch();
+                                }}
+                            >
                                 <div className="flex items-center">
 
                                     <CustomSelect
@@ -149,22 +190,7 @@ const Header = () => {
 
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                const params = new URLSearchParams();
-
-                                                params.set("sortType", "0");
-
-                                                if (searchQuery.trim() !== "") {
-                                                    params.set("keyword", searchQuery.trim());
-                                                }
-
-                                                // 👉 CHỈ GỬI categoryId nếu KHÔNG phải “Tất cả”
-                                                if (selectedCategory !== "0") {
-                                                    params.set("categoryId", selectedCategory);
-                                                }
-
-                                                router.push(`/shop?${params.toString()}`);
-                                            }}
+                                            onClick={handleSearch}
                                             className="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2"
                                         >
                                         <svg
@@ -466,6 +492,7 @@ const Header = () => {
                         {/* <!--=== Main Nav Start ===--> */}
                         {/* === MAIN NAV START – TIKI STYLE === */}
                         <div
+                            ref={navRef}
                             className={`
     absolute right-4 top-full 
     w-[290px] xl:w-auto xl:static 

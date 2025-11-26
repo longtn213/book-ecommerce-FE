@@ -1,26 +1,56 @@
 "use client";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef } from "react";
-import testimonialsData from "./testimonialsData";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import Image from "next/image";
 
 // Import Swiper styles
 import "swiper/css/navigation";
 import "swiper/css";
-import SingleItem from "./SingleItem";
+import ReviewSingleItem from "./ReviewSingleItem";
+import {Testimonial} from "@/types/testimonial";
+import {fetchNewestReviews} from "@/services/reviewService";
 
 const Testimonials = () => {
-  const sliderRef = useRef(null);
+    const sliderRef = useRef(null);
 
-  const handlePrev = useCallback(() => {
-    if (!sliderRef.current) return;
-    sliderRef.current.swiper.slidePrev();
-  }, []);
+    const [reviews, setReviews] = useState<Testimonial[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  const handleNext = useCallback(() => {
-    if (!sliderRef.current) return;
-    sliderRef.current.swiper.slideNext();
-  }, []);
+    // Fetch API review mới nhất
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const data = await fetchNewestReviews();
+
+                const mapped: Testimonial[] = data.map((r: any) => ({
+                    review: r.comment,
+                    authorName: r.fullName,
+                    authorRole: "Customer",
+                    authorImg: r.avaUrl || "/images/user/default-avatar.png",
+                    rating: r.rating,
+                    createdAt: new Date(r.createdAt),
+                }));
+
+                setReviews(mapped);
+            } catch (err) {
+                console.error("Review API error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        load();
+    }, []);
+
+    const handlePrev = useCallback(() => {
+        if (!sliderRef.current) return;
+        sliderRef.current.swiper.slidePrev();
+    }, []);
+
+    const handleNext = useCallback(() => {
+        if (!sliderRef.current) return;
+        sliderRef.current.swiper.slideNext();
+    }, []);
 
   return (
     <section className="overflow-hidden pb-16.5">
@@ -102,11 +132,27 @@ const Testimonials = () => {
                 },
               }}
             >
-              {testimonialsData.map((item, key) => (
-                <SwiperSlide key={key}>
-                  <SingleItem testimonial={item} />
-                </SwiperSlide>
-              ))}
+                {/* Loading */}
+                {loading ? (
+                    <p>Loading reviews...</p>
+                ) : (
+                    <Swiper
+                        ref={sliderRef}
+                        slidesPerView={3}
+                        spaceBetween={20}
+                        breakpoints={{
+                            0: { slidesPerView: 1 },
+                            1000: { slidesPerView: 2 },
+                            1200: { slidesPerView: 3 },
+                        }}
+                    >
+                        {reviews.map((item, index) => (
+                            <SwiperSlide key={index}>
+                                <ReviewSingleItem testimonial={item} />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                )}
             </Swiper>
           </div>
         </div>

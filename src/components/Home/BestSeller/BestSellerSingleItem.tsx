@@ -10,7 +10,7 @@ import {useAuthContext} from "@/context/AuthContext";
 import {useCart} from "@/hook/useCart";
 import {useWishlist} from "@/hook/useWishlist";
 
-const SingleItem = ({ item }: { item: any }) => {
+const BestSellerSingleItem = ({ item }: { item: any }) => {
     const { openModal } = useModalContext();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -64,8 +64,8 @@ const SingleItem = ({ item }: { item: any }) => {
             </div>
 
             <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
-            <Link href="/shop-details"> {item.title} </Link>
-          </h3>
+                <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
+            </h3>
 
           <span className="flex items-center justify-center gap-2 font-medium text-lg">
             <span className="text-dark">{item.price.toLocaleString()}₫</span>
@@ -189,4 +189,4 @@ const SingleItem = ({ item }: { item: any }) => {
   );
 };
 
-export default SingleItem;
+export default BestSellerSingleItem;

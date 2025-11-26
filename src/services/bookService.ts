@@ -26,6 +26,15 @@ export const searchBooks = async ({
 
     return res.data.data;
 };
+export const fetchBookById = async (bookId : number) => {
+    try {
+        const res = await axiosInstance.get(`/books/${bookId}`);
+        return res.data?.data || [];
+    } catch (error) {
+        console.error("Error fetching book:", error);
+        return [];
+    }
+};
 export const fetchNewestBook = async () => {
     try {
         const res = await axiosInstance.get("/books/newest");
@@ -56,6 +65,17 @@ export const fetchFeatureBook = async (
             number: 0,
             size: size,
         };
+    }
+};
+
+export const fetchRelatedBook = async (bookId : number , type :string) => {
+    try {
+        const res = await axiosInstance.get(`/books/related/${bookId}?type=${type}`);
+        return res.data?.data || [];
+
+    } catch (error) {
+        console.error("Error fetching book:", error);
+        return [];
     }
 };
 

@@ -25,11 +25,6 @@
 
         const { isWishlisted, toggle } = useWishlist();
 
-
-        const handleProductDetails = () => {
-            dispatch(updateProductDetails(item));
-        };
-
         return (
             <div className="group">
                 {/* IMAGE */}
@@ -145,9 +140,8 @@
                 {/* TITLE */}
                 <h3
                     className="font-medium text-dark hover:text-blue mb-1.5"
-                    onClick={handleProductDetails}
                 >
-                    <Link href="/shop-details">{item.title}</Link>
+                    <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
                 </h3>
 
                 {/* PRICE */}

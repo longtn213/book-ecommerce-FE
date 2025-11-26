@@ -35,6 +35,20 @@ const QuickViewModal = () => {
         };
     }, [isModalOpen, closeModal]);
 
+    // ESC TO CLOSE MODAL
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === "Escape") closeModal();
+        };
+
+        if (isModalOpen) {
+            window.addEventListener("keydown", handleEsc);
+        }
+
+        return () => window.removeEventListener("keydown", handleEsc);
+    }, [isModalOpen, closeModal]);
+
+
     return (
         <div
             className={`${
@@ -109,24 +123,21 @@ const QuickViewModal = () => {
                                 <div className="flex items-center gap-1.5">
                                     {/* giữ nguyên SVG */}
                                     <div className="flex items-center gap-1">
-                                        {[1,2,3,4,5].map((s,i)=>(
-                                            <svg
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                            <Image
                                                 key={i}
-                                                className={i < product.rating ? "fill-[#FFA645]" : "fill-gray-4"}
-                                                width="18"
-                                                height="18"
-                                                viewBox="0 0 18 18"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path d="M16.7906 6.72187L11.7 5.93438L9.39377 1.09688C9.22502 0.759375 8.77502 0.759375 8.60627 1.09688L6.30002 5.9625L1.23752 6.72187C0.871891 6.77812 0.731266 7.25625 1.01252 7.50938L4.69689 11.3063L3.82502 16.6219C3.76877 16.9875 4.13439 17.2969 4.47189 17.0719L9.05627 14.5687L13.6125 17.0719C13.9219 17.2406 14.3156 16.9594 14.2313 16.6219L13.3594 11.3063L17.0438 7.50938C17.2688 7.25625 17.1563 6.77812 16.7906 6.72187Z" />
-                                            </svg>
+                                                src="/images/icons/icon-star.svg"
+                                                alt="star"
+                                                width={18}
+                                                height={18}
+                                                className={i < Math.round(product.rating) ? "" : "opacity-30"}
+                                            />
                                         ))}
                                     </div>
 
                                     <span>
         <span className="font-medium text-dark"> {product.rating} Rating </span>
-        <span className="text-dark-2"> ({product.reviewCount} reviews) </span>
+        <span className="text-dark-2"> ({product.reviewCount} đánh giá) </span>
       </span>
                                 </div>
 

@@ -107,6 +107,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [authModalOpen]);
+    useEffect(() => {
+        if (!authModalOpen) return;
+
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setAuthModalOpen(false);
+            }
+        };
+
+        document.addEventListener("keydown", handleEsc);
+        return () => document.removeEventListener("keydown", handleEsc);
+    }, [authModalOpen]);
     return (
         <AuthContext.Provider
             value={{ user, cart, loading, login, logout, setUser, setCart, requireLogin }}

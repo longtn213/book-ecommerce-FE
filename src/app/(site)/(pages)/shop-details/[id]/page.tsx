@@ -1,6 +1,7 @@
 import React from "react";
-import ShopDetails from "@/components/ShopDetails";
+import ShopDetailsUI from "@/components/ShopDetails";
 import { Metadata } from "next";
+import {fetchBookById} from "@/services/bookService";
 
 export const metadata: Metadata = {
     title: "BookCommerce | Book E-commerce",
@@ -9,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 const ShopDetailsPage = () => {
-  return (
+    return (
     <main>
-      <ShopDetails />
+        <ShopDetailsUI />
     </main>
   );
 };

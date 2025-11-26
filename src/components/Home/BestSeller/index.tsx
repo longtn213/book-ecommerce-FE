@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import SingleItem from "./SingleItem";
+import BestSellerSingleItem from "./BestSellerSingleItem";
 import { fetchFeatureBook } from "@/services/bookService";
 
 const BestSeller = () => {
@@ -41,7 +41,7 @@ const BestSeller = () => {
                 {/* LIST */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7.5">
                     {books.map((item) => (
-                        <SingleItem item={item} key={item.id} />
+                        <BestSellerSingleItem item={item} key={item.id} />
                     ))}
                 </div>
 
