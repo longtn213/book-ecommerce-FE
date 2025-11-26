@@ -1,12 +1,12 @@
 "use client";
 
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
-import { getUserCart } from "@/services/cartService";
-import { getCurrentUser } from "@/services/userService";
-import { usePathname, useRouter } from "next/navigation";
-import { fetchWishlistAPI } from "@/services/wishlistService";
-import { clearWishlist, setWishlist } from "@/redux/features/wishlist-slice";
-import { useDispatch } from "react-redux";
+import {getUserCart} from "@/services/cartService";
+import {getCurrentUser} from "@/services/userService";
+import {usePathname, useRouter} from "next/navigation";
+import {fetchWishlistAPI} from "@/services/wishlistService";
+import {clearWishlist, setWishlist} from "@/redux/features/wishlist-slice";
+import {useDispatch} from "react-redux";
 
 interface AuthContextType {
     user: any;

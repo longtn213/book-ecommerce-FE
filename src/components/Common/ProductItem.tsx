@@ -4,7 +4,6 @@
     import {Product} from "@/types/product";
     import {useModalContext} from "@/app/context/QuickViewModalContext";
     import {updateQuickView} from "@/redux/features/quickView-slice";
-    import {updateProductDetails} from "@/redux/features/product-details";
     import {useDispatch} from "react-redux";
     import {AppDispatch} from "@/redux/store";
     import Link from "next/link";

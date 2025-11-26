@@ -15,7 +15,7 @@ import {useCart} from "@/hook/useCart";
 import {useWishlist} from "@/hook/useWishlist";
 
 // ICONS – LUCIDE
-import {Heart, Minus, Plus, ShoppingCart, Star} from "lucide-react";
+import {Heart, Minus, Plus, ShoppingCart} from "lucide-react";
 import {useParams} from "next/navigation";
 import {fetchBookById} from "@/services/bookService";
 
