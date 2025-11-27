@@ -14,7 +14,7 @@ const Checkout = () => {
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
     const { clearCart } = useCart();
-    const { user,requireLogin } = useAuthContext();
+    const { user } = useAuthContext();
 
     const [shippingAddress, setShippingAddress] = useState("");
     const [note, setNote] = useState("");

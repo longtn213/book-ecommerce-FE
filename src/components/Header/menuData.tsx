@@ -1,5 +1,5 @@
-import { Menu } from "@/types/Menu";
-import { Heart, Home, Store, Phone,ListChecks,Star } from "lucide-react";
+import {Menu} from "@/types/Menu";
+import {Heart, Home, Phone, Star, Store} from "lucide-react";
 
 export const menuData: Menu[] = [
     {
