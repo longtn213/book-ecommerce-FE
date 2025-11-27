@@ -3,9 +3,47 @@
 import Breadcrumb from "../Common/Breadcrumb";
 import WishListSingleItem from "./WishListSingleItem";
 import { useWishlist } from "@/hook/useWishlist";
+import React from "react";
+import {useAuthContext} from "@/context/AuthContext";
+import {useRouter} from "next/navigation";
 
 export const Wishlist = () => {
     const { wishlist: items } = useWishlist();
+    const { user } = useAuthContext();
+    const router = useRouter();
+    if (!user) {
+        return (
+            <>
+                <Breadcrumb title="Wishlist" pages={["Wishlist"]} />
+                <section className="bg-gray-100 py-20">
+                    <div className="max-w-[650px] mx-auto px-4">
+                        <div className="bg-white border border-gray-200 rounded-xl shadow-md p-10 text-center">
+
+                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                                Bạn chưa đăng nhập
+                            </h2>
+
+                            <p className="text-gray-600 leading-relaxed mb-8">
+                                Hãy đăng nhập để tiếp tục các thao tác của bạn.
+                            </p>
+
+                            <button
+                                onClick={() => router.push("/signin")}
+                                className="px-10 py-3 bg-blue text-white text-lg rounded-lg font-medium hover:bg-blue-dark transition"
+                            >
+                                Đăng nhập ngay
+                            </button>
+
+                            <p className="mt-6 text-sm text-gray-500">
+                                Sau khi đăng nhập bạn sẽ được thấy các thông tin
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </>
+
+        );
+    }
 
     return (
         <>

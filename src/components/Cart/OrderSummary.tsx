@@ -5,10 +5,11 @@ import React from "react";
 import {clearCoupon} from "@/redux/features/couponSlice";
 import {useDispatch} from "react-redux";
 import {Trash2Icon} from "lucide-react";
+import {useRouter} from "next/navigation";
 
 const OrderSummary = () => {
     const dispatch = useDispatch<AppDispatch>();
-
+    const router = useRouter();
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
 
@@ -17,6 +18,10 @@ const OrderSummary = () => {
     );
 
     const finalAmount = totalAmount - discountAmount;
+
+    const handleCheckout = () => {
+        router.push("/checkout");
+    };
 
     return (
         <div className="lg:max-w-[455px] w-full">
@@ -75,7 +80,7 @@ const OrderSummary = () => {
                         </p>
                     </div>
 
-                    <button className="w-full bg-blue text-white py-3 rounded-md mt-6 hover:bg-blue-dark">
+                    <button className="w-full bg-blue text-white py-3 rounded-md mt-6 hover:bg-blue-dark" onClick={handleCheckout}>
                         Tiếp tục thanh toán
                     </button>
                 </div>

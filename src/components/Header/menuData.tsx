@@ -25,20 +25,13 @@ export const menuData: Menu[] = [
     },
     {
         id: 4,
-        title: "Đơn hàng",
-        path: "/orders",
-        newTab: false,
-        icon: <ListChecks size={16} strokeWidth={1.75} />,
-    },
-    {
-        id: 5,
         title: "Đánh giá của tôi",
         path: "/my-reviews",
         newTab: false,
         icon: <Star size={16} strokeWidth={1.75} />,
     },
     {
-        id: 6,
+        id: 5,
         title: "WishList",
         newTab: false,
         path: "/wishlist",

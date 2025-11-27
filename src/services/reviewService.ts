@@ -30,6 +30,16 @@ export const fetchUserReviewForBook = async (bookId: number) => {
         return [];
     }
 };
+export const fetchUserReview = async () => {
+    try {
+        const res = await axiosInstance.get(`/reviews/user`);
+        return res.data?.data || [];
+
+    } catch (error) {
+        console.error("Error fetching book:", error);
+        return [];
+    }
+};
 export const createReviewAPI = async (body: {
     bookId: number;
     rating: number;

@@ -1,150 +1,183 @@
 "use client";
-import React from "react";
+
+import React, {useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import Login from "./Login";
-import Shipping from "./Shipping";
-import ShippingMethod from "./ShippingMethod";
-import PaymentMethod from "./PaymentMethod";
-import Coupon from "./Coupon";
-import Billing from "./Billing";
+import {useAppSelector} from "@/redux/store";
+import {useRouter} from "next/navigation";
+import {useCart} from "@/hook/useCart";
+import {checkout} from "@/services/orderService";
+import {useAuthContext} from "@/context/AuthContext";
 
 const Checkout = () => {
-  return (
-    <>
-      <Breadcrumb title={"Checkout"} pages={["checkout"]} />
-      <section className="overflow-hidden py-20 bg-gray-2">
-        <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <form>
-            <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11">
-              {/* <!-- checkout left --> */}
-              <div className="lg:max-w-[670px] w-full">
-                {/* <!-- login box --> */}
-                <Login />
+    const router = useRouter();
 
-                {/* <!-- billing details --> */}
-                <Billing />
+    const cartItems = useAppSelector((state) => state.cartReducer.items);
+    const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
+    const { clearCart } = useCart();
+    const { user,requireLogin } = useAuthContext();
 
-                {/* <!-- address box two --> */}
-                <Shipping />
+    const [shippingAddress, setShippingAddress] = useState("");
+    const [note, setNote] = useState("");
+    const [couponCode, setCouponCode] = useState("");
 
-                {/* <!-- others note box --> */}
-                <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5 mt-7.5">
-                  <div>
-                    <label htmlFor="notes" className="block mb-2.5">
-                      Other Notes (optional)
-                    </label>
+    const handlePlaceOrder = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-                    <textarea
-                      name="notes"
-                      id="notes"
-                      rows={5}
-                      placeholder="Notes about your order, e.g. speacial notes for delivery."
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full p-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    ></textarea>
-                  </div>
+        if (!shippingAddress.trim()) {
+            alert("Vui lòng nhập địa chỉ giao hàng");
+            return;
+        }
+
+        try {
+            const body = {
+                shippingAddress,
+                items: cartItems.map((item) => ({
+                    bookId: item.bookId,
+                    quantity: item.quantity,
+                })),
+                couponCode: couponCode || "",
+                note: note || "",
+            };
+
+            const res = await checkout(body);
+
+            await clearCart();
+            router.push(`/checkout/success?orderId=${res.data.data.id}`);
+        } catch (error) {
+            console.error(error);
+            alert("Đặt hàng thất bại!");
+        }
+    };
+    if (!user) {
+        return (
+            <>
+                <Breadcrumb title={"Checkout"} pages={["checkout"]} />
+                <section className="bg-gray-100 py-20">
+                    <div className="max-w-[650px] mx-auto px-4">
+                        <div className="bg-white border border-gray-200 rounded-xl shadow-md p-10 text-center">
+
+                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                                Bạn chưa đăng nhập
+                            </h2>
+
+                            <p className="text-gray-600 leading-relaxed mb-8">
+                                Hãy đăng nhập để tiếp tục các thao tác của bạn.
+                            </p>
+
+                            <button
+                                onClick={() => router.push("/signin")}
+                                className="px-10 py-3 bg-blue text-white text-lg rounded-lg font-medium hover:bg-blue-dark transition"
+                            >
+                                Đăng nhập ngay
+                            </button>
+
+                            <p className="mt-6 text-sm text-gray-500">
+                                Sau khi đăng nhập bạn sẽ được thấy các thông tin
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </>
+
+        );
+    }
+
+
+
+    return (
+        <>
+            <Breadcrumb title={"Checkout"} pages={["checkout"]} />
+
+            <section className="py-10 bg-gray-100">
+                <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
+
+                    {/* LEFT */}
+                    <div className="lg:col-span-2 space-y-6">
+
+                        {/* SHIPPING ADDRESS */}
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4">Địa chỉ giao hàng</h3>
+                            <input
+                                type="text"
+                                placeholder="VD: 123 Đội Cấn, Ba Đình, Hà Nội"
+                                value={shippingAddress}
+                                onChange={(e) => setShippingAddress(e.target.value)}
+                                className="w-full border rounded px-4 py-3 bg-gray-50"
+                            />
+                        </div>
+
+                        {/* COUPON */}
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4">Mã giảm giá</h3>
+                            <div className="flex gap-3">
+                                <input
+                                    type="text"
+                                    placeholder="Nhập mã khuyến mãi"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value)}
+                                    className="flex-1 border rounded px-4 py-3 bg-gray-50"
+                                />
+                                <button
+                                    type="button"
+                                    className="px-5 bg-blue text-white rounded-md hover:bg-blue-dark"
+                                >
+                                    Áp dụng
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* NOTE */}
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4">Ghi chú</h3>
+                            <textarea
+                                rows={5}
+                                placeholder="Ghi chú thêm cho đơn hàng..."
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                className="w-full border rounded px-4 py-3 bg-gray-50"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    {/* RIGHT */}
+                    <div className="space-y-6">
+
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                            <h3 className="text-lg font-semibold pb-4 border-b">Đơn hàng của bạn</h3>
+
+                            {/* LIST */}
+                            <div className="divide-y">
+                                {cartItems.map((item) => (
+                                    <div key={item.bookId} className="py-4 flex justify-between">
+                                        <p className="text-gray-700">{item.title} × {item.quantity}</p>
+                                        <p className="font-medium">
+                                            {(item.unitPriceSnapshot * item.quantity).toLocaleString()} đ
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* TOTAL */}
+                            <div className="pt-4 mt-4 border-t flex justify-between">
+                                <p className="text-lg font-semibold">Tổng thanh toán</p>
+                                <p className="text-lg font-semibold text-blue">
+                                    {totalAmount.toLocaleString()} đ
+                                </p>
+                            </div>
+
+                            {/* BUTTON */}
+                            <button
+                                onClick={handlePlaceOrder}
+                                className="w-full mt-6 py-3 bg-blue text-white text-lg rounded-md hover:bg-blue-dark"
+                            >
+                                Đặt hàng
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
-              {/* // <!-- checkout right --> */}
-              <div className="max-w-[455px] w-full">
-                {/* <!-- order list box --> */}
-                <div className="bg-white shadow-1 rounded-[10px]">
-                  <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
-                    <h3 className="font-medium text-xl text-dark">
-                      Your Order
-                    </h3>
-                  </div>
-
-                  <div className="pt-2.5 pb-8.5 px-4 sm:px-8.5">
-                    {/* <!-- title --> */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                      <div>
-                        <h4 className="font-medium text-dark">Product</h4>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-dark text-right">
-                          Subtotal
-                        </h4>
-                      </div>
-                    </div>
-
-                    {/* <!-- product item --> */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                      <div>
-                        <p className="text-dark">iPhone 14 Plus , 6/128GB</p>
-                      </div>
-                      <div>
-                        <p className="text-dark text-right">$899.00</p>
-                      </div>
-                    </div>
-
-                    {/* <!-- product item --> */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                      <div>
-                        <p className="text-dark">Asus RT Dual Band Router</p>
-                      </div>
-                      <div>
-                        <p className="text-dark text-right">$129.00</p>
-                      </div>
-                    </div>
-
-                    {/* <!-- product item --> */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                      <div>
-                        <p className="text-dark">Havit HV-G69 USB Gamepad</p>
-                      </div>
-                      <div>
-                        <p className="text-dark text-right">$29.00</p>
-                      </div>
-                    </div>
-
-                    {/* <!-- product item --> */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                      <div>
-                        <p className="text-dark">Shipping Fee</p>
-                      </div>
-                      <div>
-                        <p className="text-dark text-right">$15.00</p>
-                      </div>
-                    </div>
-
-                    {/* <!-- total --> */}
-                    <div className="flex items-center justify-between pt-5">
-                      <div>
-                        <p className="font-medium text-lg text-dark">Total</p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-lg text-dark text-right">
-                          $1072.00
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* <!-- coupon box --> */}
-                <Coupon />
-
-                {/* <!-- shipping box --> */}
-                <ShippingMethod />
-
-                {/* <!-- payment box --> */}
-                <PaymentMethod />
-
-                {/* <!-- checkout button --> */}
-                <button
-                  type="submit"
-                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 hover:bg-blue-dark mt-7.5"
-                >
-                  Process to Checkout
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
-    </>
-  );
+            </section>
+        </>
+    );
 };
 
 export default Checkout;
