@@ -1,51 +1,82 @@
-import { useAppSelector } from "@/redux/store";
+"use client";
+
+import {AppDispatch, useAppSelector} from "@/redux/store";
 import React from "react";
+import {clearCoupon} from "@/redux/features/couponSlice";
+import {useDispatch} from "react-redux";
+import {Trash2Icon} from "lucide-react";
 
 const OrderSummary = () => {
+    const dispatch = useDispatch<AppDispatch>();
+
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
 
+    const { discountAmount, code } = useAppSelector(
+        (state) => state.couponSliceReducer
+    );
+
+    const finalAmount = totalAmount - discountAmount;
+
     return (
         <div className="lg:max-w-[455px] w-full">
-            {/* Box wrapper */}
             <div className="bg-white shadow-1 rounded-[10px]">
                 <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
-                    <h3 className="font-medium text-xl text-dark">Order Summary</h3>
+                    <h3 className="font-medium text-xl text-dark">Tóm tắt đơn hàng</h3>
                 </div>
 
                 <div className="pt-2.5 pb-8.5 px-4 sm:px-8.5">
-                    {/* Title */}
+
+                    {/* HEADER */}
                     <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                        <h4 className="font-medium text-dark">Product</h4>
-                        <h4 className="font-medium text-dark text-right">Subtotal</h4>
+                        <h4 className="font-medium text-dark">Sản phẩm</h4>
+                        <h4 className="font-medium text-dark">Tổng phụ</h4>
                     </div>
 
-                    {/* Item list */}
+                    {/* LIST SẢN PHẨM */}
                     {cartItems.map((item) => (
                         <div
                             key={item.bookId}
                             className="flex items-center justify-between py-5 border-b border-gray-3"
                         >
-                            <p className="text-dark">{item.title}</p>
-                            <p className="text-dark text-right">
-                                {(item.unitPriceSnapshot * item.quantity).toLocaleString()} đ
-                            </p>
+                            <p>{item.title}</p>
+                            <p>{(item.unitPriceSnapshot * item.quantity).toLocaleString()} đ</p>
                         </div>
                     ))}
 
-                    {/* Total */}
+                    {/* TOTAL */}
                     <div className="flex items-center justify-between pt-5">
-                        <p className="font-medium text-lg text-dark">Total</p>
-                        <p className="font-medium text-lg text-dark text-right">
-                            {totalAmount.toLocaleString()} đ
+                        <p className="font-medium text-lg">Tổng</p>
+                        <p className="font-medium text-lg">{totalAmount.toLocaleString()} đ</p>
+                    </div>
+
+                    {/* DISCOUNT */}
+                    {discountAmount > 0 && (
+                        <div className="flex items-center justify-between pt-3 text-green-600">
+                            <p className="flex items-center gap-2">
+                                Giảm giá ({code})
+                                <button
+                                    onClick={() => dispatch(clearCoupon())}
+                                    className="text-red-500 underline text-sm hover:text-red-600"
+                                >
+                                    <Trash2Icon/>
+                                </button>
+                            </p>
+
+                            <p>-{discountAmount.toLocaleString()} đ</p>
+                        </div>
+                    )}
+
+                    {/* FINAL */}
+                    <div className="flex items-center justify-between pt-5">
+                        <p className="font-semibold text-xl text-dark">Tổng</p>
+                        <p className="font-semibold text-xl text-dark">
+                            {finalAmount.toLocaleString()} đ
                         </p>
                     </div>
 
-                    {/* Checkout Button */}
-                    <button
-                        type="submit"
-                        className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 hover:bg-blue-dark mt-7.5"
-                    >Tiếp tục thanh toán
+                    <button className="w-full bg-blue text-white py-3 rounded-md mt-6 hover:bg-blue-dark">
+                        Tiếp tục thanh toán
                     </button>
                 </div>
             </div>
