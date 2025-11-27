@@ -79,3 +79,6 @@ export const formatReviewDate = (dateString: Date | string): string => {
         (date.getMonth() + 1).toString().padStart(2, "0")
     }/${date.getFullYear()} lúc ${time}`;
 };
+// constants/shipping.ts
+export const BASE_SHIP_FEE = 40000; // phí ship chuẩn
+export const FREESHIP_MIN_AMOUNT = 500000; // đủ 300k thì freeship

@@ -8,6 +8,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 import Link from "next/link";
 import {useCart} from "@/hook/useCart";
 import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import FreeShipProgress from "@/components/Common/FreeShipProgress";
 
 const Cart = () => {
   const cartItems = useAppSelector((state) => state.cartReducer.items);
@@ -15,7 +16,9 @@ const Cart = () => {
     useEffect(() => {
         refresh();   // <--- tải giỏ hàng từ BE
     }, [refresh]);
-  return (
+    const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
+
+    return (
     <>
       {/* <!-- ===== Breadcrumb Section Start ===== --> */}
       <section>
@@ -25,7 +28,9 @@ const Cart = () => {
         {cartItems.length > 0 ? (
             <section className="py-20 bg-gray-2">
                 <div className="max-w-[1170px] w-full mx-auto">
-
+                    <div className="lg:col-span-3">
+                        <FreeShipProgress totalAmount={totalAmount} />
+                    </div>
                     <Box
                         display="flex"
                         justifyContent="space-between"
