@@ -16,6 +16,8 @@ const OrdersList = () => {
     const [pageSize, setPageSize] = useState(10);
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
+    const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+    const [orderToCancel, setOrderToCancel] = useState<number | null>(null);
     const openDetailModal = (order: any) => {
         setSelectedOrder(order);
         setDetailModalOpen(true);
@@ -76,10 +78,6 @@ const OrdersList = () => {
 
             <section className="overflow-hidden py-20 bg-gray-2">
                 <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
-
-                    <h2 className="text-dark text-2xl font-medium mb-7.5">
-                        Đơn hàng của tôi
-                    </h2>
 
                     <div className="bg-white rounded-[10px] shadow-1">
                         <div className="w-full overflow-x-auto">
@@ -201,7 +199,10 @@ const OrdersList = () => {
                                                 {/* Hủy đơn – chỉ khi PENDING */}
                                                 {order.status === "PENDING" && (
                                                     <button
-                                                        onClick={() => handleCancel(order.id)}
+                                                        onClick={() => {
+                                                            setOrderToCancel(order.id);
+                                                            setConfirmCancelOpen(true);
+                                                        }}
                                                         className="text-red-500 hover:text-red-dark"
                                                     >
                                                         <X size={20} />
@@ -332,6 +333,47 @@ const OrdersList = () => {
                         )}
                     </div>
                 )}
+            </Modal>
+            <Modal
+                open={confirmCancelOpen}
+                onCancel={() => setConfirmCancelOpen(false)}
+                footer={null}
+                centered
+                width={380}
+            >
+                <div className="text-center py-3">
+
+                    <h3 className="text-lg font-semibold text-gray-800">
+                        Xác nhận hủy đơn hàng
+                    </h3>
+
+                    <p className="text-gray-600 mt-2 text-sm leading-relaxed">
+                        Bạn có chắc chắn muốn hủy đơn hàng này?
+                        <br />
+                        Hành động này không thể hoàn tác.
+                    </p>
+
+                    <div className="flex justify-center gap-3 mt-5">
+                        <button
+                            onClick={() => setConfirmCancelOpen(false)}
+                            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 transition text-sm"
+                        >
+                            Không
+                        </button>
+
+                        <button
+                            onClick={async () => {
+                                if (orderToCancel) {
+                                    await handleCancel(orderToCancel);
+                                    setConfirmCancelOpen(false);
+                                }
+                            }}
+                            className="px-4 py-2 bg-red-light text-white rounded-md hover:bg-red-dark transition text-sm"
+                        >
+                            Đồng ý
+                        </button>
+                    </div>
+                </div>
             </Modal>
         </>
     );
