@@ -74,12 +74,12 @@ export const Actions = ({ orderItem, refreshOrders }: any) => {
 
             <div className="flex items-center gap-3 justify-center">
                 <EyeOutlined
-                    className="cursor-pointer text-blue-600 text-lg"
+                    className="cursor-pointer text-blue-dark text-lg"
                     onClick={() => setShowDetails(true)}
                 />
                 {orderItem.status === "PENDING" && (
                     <CloseCircleOutlined
-                        className="cursor-pointer text-red-500 text-lg"
+                        className="cursor-pointer text-red-light text-lg"
                         onClick={() => setShowCancelConfirm(true)}
                     />
                 )}

@@ -305,3 +305,21 @@ input[type='search']::-webkit-search-results-decoration {
 .animate-fade-in {
     animation: fade-in 0.15s ease-out;
 }
+
+.order-detail-modal .ant-modal-content {
+    margin-top: 0 !important;
+}
+
+.order-detail-modal .ant-modal {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+.order-detail-modal .ant-modal-content {
+    border-radius: 12px !important;
+    padding: 0 !important;
+}
+
+.order-detail-modal .ant-modal-close {
+    top: 16px !important;
+    right: 16px !important;
+}

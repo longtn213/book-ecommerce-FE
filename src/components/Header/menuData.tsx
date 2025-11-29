@@ -1,5 +1,5 @@
 import {Menu} from "@/types/Menu";
-import {Heart, Home, Phone, Star, Store} from "lucide-react";
+import {Heart, Home, Phone, Star, Store, ListOrdered} from "lucide-react";
 
 export const menuData: Menu[] = [
     {
@@ -32,6 +32,13 @@ export const menuData: Menu[] = [
     },
     {
         id: 5,
+        title: "Đơn hàng của tôi",
+        path: "/my-orders",
+        newTab: false,
+        icon: <ListOrdered size={16} strokeWidth={1.75} />,
+    },
+    {
+        id: 6,
         title: "WishList",
         newTab: false,
         path: "/wishlist",
