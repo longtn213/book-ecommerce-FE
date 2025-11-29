@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import {message, Modal, Pagination} from "antd";
+import {message, Modal, notification, Pagination} from "antd";
 import {Badge} from "@/components/Orders/SingleOrder";
 import {cancelOrderApi, getUserOrders} from "@/services/userService";
 import {Eye, X} from "lucide-react";
@@ -20,7 +20,7 @@ const OrdersList = () => {
         setSelectedOrder(order);
         setDetailModalOpen(true);
     };
-
+    const [api, contextHolder] = notification.useNotification();
 
     const fetchOrders = async () => {
         try {
@@ -52,10 +52,18 @@ const OrdersList = () => {
     const handleCancel = async (orderId: number) => {
         try {
             const res = await cancelOrderApi(orderId);
-            message.success(res.message || "Hủy đơn hàng thành công!");
+
+            api.success({
+                message: res.message || "Hủy đơn hàng thành công!",
+                description: res.message || "Hủy đơn hàng thành công!",
+            });
             fetchOrders(); // refresh list
         } catch (e: any) {
-            message.error(e?.response?.data?.message || "Hủy đơn thất bại!");
+            api.error({
+                message: "Hủy đơn thất bại!",
+                description: e?.response?.data?.message|| "Vui lòng thử lại.",
+                placement: "topRight",
+            });
         }
     };
 
@@ -63,6 +71,7 @@ const OrdersList = () => {
 
     return (
         <>
+            {contextHolder}
             <Breadcrumb title="Đơn hàng của tôi" pages={["Orders"]} />
 
             <section className="overflow-hidden py-20 bg-gray-2">

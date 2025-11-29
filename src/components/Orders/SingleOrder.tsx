@@ -57,14 +57,18 @@ export const Actions = ({ orderItem, refreshOrders }: any) => {
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [api, contextHolder] = notification.useNotification();
 
-    const handleCancel = async () => {
+    const handleCancel = async (orderId: number) => {
         try {
-            const res = await cancelOrderApi(orderItem.id);
-            api.success({ message: res.message || "Hủy đơn thành công!" });
-            setShowCancelConfirm(false);
-            refreshOrders();
+            const res = await cancelOrderApi(orderId);
+            api.success({
+                message:res.message || "Hủy đơn hàng thành công!",
+            });
         } catch (e: any) {
-            api.error({ message: e?.response?.data?.message || "Lỗi hủy đơn" });
+            api.error({
+                message: "Hủy đơn thất bại!",
+                description: e?.response?.data?.message|| "Vui lòng thử lại.",
+                placement: "topRight",
+            });
         }
     };
 
