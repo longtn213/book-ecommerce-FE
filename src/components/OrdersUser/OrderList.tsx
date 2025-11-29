@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import {message, Modal, notification, Pagination} from "antd";
+import {Modal, notification, Pagination} from "antd";
 import {Badge} from "@/components/Orders/SingleOrder";
 import {cancelOrderApi, getUserOrders} from "@/services/userService";
 import {Eye, X} from "lucide-react";

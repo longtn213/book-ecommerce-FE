@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { notification } from "antd";
+import React, {useState} from "react";
+import {notification} from "antd";
 import OrderModal from "./OrderModal";
 import CancelConfirm from "@/components/Orders/CancelConfirm";
-import { cancelOrderApi } from "@/services/userService";
-import { EyeOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import {cancelOrderApi} from "@/services/userService";
+import {CloseCircleOutlined, EyeOutlined} from "@ant-design/icons";
 
 const statusBadge: any = {
     COMPLETED: {
