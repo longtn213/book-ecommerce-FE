@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import { Pagination } from "antd";
-import { Actions, Badge } from "@/components/Orders/SingleOrder";
+import {message, Modal, Pagination} from "antd";
+import {Badge} from "@/components/Orders/SingleOrder";
 import {cancelOrderApi, getUserOrders} from "@/services/userService";
-import { Modal, message } from "antd";
-import { Eye, X } from "lucide-react";
+import {Eye, X} from "lucide-react";
 
 
 const OrdersList = () => {
