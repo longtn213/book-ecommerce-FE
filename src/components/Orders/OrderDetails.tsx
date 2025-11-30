@@ -36,9 +36,9 @@ const OrderDetails = ({ orderItem }: any) => {
                     <p>
                         <b>Thanh toán:</b>{" "}
                         {!orderItem.paid ?
-                            <span className="text-red-500 font-medium">Chưa thanh toán</span>
+                            <span className="text-red-dark font-medium">Chưa thanh toán</span>
                             :
-                            <span className="text-green-600 font-medium">Đã thanh toán</span>
+                            <span className="text-green-dark font-medium">Đã thanh toán</span>
                         }
                     </p>
 
@@ -65,7 +65,7 @@ const OrderDetails = ({ orderItem }: any) => {
                         <div className="flex justify-between py-2">
                             <div>
                                 <p className="font-medium">{i.bookTitle}</p>
-                                <p className="text-gray-500 text-sm">{i.price.toLocaleString()} đ × {i.quantity}</p>
+                                <p className="text-gray-5 text-sm">{i.price.toLocaleString()} đ × {i.quantity}</p>
                             </div>
 
                             <p className="font-semibold">{i.total.toLocaleString()} đ</p>

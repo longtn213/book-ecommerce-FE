@@ -1,7 +1,7 @@
     "use client";
     import React from "react";
     import Image from "next/image";
-    import {Product} from "@/types/product";
+    import {Book} from "@/types/book";
     import {useModalContext} from "@/app/context/QuickViewModalContext";
     import {updateQuickView} from "@/redux/features/quickView-slice";
     import {useDispatch} from "react-redux";
@@ -11,7 +11,7 @@
     import {useCart} from "@/hook/useCart";
     import {useWishlist} from "@/hook/useWishlist";
 
-    const ProductItem = ({ item }: { item: Product }) => {
+    const ProductItem = ({ item }: { item: Book }) => {
         const { openModal } = useModalContext();
         const dispatch = useDispatch<AppDispatch>();
         const { user, requireLogin } = useAuthContext();

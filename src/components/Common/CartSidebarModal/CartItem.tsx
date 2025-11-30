@@ -9,10 +9,10 @@ const CartItem = ({ item }) => {
     const isLoading = loadingMap[item.bookId] === true;
 
     return (
-        <div className="flex items-start justify-between gap-4 p-3 rounded-lg border border-gray-200 hover:shadow-md transition-all">
+        <div className="flex items-start justify-between gap-4 p-3 rounded-lg border border-gray-2 hover:shadow-md transition-all">
 
             {/* IMAGE */}
-            <div className="w-[80px] h-[100px] flex-shrink-0 rounded-md overflow-hidden bg-gray-200 shadow-sm">
+            <div className="w-[80px] h-[100px] flex-shrink-0 rounded-md overflow-hidden bg-gray-2 shadow-sm">
                 <Image
                     src={item.cartItemUrl?.[0] || "/images/default-book.png"}
                     alt={item.title}
@@ -29,7 +29,7 @@ const CartItem = ({ item }) => {
                 </h3>
 
                 {/* PRICE */}
-                <p className="text-[14px] text-gray-600 mb-2">
+                <p className="text-[14px] text-gray-6 mb-2">
                     Price:
                     <span className="font-semibold text-dark ml-1">
                         {item.unitPriceSnapshot.toLocaleString()} đ
@@ -42,7 +42,7 @@ const CartItem = ({ item }) => {
                         disabled={item.quantity <= 1 || isLoading}
                         onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
                         className={`w-8 h-8 flex items-center justify-center border rounded 
-                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 border-gray-300"}
+                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-1 border-gray-3"}
                         `}
                     >
                         −
@@ -56,7 +56,7 @@ const CartItem = ({ item }) => {
                         disabled={isLoading}
                         onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
                         className={`w-8 h-8 flex items-center justify-center border rounded 
-                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100 border-gray-300"}
+                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-1 border-gray-3"}
                         `}
                     >
                         +
@@ -69,7 +69,7 @@ const CartItem = ({ item }) => {
                 disabled={isLoading}
                 onClick={() => removeItems([item.bookId])}
                 className={`flex items-center justify-center w-10 h-10 rounded-md 
-                    bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 hover:border-red-300
+                    bg-red-50 border border-red-light-2 text-red-dark hover:bg-red-light hover:border-red-light-3
                     transition-all ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
                 `}
             >

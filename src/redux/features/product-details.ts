@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Product } from "@/types/product";
+import { Book } from "@/types/book";
 
 export interface ProductDetailsState {
-    product: Product | null;
+    product: Book | null;
     activeIndex: number;
 }
 

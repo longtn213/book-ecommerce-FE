@@ -1,4 +1,4 @@
-export type Product = {
+export type Book = {
     id: number;
     title: string;
     slug: string;
@@ -16,4 +16,5 @@ export type Product = {
     images: string[];
     rating: number;
     reviewCount:number;
+    inDatabase: boolean;
 };

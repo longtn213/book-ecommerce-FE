@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Product } from "@/types/product";
+import { Book } from "@/types/book";
 
 type InitialState = {
-    value: Product;
+    value: Book;
 };
 
 const initialState: InitialState = {
@@ -31,7 +31,7 @@ export const quickView = createSlice({
     name: "quickView",
     initialState,
     reducers: {
-        updateQuickView: (_, action: PayloadAction<Product>) => {
+        updateQuickView: (_, action: PayloadAction<Book>) => {
             return {
                 value: {
                     ...action.payload,

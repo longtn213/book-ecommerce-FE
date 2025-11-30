@@ -173,7 +173,7 @@ const Discount = () => {
 
                         {/* THÀNH CÔNG */}
                         {successMessage && (
-                            <p className="text-green-600 text-sm mt-2">{successMessage}</p>
+                            <p className="text-green-dark text-sm mt-2">{successMessage}</p>
                         )}
                     </div>
                 </div>

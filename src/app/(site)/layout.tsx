@@ -18,6 +18,7 @@ import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
 
 import { AuthProvider } from "@/context/AuthContext";
+import ChatbotWidget from "@/components/Ai/ChatbotWidget";
 
 export default function RootLayout({
                                        children,
@@ -39,34 +40,30 @@ export default function RootLayout({
 
         {/* ---------------- AUTH PROVIDER LUÔN BAO TOÀN BỘ APP ---------------- */}
         <ReduxProvider>
-
-        <AuthProvider>
+            <AuthProvider>
                 <CartModalProvider>
                     <ModalProvider>
                         <PreviewSliderProvider>
 
-                            {/* Preloader chỉ là overlay UI */}
                             {loading && <PreLoader />}
 
-                            {/* Header luôn phải nằm trong AuthProvider để nhận user */}
                             <Header />
-
-                            {/* Nội dung chính */}
                             <main>{children}</main>
 
-                            {/* Các modal của bạn */}
                             <QuickViewModal />
                             <CartSidebarModal />
                             <PreviewSliderModal />
+
+                            {/* ⭐⭐ CHỈ RENDER CHATBOT KHI USER ĐĂNG NHẬP ⭐⭐ */}
+                            <ChatbotWidget />
 
                         </PreviewSliderProvider>
                     </ModalProvider>
 
                     <ScrollToTop />
                     <Footer />
-
                 </CartModalProvider>
-        </AuthProvider>
+            </AuthProvider>
         </ReduxProvider>
 
         </body>

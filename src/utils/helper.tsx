@@ -1,3 +1,5 @@
+import {Book} from "@/types/book";
+
 export const EyeIcon = ({isOpen}: { isOpen: boolean }) => (
     isOpen ? (
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -82,3 +84,28 @@ export const formatReviewDate = (dateString: Date | string): string => {
 // constants/shipping.ts
 export const BASE_SHIP_FEE = 40000; // phí ship chuẩn
 export const FREESHIP_MIN_AMOUNT = 500000; // đủ 300k thì freeship
+
+export const normalizeToBook = (item: any): Book => ({
+    id: item.id ?? 0,
+    title: item.title,
+    slug: item.slug ?? "",
+    isbn: "",
+    description: "",
+    price: item.price ?? 0,
+    stockQuantity: 0,
+    pages: 0,
+    language: "",
+    publishYear: 0,
+    status: "",
+    publisherName: "",
+    authors: item.author ? [item.author] : ["Không rõ"],
+    categories: [],
+    images: Array.isArray(item.coverUrl)
+        ? item.coverUrl
+        : item.coverUrl
+            ? [item.coverUrl]
+            : ["/placeholder-book.png"],
+    rating: 0,
+    reviewCount: 0,
+    inDatabase: item.inDatabase,
+});

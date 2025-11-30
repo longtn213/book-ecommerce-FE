@@ -34,7 +34,7 @@ const OrderActions = ({ toggleDetails,  showCancel, onCancel }: any) => {
             {showCancel && (
             <button
                 onClick={onCancel}
-                className="hover:bg-red-100 rounded-sm p-2"
+                className="hover:bg-red-light rounded-sm p-2"
             >
                 <svg
                     width="18"

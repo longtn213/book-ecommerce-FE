@@ -159,7 +159,7 @@ const BestSellerSingleItem = ({ item }: { item: any }) => {
             aria-label="button for add to fav"
             id="addFavOne"
             className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 bg-white 
-              ${isWishlisted(item.id) ? "text-red-500" : "text-dark"}
+              ${isWishlisted(item.id) ? "text-red" : "text-dark"}
               hover:bg-blue hover:text-white`}
           >
               {isWishlisted(item.id) ? (

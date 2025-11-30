@@ -18,7 +18,7 @@ const PromoBanner = () => {
                             Sách Hot Nhất Năm
                         </h2>
 
-                        <p className="text-base text-gray-600 leading-relaxed max-w-[480px]">
+                        <p className="text-base text-gray-6 leading-relaxed max-w-[480px]">
                             Khám phá loạt sách best-seller, sách kỹ năng, văn học và light novel
                             mới nhất. Ưu đãi độc quyền chỉ áp dụng trong tháng này!
                         </p>

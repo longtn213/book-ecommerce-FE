@@ -44,7 +44,7 @@ const Orders = () => {
             dataIndex: "orderCode",
             width: 110,
             render: (code: string) => (
-                <span className="font-semibold text-blue-600">
+                <span className="font-semibold text-blue-dark">
                     #{code.slice(-7)}
                 </span>
             ),
@@ -65,7 +65,7 @@ const Orders = () => {
             dataIndex: "title",
             width: 350,
             render: (t: string) => (
-                <div className="whitespace-pre-line break-words text-gray-700 leading-relaxed">
+                <div className="whitespace-pre-line break-words text-gray-7 leading-relaxed">
                     {t}
                 </div>
             ),
@@ -75,7 +75,7 @@ const Orders = () => {
             dataIndex: "totalAmount",
             width: 130,
             render: (amount: number) => (
-                <span className="font-bold text-gray-900">
+                <span className="font-bold text-gray-7">
                     {amount.toLocaleString()} đ
                 </span>
             ),

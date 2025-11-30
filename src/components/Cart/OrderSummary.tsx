@@ -57,12 +57,12 @@ const OrderSummary = () => {
 
                     {/* DISCOUNT */}
                     {discountAmount > 0 && (
-                        <div className="flex items-center justify-between pt-3 text-green-600">
+                        <div className="flex items-center justify-between pt-3 text-green-dark">
                             <p className="flex items-center gap-2">
                                 Giảm giá ({code})
                                 <button
                                     onClick={() => dispatch(clearCoupon())}
-                                    className="text-red-500 underline text-sm hover:text-red-600"
+                                    className="text-red-500 underline text-sm hover:text-red-dark"
                                 >
                                     <Trash2Icon/>
                                 </button>

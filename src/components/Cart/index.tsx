@@ -40,7 +40,7 @@ const Cart = () => {
                         <Typography variant="h5" fontWeight={600}>Giỏ hàng của bạn
                         </Typography>
 
-                        <button onClick={clearCart} className="text-blue-600">
+                        <button onClick={clearCart} className="text-blue-dark">
                             Xóa hết
                         </button>
                     </Box>

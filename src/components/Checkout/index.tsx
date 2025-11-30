@@ -93,7 +93,7 @@ const Checkout = () => {
             fireConfetti();
 
             setTimeout(() => {
-                router.push("/my-account?tab=orders");
+                router.push("/my-orders");
             }, 3000);
 
         } catch (error) {
@@ -108,8 +108,8 @@ const Checkout = () => {
                 <Breadcrumb title={"Thanh toán"} pages={["checkout"]} />
                 <section className="bg-gray-100 py-20">
                     <div className="max-w-[650px] mx-auto px-4">
-                        <div className="bg-white border border-gray-200 rounded-xl shadow-md p-10 text-center">
-                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                        <div className="bg-white border border-gray-2 rounded-xl shadow-md p-10 text-center">
+                            <h2 className="text-2xl font-semibold text-gray-7 mb-4">
                                 Bạn chưa đăng nhập
                             </h2>
 
@@ -130,7 +130,7 @@ const Checkout = () => {
         <>
             <Breadcrumb title={"Thanh toán"} pages={["checkout"]} />
 
-            <section className="py-10 bg-gray-100">
+            <section className="py-10 bg-gray-1">
                 <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
                     {/* FREESHIP BAR */}
                     <div className="lg:col-span-3">
@@ -141,7 +141,7 @@ const Checkout = () => {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* SHIPPING ADDRESS */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
                             <h3 className="text-lg font-semibold mb-4">Địa chỉ giao hàng</h3>
 
                             <input
@@ -152,7 +152,7 @@ const Checkout = () => {
                                     setShippingAddress(e.target.value);
                                     if (shippingAddressError) setShippingAddressError("");
                                 }}
-                                className={`w-full border rounded px-4 py-3 bg-gray-50 ${
+                                className={`w-full border rounded px-4 py-3 bg-gray-5 ${
                                     shippingAddressError ? "border-red" : ""
                                 }`}
                             />
@@ -164,27 +164,27 @@ const Checkout = () => {
                         </div>
 
                         {/* NOTE */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
                             <h3 className="text-lg font-semibold mb-4">Ghi chú</h3>
                             <textarea
                                 rows={5}
                                 placeholder="Ghi chú thêm cho đơn hàng..."
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
-                                className="w-full border rounded px-4 py-3 bg-gray-50"
+                                className="w-full border rounded px-4 py-3 bg-gray-5"
                             ></textarea>
                         </div>
 
                         {/* COUPON */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
                             <h3 className="text-lg font-semibold mb-4">Mã giảm giá</h3>
 
                             {couponCodeApplied ? (
-                                <div className="flex justify-between items-center p-3 border rounded bg-green-50 border-green-300">
-                                    <p className="font-medium text-green-700">{couponCodeApplied}</p>
+                                <div className="flex justify-between items-center p-3 border rounded bg-green-light-5 border-green-light-3">
+                                    <p className="font-medium text-green-dark">{couponCodeApplied}</p>
                                     <button
                                         onClick={() => dispatch(clearCoupon())}
-                                        className="text-sm text-red-600 hover:underline"
+                                        className="text-sm text-red-dark hover:underline"
                                     >
                                         Xóa mã
                                     </button>
@@ -197,7 +197,7 @@ const Checkout = () => {
 
                     {/* RIGHT SIDE */}
                     <div className="space-y-6">
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
                             <h3 className="text-lg font-semibold pb-4 border-b">Đơn hàng của bạn</h3>
 
                             {/* Items */}
@@ -214,16 +214,16 @@ const Checkout = () => {
 
                             {/* Discount */}
                             {discountAmount > 0 && (
-                                <div className="pt-4 mt-4 border-t flex justify-between text-green-700 font-medium">
+                                <div className="pt-4 mt-4 border-t flex justify-between text-green-dark font-medium">
                                     <p>Giảm giá:</p>
                                     <p>- {discountAmount.toLocaleString()} đ</p>
                                 </div>
                             )}
 
                             {/* Ship */}
-                            <div className="pt-4 mt-4 border-t flex justify-between text-gray-700">
+                            <div className="pt-4 mt-4 border-t flex justify-between text-gray-7">
                                 <p>Phí vận chuyển:</p>
-                                <p className={isFreeShip ? "text-green-600 font-semibold" : ""}>
+                                <p className={isFreeShip ? "text-green-dark font-semibold" : ""}>
                                     {isFreeShip ? "0đ (FREESHIP)" : `${shippingFee.toLocaleString()} đ`}
                                 </p>
                             </div>
@@ -251,15 +251,15 @@ const Checkout = () => {
             {openSuccess && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
                     <div className="bg-white rounded-xl p-8 shadow-xl max-w-sm w-full text-center">
-                        <h2 className="text-2xl font-semibold text-green-600 mb-3">
+                        <h2 className="text-2xl font-semibold text-green-dark mb-3">
                             🎉 Đặt hàng thành công!
                         </h2>
 
-                        <p className="text-gray-700 mb-4">
+                        <p className="text-gray-7 mb-4">
                             Mã đơn hàng: <strong>#{createdOrderId}</strong>
                         </p>
 
-                        <p className="text-gray-500 mb-6">
+                        <p className="text-gray-5 mb-6">
                             Bạn sẽ được chuyển đến trang đơn hàng trong giây lát...
                         </p>
 

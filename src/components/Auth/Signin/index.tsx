@@ -177,7 +177,7 @@ const Signin = () => {
                                         if (loginUsernameError) setLoginUsernameError("");
                                     }}
                                     className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border
-        ${loginUsernameError ? "input-error" : "border-gray-300 bg-gray-100"}`}
+        ${loginUsernameError ? "input-error" : "border-gray-3 bg-gray-1"}`}
                                     style={{
                                         borderRadius: "8px",
                                         borderColor: loginUsernameError ? "#ef4444" : "#d1d5db",
@@ -209,7 +209,7 @@ const Signin = () => {
                                             if (loginPasswordError) setLoginPasswordError("");
                                         }}
                                         className={`rounded-lg w-full py-3 px-5 pr-12 outline-none duration-200 border
-                ${loginPasswordError ? "input-error" : "border-gray-300 bg-gray-100"}`}
+                ${loginPasswordError ? "input-error" : "border-gray-3 bg-gray-1"}`}
                                         style={{
                                             borderRadius: "8px",
                                             borderColor: loginPasswordError ? "#ef4444" : "#d1d5db",

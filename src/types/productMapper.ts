@@ -1,6 +1,6 @@
-import { Product } from "@/types/product";
+import { Book } from "@/types/book";
 
-export function mapProduct(p: any): Product & {
+export function mapProduct(p: any): Book & {
     thumbnails: string[];
     previews: string[];
 } {

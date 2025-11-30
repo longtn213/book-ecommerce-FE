@@ -1,11 +1,16 @@
-"use client"
+"use client";
 
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import {notification} from "antd";
-import {sendMessage} from "@/services/contactMessageService";
+import { notification } from "antd";
+import { sendMessage } from "@/services/contactMessageService";
+import {useRouter, useSearchParams} from "next/navigation";
 
 const Contact = () => {
+    const searchParams = useSearchParams();
+    const bookTitle = searchParams.get("title") || "";
+    const router = useRouter();
+
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
@@ -14,7 +19,9 @@ const Contact = () => {
         message: "",
         email: "",
     });
+
     const [api, contextHolder] = notification.useNotification();
+
     const isFormValid =
         form.firstName.trim() !== "" &&
         form.lastName.trim() !== "" &&
@@ -22,6 +29,16 @@ const Contact = () => {
         form.email.trim() !== "" &&
         form.message.trim() !== "";
 
+    // ⭐ Auto-fill khi khách đến từ chatbot
+    useEffect(() => {
+        if (bookTitle) {
+            setForm((prev) => ({
+                ...prev,
+                subject: `Đặt sách theo yêu cầu: ${bookTitle}`,
+                message: `Tôi muốn đặt sách "${bookTitle}" theo yêu cầu. Vui lòng liên hệ lại để tư vấn và báo giá.`,
+            }));
+        }
+    }, [bookTitle]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,7 +48,7 @@ const Contact = () => {
         e.preventDefault();
 
         if (!form.firstName || !form.lastName) {
-            api.error({message: "Vui lòng nhập đầy đủ họ và tên"});
+            api.error({ message: "Vui lòng nhập đầy đủ họ và tên" });
             return;
         }
 
@@ -39,10 +56,10 @@ const Contact = () => {
             const res = await sendMessage(form);
 
             api.success({
-                message:res.message || "Gửi tin nhắn thành công!",
+                message: res.message || "Gửi yêu cầu thành công!",
             });
 
-            // Reset form
+            // ⭐ RESET VỀ FORM MẶC ĐỊNH KHÔNG LIÊN QUAN ĐẶT SÁCH
             setForm({
                 firstName: "",
                 lastName: "",
@@ -51,24 +68,54 @@ const Contact = () => {
                 message: "",
                 email: "",
             });
+
+            setTouched({
+                firstName: false,
+                lastName: false,
+                phone: false,
+                email: false,
+                message: false,
+            });
+
+            // ⭐ XÓA QUERY PARAM title khỏi URL → trở về trang Contact bình thường
+            router.replace("/contact", { scroll: false });
+
         } catch (err: any) {
-            api.error({message: err.message || "Gửi tin nhắn thất bại!"});
+            api.error({ message: err.message || "Gửi tin nhắn thất bại!" });
         }
     };
-  return (
-    <>
-        {contextHolder}
-      <Breadcrumb title={"Thông tin"} pages={["contact"]} />
 
-      <section className="overflow-hidden py-20 bg-gray-2">
-        <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="flex flex-col xl:flex-row gap-7.5">
-            <div className="xl:max-w-[370px] w-full bg-white rounded-xl shadow-1">
-              <div className="py-5 px-4 sm:px-7.5 border-b border-gray-3">
-                <p className="font-medium text-xl text-dark">
-                  Thông tin liên lạc
-                </p>
-              </div>
+    const [touched, setTouched] = useState({
+        firstName: false,
+        lastName: false,
+        phone: false,
+        email: false,
+        message: false,
+    });
+
+    const getError = (field: string) => {
+        if (!touched[field]) return "";
+        if (!form[field].trim()) return "Trường này là bắt buộc";
+        return "";
+    };
+
+    const handleBlur = (e: any) => {
+        setTouched(prev => ({ ...prev, [e.target.name]: true }));
+    };
+
+    return (
+        <>
+            {contextHolder}
+            <Breadcrumb title={"Thông tin"} pages={["contact"]} />
+
+            <section className="overflow-hidden py-20 bg-gray-2">
+                <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+                    <div className="flex flex-col xl:flex-row gap-7.5">
+                        {/* ================= LEFT INFO ================= */}
+                        <div className="xl:max-w-[370px] w-full bg-white rounded-xl shadow-1">
+                            <div className="py-5 px-4 sm:px-7.5 border-b border-gray-3">
+                                <p className="font-medium text-xl text-dark">Thông tin liên lạc</p>
+                            </div>
 
               <div className="p-4 sm:p-7.5">
                 <div className="flex flex-col gap-4">
@@ -140,109 +187,164 @@ const Contact = () => {
               </div>
             </div>
 
-              <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
-                  <form onSubmit={onSubmit}>
-                      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
+                        {/* ================= RIGHT FORM ================= */}
+                        <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
+                            {bookTitle && (
+                                <div className="mb-5 p-4 rounded-lg bg-blue-50 border border-blue-light-3 text-blue-dark text-sm">
+                                    Bạn đang đặt sách theo yêu cầu: <strong>&#34;{bookTitle}&#34;</strong>
+                                </div>
+                            )}
 
-                          {/* First Name */}
-                          <div className="w-full">
-                              <label className="block mb-2.5">
-                                  Họ <span className="text-red">*</span>
-                              </label>
-                              <input
-                                  type="text"
-                                  name="firstName"
-                                  value={form.firstName}
-                                  onChange={handleChange}
-                                  placeholder="Nhập họ của bạn"
-                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
-                              />
-                          </div>
+                            <form onSubmit={onSubmit}>
+                                {/* Họ & Tên */}
+                                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
 
-                          {/* Last Name */}
-                          <div className="w-full">
-                              <label className="block mb-2.5">
-                                  Tên <span className="text-red">*</span>
-                              </label>
-                              <input
-                                  type="text"
-                                  name="lastName"
-                                  value={form.lastName}
-                                  onChange={handleChange}
-                                  placeholder="Nhập tên của bạn"
-                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
-                              />
-                          </div>
-                      </div>
+                                    {/* Họ */}
+                                    <div className="w-full">
+                                        <label className="block mb-2.5">
+                                            Họ <span className="text-red-dark">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="firstName"
+                                            value={form.firstName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Nhập họ của bạn"
+                                            className={`rounded-md w-full py-2.5 px-5 border 
+                    ${getError("firstName") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+                `}
+                                        />
+                                        {getError("firstName") && (
+                                            <p className="text-xs text-red-dark mt-1">{getError("firstName")}</p>
+                                        )}
+                                    </div>
 
-                      {/* Subject + Phone */}
-                      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-                          <div className="w-full">
-                              <label className="block mb-2.5">Tiêu đề</label>
-                              <input
-                                  type="text"
-                                  name="subject"
-                                  value={form.subject}
-                                  onChange={handleChange}
-                                  placeholder="Nhập tiêu đề"
-                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
-                              />
-                          </div>
+                                    {/* Tên */}
+                                    <div className="w-full">
+                                        <label className="block mb-2.5">
+                                            Tên <span className="text-red-dark">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="lastName"
+                                            value={form.lastName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Nhập tên của bạn"
+                                            className={`rounded-md w-full py-2.5 px-5 border 
+                    ${getError("lastName") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+                `}
+                                        />
+                                        {getError("lastName") && (
+                                            <p className="text-xs text-red-dark mt-1">{getError("lastName")}</p>
+                                        )}
+                                    </div>
+                                </div>
 
-                          <div className="w-full">
-                              <label className="block mb-2.5">Số điện thoại</label>
-                              <input
-                                  type="text"
-                                  name="phone"
-                                  value={form.phone}
-                                  onChange={handleChange}
-                                  placeholder="Nhập số điện thoại"
-                                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
-                              />
-                          </div>
-                      </div>
+                                {/* Subject + Phone */}
+                                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
+                                    <div className="w-full">
+                                        <label className="block mb-2.5">
+                                            Tiêu đề <span className="text-red-dark">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="subject"
+                                            value={form.subject}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Nhập tiêu đề"
+                                            className={`rounded-md w-full py-2.5 px-5 border 
+                    ${getError("subject") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+                `}
+                                        />
+                                        {getError("subject") && (
+                                            <p className="text-xs text-red-dark mt-1">{getError("subject")}</p>
+                                        )}
+                                    </div>
 
-                      {/* Email */}
-                      <div className="mb-5">
-                          <label className="block mb-2.5">Email</label>
-                          <input
-                              type="text"
-                              name="email"
-                              value={form.email}
-                              onChange={handleChange}
-                              placeholder="Nhập email của bạn"
-                              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5"
-                          />
-                      </div>
+                                    <div className="w-full">
+                                        <label className="block mb-2.5">
+                                            Số điện thoại <span className="text-red-dark">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="phone"
+                                            value={form.phone}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Nhập số điện thoại"
+                                            className={`rounded-md w-full py-2.5 px-5 border 
+                    ${getError("phone") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+                `}
+                                        />
+                                        {getError("phone") && (
+                                            <p className="text-xs text-red-dark mt-1">{getError("phone")}</p>
+                                        )}
+                                    </div>
+                                </div>
 
-                      {/* Message */}
-                      <div className="mb-7.5">
-                          <label className="block mb-2.5">Nội dung tin nhắn</label>
-                          <textarea
-                              name="message"
-                              value={form.message}
-                              onChange={handleChange}
-                              rows={5}
-                              placeholder="Nhập nội dung bạn muốn gửi..."
-                              className="rounded-md border border-gray-3 bg-gray-1 w-full p-5"
-                          />
-                      </div>
+                                {/* Email */}
+                                <div className="mb-5">
+                                    <label className="block mb-2.5">
+                                        Email <span className="text-red-dark">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder="Nhập email của bạn"
+                                        className={`rounded-md w-full py-2.5 px-5 border 
+                ${getError("email") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+            `}
+                                    />
+                                    {getError("email") && (
+                                        <p className="text-xs text-red-dark mt-1">{getError("email")}</p>
+                                    )}
+                                </div>
 
-                      <button
-                          type="submit"
-                          disabled={!isFormValid}
-                          className={`inline-flex font-medium text-white py-3 px-7 rounded-md ${isFormValid ? "bg-blue hover:bg-blue-dark" : "bg-gray-400 cursor-not-allowed"} `}
-                      >
-                          Gửi tin nhắn
-                      </button>
+                                {/* Message */}
+                                <div className="mb-7.5">
+                                    <label className="block mb-2.5">
+                                        Nội dung tin nhắn <span className="text-red-dark">*</span>
+                                    </label>
+                                    <textarea
+                                        name="message"
+                                        value={form.message}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        rows={5}
+                                        className={`rounded-md w-full p-5 border 
+                ${getError("message") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
+            `}
+                                        placeholder="Nhập nội dung bạn muốn gửi..."
+                                    />
+                                    {getError("message") && (
+                                        <p className="text-xs text-red-dark mt-1">{getError("message")}</p>
+                                    )}
+                                </div>
 
-                  </form>
-              </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+                                {/* Button */}
+                                <button
+                                    type="submit"
+                                    disabled={!isFormValid}
+                                    className={`inline-flex font-medium text-white py-3 px-7 rounded-md 
+            ${isFormValid ? "bg-blue hover:bg-blue-dark" : "bg-gray-4 cursor-not-allowed"}
+        `}
+                                >
+                                    Gửi tin nhắn
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </>
+    );
 };
 
 export default Contact;

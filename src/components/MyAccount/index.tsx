@@ -256,11 +256,11 @@ const MyAccount = () => {
                                         w-10 h-10
                                         rounded-full
                                         bg-[#E4E6EB]
-                                        border border-gray-300
+                                        border border-gray-3
                                         shadow-lg
                                         flex items-center justify-center
                                         cursor-pointer
-                                        hover:bg-gray-300
+                                        hover:bg-gray-3
                                         transition
                                     "
                                     >
@@ -312,7 +312,7 @@ const MyAccount = () => {
                                     {/* USER NAME + EMAIL */}
                                     <div className="text-center mt-4">
                                         <p className="font-semibold text-lg">{user?.fullName}</p>
-                                        <p className="text-sm text-gray-500">{user?.email}</p>
+                                        <p className="text-sm text-gray-5">{user?.email}</p>
                                     </div>
                                 </div>
 

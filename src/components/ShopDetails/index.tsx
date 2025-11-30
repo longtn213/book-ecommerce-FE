@@ -9,7 +9,7 @@ import {AppDispatch, useAppSelector} from "@/redux/store";
 import {setActiveIndex} from "@/redux/features/product-details";
 import {useDispatch} from "react-redux";
 
-import {Product} from "@/types/product";
+import {Book} from "@/types/book";
 import {useAuthContext} from "@/context/AuthContext";
 import {useCart} from "@/hook/useCart";
 import {useWishlist} from "@/hook/useWishlist";
@@ -25,7 +25,7 @@ const ShopDetailsUI = () => {
         const params = useParams();
         const id = Number(params.id);
 
-        const [product, setProduct] = useState<Product | null>(null);
+        const [product, setProduct] = useState<Book | null>(null);
         const [loading, setLoading] = useState(true);
 
         const dispatch = useDispatch<AppDispatch>();

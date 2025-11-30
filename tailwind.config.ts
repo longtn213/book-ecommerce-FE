@@ -104,6 +104,9 @@ const config: Config = {
       ...defaultTheme.screens,
     },
     extend: {
+        colors: {
+            primary: "#2563EB",
+        },
       fontSize: {
         "2xs": ["10px", "17px"],
         "heading-1": ["60px", "72px"],

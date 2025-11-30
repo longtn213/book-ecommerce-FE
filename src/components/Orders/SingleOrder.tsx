@@ -12,31 +12,31 @@ const statusBadge: any = {
         label: "Hoàn thành",
         icon: "✔️",
         class:
-            "bg-green-100 text-green-700 border border-green-300",
+            "text-green border border-green",
     },
     PAID: {
         label: "Đã thanh toán",
         icon: "💸",
         class:
-            "bg-blue-100 text-blue-700 border border-blue-300",
+            "text-blue border border-blue",
     },
     SHIPPING: {
         label: "Đang giao",
         icon: "🚚",
         class:
-            "bg-orange-100 text-orange-700 border border-orange-300",
+            "text-orange border border-orange",
     },
     CANCELLED: {
         label: "Đã hủy",
         icon: "⛔",
         class:
-            "bg-red-100 text-red-700 border border-red-300",
+            "text-red border border-red",
     },
     PENDING: {
         label: "Chờ xử lý",
         icon: "⏳",
         class:
-            "bg-yellow-100 text-yellow-700 border border-yellow-300",
+            "text-yellow border border-yellow",
     },
 };
 

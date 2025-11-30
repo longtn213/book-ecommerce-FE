@@ -92,11 +92,11 @@ export default function ResetPassword() {
             {contextHolder}
             <Breadcrumb title="Reset Mật Khẩu" pages={["Reset Mật Khẩu"]}/>
 
-            <div className="flex justify-center bg-gray-50 py-12 px-4">
+            <div className="flex justify-center bg-gray py-12 px-4">
             <div className="max-w-md w-full bg-white shadow-lg rounded-xl p-8">
 
                     <h2 className="text-2xl font-semibold text-center mb-4">Đặt lại mật khẩu</h2>
-                    <p className="text-center text-gray-500 mb-6">
+                    <p className="text-center text-gray-5 mb-6">
                         Nhập mật khẩu mới cho tài khoản của bạn.
                     </p>
 
@@ -111,7 +111,7 @@ export default function ResetPassword() {
                                 setPassword(e.target.value);
                                 setErrorPassword("");
                             }}
-                            className="w-full px-4 py-3 border rounded-lg outline-none bg-gray-100"
+                            className="w-full px-4 py-3 border rounded-lg outline-none bg-gray-1"
                             style={{
                                 borderColor: errorPassword ? "#ef4444" : "#d1d5db",
                                 backgroundColor: errorPassword ? "#fef2f2" : "#f3f4f6",
@@ -136,7 +136,7 @@ export default function ResetPassword() {
                                 setConfirm(e.target.value);
                                 setErrorConfirm("");
                             }}
-                            className="w-full px-4 py-3 border rounded-lg outline-none bg-gray-100"
+                            className="w-full px-4 py-3 border rounded-lg outline-none bg-gray-1"
                             style={{
                                 borderColor: errorConfirm ? "#ef4444" : "#d1d5db",
                                 backgroundColor: errorConfirm ? "#fef2f2" : "#f3f4f6",
@@ -153,7 +153,7 @@ export default function ResetPassword() {
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="w-full bg-blue text-white py-3 rounded-lg hover:bg-blue-600 transition"
+                        className="w-full bg-blue text-white py-3 rounded-lg hover:bg-blue-dark transition"
                     >
                         {loading ? "Đang xử lý..." : "Cập nhật mật khẩu"}
                     </button>
