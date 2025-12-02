@@ -1,236 +1,256 @@
 "use client";
-import React, {useEffect, useState} from "react";
-
-import {useModalContext} from "@/app/context/QuickViewModalContext";
-import {useAppSelector} from "@/redux/store";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import {useAuthContext} from "@/context/AuthContext";
-import {useCart} from "@/hook/useCart";
+import { useModalContext } from "@/app/context/QuickViewModalContext";
+import { useAppSelector } from "@/redux/store";
+import { useAuthContext } from "@/context/AuthContext";
+import { useCart } from "@/hook/useCart";
+
+/*
+🔥 NEW FEATURES:
+- Zoom ảnh
+- Layout giống TIKI
+- Thumbs giống Shopee
+- Modal NẰM GIỮA cố định
+*/
 
 const QuickViewModal = () => {
     const { isModalOpen, closeModal } = useModalContext();
-    const [quantity, setQuantity] = useState(1);
+    const product = useAppSelector((state) => state.quickViewReducer.value);
     const { user, requireLogin } = useAuthContext();
     const { addToCart } = useCart();
-    // product từ quickViewReducer
-    const product = useAppSelector((state) => state.quickViewReducer.value);
 
+    const [quantity, setQuantity] = useState(1);
     const [activePreview, setActivePreview] = useState(0);
+    const [zoom, setZoom] = useState(false);
 
-
+    const imgRef = useRef<HTMLImageElement | null>(null);
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (!event.target.closest(".modal-content")) {
-                closeModal();
-            }
-        }
-
         if (isModalOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
+            setQuantity(1);
+            setActivePreview(0);
+            document.body.style.overflow = "hidden";
+
+        } else {
+            document.body.style.overflow = "";
         }
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            setQuantity(1);
+            document.body.style.overflow = "";
         };
-    }, [isModalOpen, closeModal]);
+    }, [isModalOpen]);
 
-    // ESC TO CLOSE MODAL
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") closeModal();
-        };
+    if (!isModalOpen) return null;
 
-        if (isModalOpen) {
-            window.addEventListener("keydown", handleEsc);
-        }
+    // LOCK SCROLL WHEN MODAL OPEN
 
-        return () => window.removeEventListener("keydown", handleEsc);
-    }, [isModalOpen, closeModal]);
 
 
     return (
-        <div
-            className={`${
-                isModalOpen ? "z-99999" : "hidden"
-            } fixed top-0 left-0 overflow-y-auto no-scrollbar w-full h-screen sm:py-20 xl:py-25 2xl:py-[230px] bg-dark/70 sm:px-8 px-4 py-5`}
+        <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 py-6"
+            onClick={closeModal}
         >
-            <div className="flex items-center justify-center">
-                <div className="w-full max-w-[1100px] rounded-xl shadow-3 bg-white p-7.5 relative modal-content">
-                    {/* Close button */}
-                    <button
-                        onClick={closeModal}
-                        className="absolute top-0 right-0 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-meta text-body hover:text-dark flex items-center justify-center"
-                    >
-                        ✕
-                    </button>
+            {/* MODAL */}
+            <div
+                className="
+          quick-modal relative
+          max-w-[1100px] w-full
+          bg-white rounded-2xl shadow-2xl
+          p-6 sm:p-10
+          animate-fadeIn
+        "
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* CLOSE BTN */}
+                <button
+                    onClick={closeModal}
+                    className="
+            absolute top-4 right-4 md:top-6 md:right-6
+            w-10 h-10 rounded-full
+            bg-gray-100 hover:bg-gray-200
+            flex items-center justify-center
+            text-gray-700 text-xl
+            transition shadow-sm
+          "
+                >
+                    ✕
+                </button>
 
-                    <div className="flex flex-wrap items-center gap-12.5">
-                        {/* LEFT IMAGE AREA */}
-                        <div className="max-w-[526px] w-full">
-                            <div className="flex gap-5">
-                                {/* Small thumbnails */}
-                                <div className="flex flex-col gap-5">
-                                    {product.images?.map((img, key) => (
-                                        <button
-                                            key={key}
-                                            onClick={() => setActivePreview(key)}
-                                            className={`w-20 h-20 rounded-lg bg-gray-1 overflow-hidden flex items-center justify-center 
-                      hover:border-2 hover:border-blue duration-200 
-                      ${activePreview === key ? "border-2 border-blue" : ""}`}
-                                        >
-                                            <Image
-                                                src={img}
-                                                alt="thumbnail"
-                                                width={61}
-                                                height={61}
-                                                className="aspect-square"
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-                                {/* Main image - No preview zoom */}
-                                <div className="relative flex items-center justify-center w-full sm:min-h-[508px] bg-gray-1 rounded-lg border border-gray-3">
-                                    {product?.images?.[activePreview] ? (
-                                        <Image
-                                            src={product.images[activePreview]}
-                                            alt="product"
-                                            width={400}
-                                            height={400}
-                                        />
-                                    ) : (
-                                        <div className="w-[400px] h-[400px] flex items-center justify-center bg-gray-100 text-gray-400">
-                                            No image
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* RIGHT INFO AREA */}
-                        <div className="max-w-[445px] w-full">
-  <span className="inline-block text-custom-xs font-medium text-white py-1 px-3 bg-green mb-6.5">
-    {product.status === "OUT_OF_STOCK" ? "HẾT HÀNG" : "SALE 20% OFF"}
-  </span>
-
-                            <h3 className="font-semibold text-xl xl:text-heading-5 text-dark mb-4">
-                                {product.title}
-                            </h3>
-
-                            {/* rating */}
-                            <div className="flex flex-wrap items-center gap-5 mb-6">
-                                <div className="flex items-center gap-1.5">
-                                    {/* giữ nguyên SVG */}
-                                    <div className="flex items-center gap-1">
-                                        {Array.from({ length: 5 }).map((_, i) => (
-                                            <Image
-                                                key={i}
-                                                src="/images/icons/icon-star.svg"
-                                                alt="star"
-                                                width={18}
-                                                height={18}
-                                                className={i < Math.round(product.rating) ? "" : "opacity-30"}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    <span>
-        <span className="font-medium text-dark"> {product.rating} Rating </span>
-        <span className="text-dark-2"> ({product.reviewCount} đánh giá) </span>
-      </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <svg
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 20 20"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
+                    {/* LEFT — IMAGE */}
+                    <div>
+                        <div className="flex gap-4">
+                            {/* Thumbnails (Shopee Style) */}
+                            <div className="flex flex-col gap-3">
+                                {product.images?.map((img, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setActivePreview(i)}
+                                        className={`
+                      w-20 h-20 rounded-lg overflow-hidden border 
+                      flex items-center justify-center 
+                      bg-gray-50 transition
+                      hover:brightness-110
+                      ${i === activePreview ? "border-blueCustom shadow" : "border-gray-200"}
+                    `}
                                     >
-                                        <path
-                                            d="M10 0.5625C4.78125 0.5625 0.5625 4.78125 0.5625 10C0.5625 15.2188 4.78125 19.4688 10 19.4688C15.2188 19.4688 19.4688 15.2188 19.4688 10C19.4688 4.78125 15.2188 0.5625 10 0.5625Z"
-                                            fill={product.status === "OUT_OF_STOCK" ? "#ff2d2d" : "#22AD5C"}
+                                        <Image
+                                            src={img}
+                                            alt="thumb"
+                                            width={80}
+                                            height={80}
+                                            className="object-cover"
                                         />
-                                    </svg>
-
-                                    <span className="font-medium text-dark">
-        {product.status === "OUT_OF_STOCK" ? "Out of Stock" : "In Stock"}
-      </span>
-                                </div>
+                                    </button>
+                                ))}
                             </div>
 
-                            {/* DESCRIPTION */}
-                            <p className="mb-3 text-dark">{product.description}</p>
-
-                            {/* EXTRA INFO */}
-                            <div className="space-y-1 text-sm text-dark mb-6">
-                                <p><strong>Tác giả:</strong> {product.authors?.join(", ")}</p>
-                                <p><strong>Thể loại:</strong> {product.categories?.join(", ")}</p>
-                                <p><strong>ISBN:</strong> {product.isbn}</p>
-                                <p><strong>Ngôn ngữ:</strong> {product.language}</p>
-                                <p><strong>Số trang:</strong> {product.pages}</p>
-                                <p><strong>Năm XB:</strong> {product.publishYear}</p>
-                                <p><strong>NXB:</strong> {product.publisherName}</p>
-                                <p><strong>Tồn kho:</strong> {product.stockQuantity}</p>
-                            </div>
-
-                            {/* PRICE + QUANTITY (UI original) */}
-                            <div className="flex flex-wrap justify-between gap-5 mt-6 mb-7.5">
-                                <div>
-                                    <h4 className="font-semibold text-lg text-dark mb-3.5">Price</h4>
-                                    <span className="flex items-center gap-2">
-        <span className="font-semibold text-dark text-xl xl:text-heading-4">
-          {product.price.toLocaleString()}₫
-        </span>
-        <span className="font-medium text-dark-4 text-lg xl:text-2xl line-through">
-          {(product.price * 1.2).toLocaleString()}₫
-        </span>
-      </span>
-                                </div>
-
-                                {/* quantity giữ nguyên UI */}
-                                <div>
-                                    <h4 className="font-semibold text-lg text-dark mb-3.5">Quantity</h4>
-
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                                            className="flex items-center justify-center w-10 h-10 rounded-[5px] bg-gray-2 text-dark hover:text-blue"
-                                        >
-                                            -
-                                        </button>
-
-                                        <span className="flex items-center justify-center w-20 h-10 rounded-[5px] border border-gray-4 bg-white font-medium text-dark">
-          {quantity}
-        </span>
-
-                                        <button
-                                            onClick={() => setQuantity(quantity + 1)}
-                                            className="flex items-center justify-center w-10 h-10 rounded-[5px] bg-gray-2 text-dark hover:text-blue"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* BUTTON */}
-                            <button
-                                disabled={product.status === "OUT_OF_STOCK"}
-                                className={`inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark ${
-                                    product.status === "OUT_OF_STOCK" ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
-                                onClick={() => {
-                                    if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
-                                    addToCart(product.id, quantity);
+                            {/* MAIN IMAGE + ZOOM EFFECT */}
+                            <div
+                                className="
+                  relative flex-1 bg-gray-50
+                  rounded-xl border border-gray-300
+                  overflow-hidden
+                  cursor-zoom-in
+                "
+                                onMouseEnter={() => setZoom(true)}
+                                onMouseLeave={() => setZoom(false)}
+                                onMouseMove={(e) => {
+                                    if (!imgRef.current) return;
+                                    const { left, top, width, height } =
+                                        e.currentTarget.getBoundingClientRect();
+                                    const x = ((e.pageX - left) / width) * 100;
+                                    const y = ((e.pageY - top) / height) * 100;
+                                    imgRef.current.style.transformOrigin = `${x}% ${y}%`;
                                 }}
                             >
-                                Add to Cart
-                            </button>
+                                <Image
+                                    ref={imgRef}
+                                    src={product.images?.[activePreview] || "/images/no-image.png"}
+                                    alt="product"
+                                    width={450}
+                                    height={450}
+                                    className={`
+                    object-contain transition duration-200
+                    ${zoom ? "scale-150 cursor-zoom-out" : "scale-100"}
+                  `}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT — INFO (Tiki Style) */}
+                    <div className="flex flex-col">
+
+                        {/* STATUS */}
+                        <span
+                            className={`
+                inline-block px-3 py-1 rounded-md text-xs font-semibold mb-4 w-fit
+                ${product.status === "OUT_OF_STOCK" ? "bg-red-500 text-white" : "bg-green-600 text-white"}
+              `}
+                        >
+              {product.status === "OUT_OF_STOCK" ? "Hết hàng" : "Còn hàng"}
+            </span>
+
+                        {/* TITLE */}
+                        <h1 className="text-[26px] font-bold text-gray-900 leading-snug mb-4">
+                            {product.title}
+                        </h1>
+
+                        {/* RATING */}
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="flex">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Image
+                                        key={i}
+                                        src="/images/icons/icon-star.svg"
+                                        width={18}
+                                        height={18}
+                                        className={i < Math.round(product.rating) ? "" : "opacity-25"}
+                                        alt="star"
+                                    />
+                                ))}
+                            </div>
+
+                            <span className="text-gray-600 text-sm">
+                {product.rating} ({product.reviewCount} đánh giá)
+              </span>
                         </div>
 
+                        {/* DESCRIPTION */}
+                        <p className="text-gray-700 leading-relaxed mb-5">
+                            {product.description}
+                        </p>
+
+                        {/* EXTRA INFO */}
+                        <div className="space-y-1 text-sm text-gray-700 mb-6">
+                            <p><b>Tác giả:</b> {product.authors?.join(", ")}</p>
+                            <p><b>Thể loại:</b> {product.categories?.join(", ")}</p>
+                            <p><b>ISBN:</b> {product.isbn}</p>
+                            <p><b>Ngôn ngữ:</b> {product.language}</p>
+                            <p><b>Số trang:</b> {product.pages}</p>
+                            <p><b>Năm XB:</b> {product.publishYear}</p>
+                            <p><b>NXB:</b> {product.publisherName}</p>
+                            <p><b>Tồn kho:</b> {product.stockQuantity}</p>
+                        </div>
+
+                        {/* PRICE + QUANTITY */}
+                        <div className="flex justify-between items-start gap-6 mb-8 flex-wrap">
+                            {/* PRICE */}
+                            <div>
+                                <p className="text-gray-500 text-sm mb-1">Giá bán</p>
+                                <div className="flex items-center gap-2">
+                  <span className="text-[28px] font-bold text-red-600">
+                    {product.price.toLocaleString()}₫
+                  </span>
+                                    <span className="line-through text-gray-400 text-lg">
+                    {(product.price * 1.2).toLocaleString()}₫
+                  </span>
+                                </div>
+                            </div>
+
+                            {/* QUANTITY */}
+                            <div>
+                                <p className="text-gray-500 text-sm mb-1">Số lượng</p>
+                                <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                                    <button
+                                        onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 text-xl"
+                                    >
+                                        -
+                                    </button>
+
+                                    <div className="w-12 h-10 flex items-center justify-center border-x border-gray-200">
+                                        {quantity}
+                                    </div>
+
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 text-xl"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ADD TO CART */}
+                        <button
+                            disabled={product.status === "OUT_OF_STOCK"}
+                            onClick={() => {
+                                if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
+                                addToCart(product.id, quantity);
+                            }}
+                            className={`
+                w-full py-3 rounded-xl text-white font-semibold shadow-md transition 
+                ${product.status === "OUT_OF_STOCK"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-blueCustom hover:bg-blueCustom-dark"}
+              `}
+                        >
+                            {product.status === "OUT_OF_STOCK" ? "Sản phẩm tạm hết hàng" : "Thêm vào giỏ hàng"}
+                        </button>
                     </div>
 
                 </div>

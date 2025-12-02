@@ -3,66 +3,78 @@
 import Image from "next/image";
 import { useWishlist } from "@/hook/useWishlist";
 import { useCart } from "@/hook/useCart";
-import {Trash2} from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 const WishListSingleItem = ({ item }) => {
     const { toggle } = useWishlist();
     const { addToCart } = useCart();
 
     return (
-        <div className="flex items-center border-t border-gray-3 py-5 px-10">
+        <div className="grid grid-cols-12 items-center border-t border-gray-200 py-6 px-4 hover:bg-gray-50 transition">
+
             {/* REMOVE BUTTON */}
-            <div className="min-w-[83px]">
+            <div className="col-span-1 flex justify-center">
                 <button
-                    onClick={() => toggle({
-                        id: item.bookId,
-                        title: item.title,
-                        authorName: item.authorName,
-                        price: item.price,
-                        coverUrl: item.coverUrl
-                    })}
+                    onClick={() =>
+                        toggle({
+                            id: item.bookId,
+                            title: item.title,
+                            authorName: item.authorName,
+                            price: item.price,
+                            coverUrl: item.coverUrl,
+                        })
+                    }
                     aria-label="remove wishlist"
-                    className="flex items-center justify-center rounded-lg max-w-[38px] h-9.5 bg-gray-2 border border-gray-3 hover:bg-red-light-6 hover:border-red-light-4 hover:text-red"
+                    className="p-2 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-600 transition"
                 >
-                    <Trash2 size={24} />
+                    <Trash2 size={18} />
                 </button>
             </div>
 
-            {/* PRODUCT COLUMN */}
-            <div className="min-w-[387px]">
-                <div className="flex items-center gap-5">
-                    <div className="flex items-center justify-center rounded-[5px] bg-gray-2 w-[80px] h-[90px]">
-                        <Image
-                            src={item.coverUrl || "/images/default-book.png"}
-                            alt={item.title}
-                            width={80}
-                            height={100}
-                            className="object-cover"
-                        />
-                    </div>
-
-                    <h3 className="text-dark hover:text-blue transition">
-                        {item.title}
-                    </h3>
+            {/* BOOK INFO */}
+            <div className="col-span-5 flex items-center gap-4">
+                <div className="w-[80px] h-[100px] flex items-center justify-center bg-gray-100 rounded-md overflow-hidden">
+                    <Image
+                        src={item.coverUrl || "/images/default-book.png"}
+                        alt={item.title}
+                        width={80}
+                        height={100}
+                        className="object-cover"
+                    />
                 </div>
+
+                <h3 className="text-base font-medium text-gray-800 hover:text-blue-600 transition line-clamp-2">
+                    {item.title}
+                </h3>
             </div>
-            {/* Author name */}
-            <div className="min-w-[265px]">
+
+            {/* AUTHOR */}
+            <div className="col-span-3">
                 <span className="text-green-600 font-medium">{item.authorName}</span>
             </div>
 
             {/* PRICE */}
-            <div className="min-w-[205px]">
-                <p className="text-dark">${item.price.toLocaleString()}</p>
+            <div className="col-span-2">
+                <p className="font-semibold text-gray-800">
+                    {item.price.toLocaleString()}₫
+                </p>
             </div>
 
-            {/* ACTION */}
-            <div className="min-w-[150px] flex justify-end">
+            {/* ACTION BUTTON */}
+            <div className="col-span-1 flex justify-center">
                 <button
                     onClick={() => addToCart(item.bookId, 1)}
-                    className="inline-flex text-dark hover:text-white bg-gray-1 border border-gray-3 py-2.5 px-6 rounded-md hover:bg-blue"
+                    className="
+                        px-4 py-2
+                        rounded-lg
+                        text-blue-600 border border-blue-500
+                        hover:bg-blue-500 hover:text-white
+                        font-medium text-sm
+                        transition
+                        items-center
+                    "
                 >
-                    Add to Cart
+                    Thêm vào giỏ hàng
                 </button>
             </div>
         </div>

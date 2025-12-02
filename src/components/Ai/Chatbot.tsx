@@ -148,7 +148,7 @@ const Chatbot = ({ variant = "full", onClose }: ChatbotProps) => {
                 {/* CHAT */}
                 <div
                     ref={scrollRef}
-                    className={`flex-1 overflow-y-auto px-4 py-4 bg-gray-5 space-y-3 ${chatBoxHeight}`}
+                    className={`flex-1 overflow-y-auto px-4 py-4 bg-gray-50 space-y-3 ${chatBoxHeight}`}
                 >
                     {messages.map((m) => (
                         <ChatMessageItem
@@ -223,7 +223,7 @@ const Chatbot = ({ variant = "full", onClose }: ChatbotProps) => {
                                 <button key={i} onClick={() => setRating(i + 1)}>
                   <span
                       className={`text-2xl ${
-                          i < rating ? "text-yellow-light" : "text-gray-7"
+                          i < rating ? "text-yellow-400" : "text-gray-700"
                       }`}
                   >
                     ★

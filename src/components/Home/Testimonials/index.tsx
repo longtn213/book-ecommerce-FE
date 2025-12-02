@@ -60,7 +60,7 @@ const Testimonials = () => {
             {/* <!-- section title --> */}
             <div className="mb-10 flex items-center justify-between">
               <div>
-                <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
+                <span className="flex items-center gap-2.5 font-medium text-darkCustom mb-1.5">
                   <Image
                     src="/images/icons/icon-08.svg"
                     alt="icon"
@@ -69,7 +69,7 @@ const Testimonials = () => {
                   />
                   Testimonials
                 </span>
-                <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
+                <h2 className="font-semibold text-xl xl:text-heading-5 text-darkCustom">
                   User Feedbacks
                 </h2>
               </div>

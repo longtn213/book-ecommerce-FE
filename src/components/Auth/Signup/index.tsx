@@ -1,20 +1,24 @@
 "use client";
 
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
-import {notification} from "antd";
+import { useRouter } from "next/navigation";
+import { notification } from "antd";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import {register} from "@/services/authService";
+import { register } from "@/services/authService";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-import {useAuth} from "@/hook/useAuth";
+import { useAuth } from "@/hook/useAuth";
 
 const Signup = () => {
     const router = useRouter();
+    const { login } = useAuth();
     const [api, contextHolder] = notification.useNotification();
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const { login } = useAuth();
+
+    const [loading, setLoading] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -24,24 +28,55 @@ const Signup = () => {
         confirmPassword: "",
     });
 
-    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({
+        fullName: "",
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+    });
+
+    const validateField = (name: string, value: string) => {
+        let msg = "";
+
+        if (!value.trim()) {
+            msg = "Trường này là bắt buộc.";
+        } else {
+            if (name === "email") {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regex.test(value)) msg = "Email không hợp lệ.";
+            }
+            if (name === "password") {
+                if (value.length < 6) msg = "Mật khẩu phải ít nhất 6 ký tự.";
+            }
+            if (name === "confirmPassword") {
+                if (value !== formData.password) msg = "Mật khẩu không trùng khớp.";
+            }
+        }
+
+        setErrors((prev) => ({ ...prev, [name]: msg }));
+    };
+
+    useEffect(() => {
+        const noErrors =
+            Object.values(errors).every((e) => e === "") &&
+            Object.values(formData).every((v) => v.trim() !== "") &&
+            formData.password === formData.confirmPassword;
+
+        setIsFormValid(noErrors);
+    }, [errors, formData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setFormData((prev) => ({ ...prev, [name]: value }));
+        validateField(name, value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.password !== formData.confirmPassword) {
-            api.error({
-                message: "Lỗi xác nhận mật khẩu",
-                description: "Mật khẩu nhập lại không khớp!",
-                placement: "topRight",
-            });
-            return;
-        }
+        if (!isFormValid) return;
 
         setLoading(true);
 
@@ -54,8 +89,6 @@ const Signup = () => {
             });
 
             if (res.success && res.data?.token) {
-
-                // 🚀 GỌI LOGIN CỦA AUTHCONTEXT
                 await login(res.data.token);
 
                 api.success({
@@ -64,9 +97,7 @@ const Signup = () => {
                     placement: "topRight",
                 });
 
-                // 🚀 Chuyển sang trang chủ
                 setTimeout(() => router.push("/"), 800);
-
             } else {
                 api.error({
                     message: "Đăng ký thất bại",
@@ -77,7 +108,7 @@ const Signup = () => {
         } catch (err: any) {
             api.error({
                 message: "Lỗi máy chủ",
-                description: err.response?.data?.message || "Có lỗi xảy ra!",
+                description: err.response?.data?.message || "Đã xảy ra lỗi!",
                 placement: "topRight",
             });
         } finally {
@@ -85,122 +116,146 @@ const Signup = () => {
         }
     };
 
+    const inputErrorClass =
+        "border-red-500 bg-red-50 focus:ring-red-200 focus:border-red-500";
+
     return (
         <>
             {contextHolder}
+
             <Breadcrumb title={"Đăng ký"} pages={["Đăng ký"]} />
 
-            <section className="overflow-hidden py-20 bg-gray-2">
-                <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-                    <div className="max-w-[570px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
-                        <div className="text-center mb-11">
-                            <h2 className="font-semibold text-xl sm:text-2xl xl:text-heading-5 text-dark mb-1.5">
-                                Tạo tài khoản mới
-                            </h2>
-                            <p>Nhập thông tin của bạn bên dưới</p>
+            <section className="py-20 bg-gray-100">
+                <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
+                    <div className="max-w-[500px] mx-auto bg-white rounded-2xl shadow-lg px-6 py-10 sm:px-10">
+
+                        <div className="text-center mb-10">
+                            <h2 className="text-2xl font-bold text-dark mb-1">Tạo tài khoản mới</h2>
+                            <p className="text-gray-600 text-sm">Điền thông tin bên dưới để đăng ký</p>
                         </div>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-5">
-                                <label htmlFor="fullName" className="block mb-2.5">
-                                    Họ và tên <span className="text-red">*</span>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* FULL NAME */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                    Họ và tên <span className="text-red-600">*</span>
                                 </label>
+
                                 <input
                                     type="text"
-                                    id="fullName"
                                     name="fullName"
-                                    placeholder="Nhập họ và tên"
                                     value={formData.fullName}
                                     onChange={handleChange}
-                                    required
-                                    className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                    placeholder="Nhập họ và tên"
+                                    className={`w-full px-4 py-3 rounded-lg border bg-gray-50
+                    focus:bg-white focus:ring-2 transition 
+                    ${errors.fullName ? inputErrorClass : "focus:border-blue-500"}`}
                                 />
+
+                                {errors.fullName && (
+                                    <p className="text-red-600 text-sm mt-1">{errors.fullName}</p>
+                                )}
                             </div>
 
-                            <div className="mb-5">
-                                <label htmlFor="email" className="block mb-2.5">
-                                    Email <span className="text-red">*</span>
+                            {/* EMAIL */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                    Email <span className="text-red-600">*</span>
                                 </label>
+
                                 <input
                                     type="email"
-                                    id="email"
                                     name="email"
-                                    placeholder="Nhập email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    required
-                                    className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                    placeholder="Nhập email"
+                                    className={`w-full px-4 py-3 rounded-lg border bg-gray-50
+                    focus:bg-white focus:ring-2 transition 
+                    ${errors.email ? inputErrorClass : "focus:border-blue-500"}`}
                                 />
+
+                                {errors.email && (
+                                    <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+                                )}
                             </div>
 
-                            <div className="mb-5">
-                                <label htmlFor="username" className="block mb-2.5">
-                                    Tên đăng nhập <span className="text-red">*</span>
+                            {/* USERNAME */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                    Tên đăng nhập <span className="text-red-600">*</span>
                                 </label>
+
                                 <input
                                     type="text"
-                                    id="username"
                                     name="username"
-                                    placeholder="Nhập tên đăng nhập"
                                     value={formData.username}
                                     onChange={handleChange}
-                                    required
-                                    className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                    placeholder="Nhập tên đăng nhập"
+                                    className={`w-full px-4 py-3 rounded-lg border bg-gray-50
+                    focus:bg-white focus:ring-2 transition 
+                    ${errors.username ? inputErrorClass : "focus:border-blue-500"}`}
                                 />
+
+                                {errors.username && (
+                                    <p className="text-red-600 text-sm mt-1">{errors.username}</p>
+                                )}
                             </div>
 
-                            <div className="mb-5">
-                                <label htmlFor="password" className="block mb-2.5">
-                                    Mật khẩu <span className="text-red">*</span>
+                            {/* PASSWORD */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                    Mật khẩu <span className="text-red-600">*</span>
                                 </label>
 
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
-                                        id="password"
                                         name="password"
-                                        placeholder="Nhập mật khẩu"
                                         value={formData.password}
                                         onChange={handleChange}
-                                        required
-                                        className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 pr-12 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                        placeholder="Nhập mật khẩu"
+                                        className={`w-full px-4 py-3 pr-12 rounded-lg border bg-gray-50
+                      focus:bg-white focus:ring-2 transition 
+                      ${errors.password ? inputErrorClass : "focus:border-blue-500"}`}
                                     />
 
                                     <button
                                         type="button"
-                                        onClick={() => setShowPassword((prev) => !prev)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-5 hover:text-dark"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-dark"
                                     >
-                                        {showPassword ? (
-                                            <HiOutlineEyeOff size={22} />
-                                        ) : (
-                                            <HiOutlineEye size={22} />
-                                        )}
+                                        {showPassword ? <HiOutlineEyeOff size={22} /> : <HiOutlineEye size={22} />}
                                     </button>
                                 </div>
+
+                                {errors.password && (
+                                    <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+                                )}
                             </div>
 
-                            <div className="mb-5.5">
-                                <label htmlFor="confirmPassword" className="block mb-2.5">
-                                    Nhập lại mật khẩu <span className="text-red">*</span>
+                            {/* CONFIRM PASSWORD */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
+                                    Nhập lại mật khẩu <span className="text-red-600">*</span>
                                 </label>
 
                                 <div className="relative">
                                     <input
                                         type={showConfirmPassword ? "text" : "password"}
-                                        id="confirmPassword"
                                         name="confirmPassword"
-                                        placeholder="Nhập lại mật khẩu"
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        required
-                                        className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 pr-12 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                                        placeholder="Nhập lại mật khẩu"
+                                        className={`w-full px-4 py-3 pr-12 rounded-lg border bg-gray-50
+                      focus:bg-white focus:ring-2 transition 
+                      ${errors.confirmPassword ? inputErrorClass : "focus:border-blue-500"}`}
                                     />
 
                                     <button
                                         type="button"
-                                        onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-5 hover:text-dark"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-dark"
                                     >
                                         {showConfirmPassword ? (
                                             <HiOutlineEyeOff size={22} />
@@ -209,21 +264,31 @@ const Signup = () => {
                                         )}
                                     </button>
                                 </div>
+
+                                {errors.confirmPassword && (
+                                    <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+                                )}
                             </div>
 
+                            {/* SUBMIT BUTTON */}
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className="w-full flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg ease-out duration-200 hover:bg-blue mt-7.5"
+                                disabled={!isFormValid || loading}
+                                className={`w-full py-3 rounded-lg text-white font-semibold transition shadow-md
+                  ${
+                                    isFormValid
+                                        ? "bg-blue-500 hover:bg-blue-600"
+                                        : "bg-gray-300 cursor-not-allowed"
+                                }`}
                             >
                                 {loading ? "Đang xử lý..." : "Tạo tài khoản"}
                             </button>
 
-                            <p className="text-center mt-6">
+                            <p className="text-center text-sm mt-4">
                                 Đã có tài khoản?
                                 <Link
                                     href="/signin"
-                                    className="text-dark ease-out duration-200 hover:text-blue pl-2"
+                                    className="text-blue-600 font-medium ml-1 hover:underline"
                                 >
                                     Đăng nhập ngay
                                 </Link>

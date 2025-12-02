@@ -79,9 +79,6 @@ export const MyReview = () => {
 
             <section className="py-10 bg-gray-100">
                 <div className="max-w-[900px] mx-auto px-4">
-                    <h2 className="text-2xl font-semibold text-dark mb-8">
-                        Đánh giá của bạn
-                    </h2>
 
                     {reviews.length > 0 ? (
                         reviews.map((review) => (

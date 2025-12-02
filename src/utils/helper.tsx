@@ -45,6 +45,7 @@ export const convertBookToProduct = (b: any) => ({
     images: b.images?.length ? b.images : ["/images/default-book.png"],
     rating: b.rating || 0,
     reviewCount: b.reviewCount || 0,
+    inDatabase: b.inDatabase || 0,
 });
 export const formatReviewDate = (dateString: Date | string): string => {
     const date = new Date(dateString);

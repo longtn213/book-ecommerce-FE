@@ -258,7 +258,7 @@ const Shop = () => {
                                             <p>Filters:</p>
                                             <button
                                                 type="button"
-                                                className="text-blue"
+                                                className="text-blueCustom"
                                                 onClick={resetFilters}
                                             >
                                                 Clean All

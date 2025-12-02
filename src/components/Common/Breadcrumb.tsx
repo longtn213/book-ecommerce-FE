@@ -1,33 +1,84 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
-const Breadcrumb = ({ title, pages }) => {
-  return (
-    <div className="overflow-hidden shadow-breadcrumb pt-[209px] sm:pt-[155px] lg:pt-[95px] xl:pt-[165px]">
-      <div className="border-t border-gray-3">
-        <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0 py-5 xl:py-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h1 className="font-semibold text-dark text-xl sm:text-2xl xl:text-custom-2">
-              {title}
-            </h1>
+const Breadcrumb = ({ title, pages = [] }) => {
+    const [offset, setOffset] = useState(0);
 
-            <ul className="flex items-center gap-2">
-              <li className="text-custom-sm hover:text-blue">
-                <Link href="/">Home /</Link>
-              </li>
+    useEffect(() => {
+        const header = document.querySelector("header");
+        if (!header) return;
 
-              {pages.length > 0 &&
-                pages.map((page, key) => (
-                  <li className="text-custom-sm last:text-blue capitalize" key={key}>
-                    {page} 
-                  </li>
-                ))}
-            </ul>
-          </div>
+        const updateHeight = () => {
+            const h = header.getBoundingClientRect().height;
+            setOffset(h);
+        };
+
+        updateHeight();
+
+        // Update on window resize
+        window.addEventListener("resize", updateHeight);
+
+        // Update on scroll (vì header sticky có thể thay đổi height)
+        window.addEventListener("scroll", updateHeight);
+
+        return () => {
+            window.removeEventListener("resize", updateHeight);
+            window.removeEventListener("scroll", updateHeight);
+        };
+    }, []);
+
+    return (
+        <div
+            className="w-full bg-gray-50 border-b border-gray-200 py-6 transition-all"
+            style={{ marginTop: offset }}
+        >
+            <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
+
+                {/* Title */}
+                <h1 className="font-semibold text-dark text-xl sm:text-2xl xl:text-3xl mb-3">
+                    {title}
+                </h1>
+
+                {/* Breadcrumb items */}
+                <ul className="flex items-center text-sm text-gray-600 gap-1">
+                    <li className="flex items-center">
+                        <Link href="/" className="hover:text-blue-600 transition">
+                            Trang chủ
+                        </Link>
+                    </li>
+
+                    {pages.length > 0 && (
+                        <li className="text-gray-400">
+                            <ChevronRight size={16} />
+                        </li>
+                    )}
+
+                    {pages.map((page, index) => (
+                        <React.Fragment key={index}>
+                            <li
+                                className={`capitalize ${
+                                    index === pages.length - 1
+                                        ? "text-blue-600 font-medium"
+                                        : "hover:text-blue-600"
+                                }`}
+                            >
+                                {page}
+                            </li>
+
+                            {index < pages.length - 1 && (
+                                <li className="text-gray-400">
+                                    <ChevronRight size={16} />
+                                </li>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </ul>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Breadcrumb;

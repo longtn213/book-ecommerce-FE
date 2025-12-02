@@ -188,21 +188,23 @@ const Contact = () => {
             </div>
 
                         {/* ================= RIGHT FORM ================= */}
+                        {/* ================= RIGHT FORM ================= */}
                         <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
+
                             {bookTitle && (
-                                <div className="mb-5 p-4 rounded-lg bg-blue-50 border border-blue-light-3 text-blue-dark text-sm">
-                                    Bạn đang đặt sách theo yêu cầu: <strong>&#34;{bookTitle}&#34;</strong>
+                                <div className="mb-5 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm">
+                                    Bạn đang đặt sách theo yêu cầu: <strong>"{bookTitle}"</strong>
                                 </div>
                             )}
 
                             <form onSubmit={onSubmit}>
-                                {/* Họ & Tên */}
-                                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
 
+                                {/* Họ & tên */}
+                                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                                     {/* Họ */}
                                     <div className="w-full">
-                                        <label className="block mb-2.5">
-                                            Họ <span className="text-red-dark">*</span>
+                                        <label className="block mb-2 font-medium text-gray-700">
+                                            Họ <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -211,19 +213,22 @@ const Contact = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             placeholder="Nhập họ của bạn"
-                                            className={`rounded-md w-full py-2.5 px-5 border 
-                    ${getError("firstName") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-                `}
+                                            className={[
+                                                "w-full rounded-md py-2.5 px-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                                getError("firstName")
+                                                    ? "border-red-500 focus:ring-red-500"
+                                                    : "border-gray-300 focus:ring-blue-500"
+                                            ].join(" ")}
                                         />
                                         {getError("firstName") && (
-                                            <p className="text-xs text-red-dark mt-1">{getError("firstName")}</p>
+                                            <p className="text-xs text-red-500 mt-1">{getError("firstName")}</p>
                                         )}
                                     </div>
 
                                     {/* Tên */}
                                     <div className="w-full">
-                                        <label className="block mb-2.5">
-                                            Tên <span className="text-red-dark">*</span>
+                                        <label className="block mb-2 font-medium text-gray-700">
+                                            Tên <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -232,21 +237,25 @@ const Contact = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             placeholder="Nhập tên của bạn"
-                                            className={`rounded-md w-full py-2.5 px-5 border 
-                    ${getError("lastName") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-                `}
+                                            className={[
+                                                "w-full rounded-md py-2.5 px-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                                getError("lastName")
+                                                    ? "border-red-500 focus:ring-red-500"
+                                                    : "border-gray-300 focus:ring-blue-500"
+                                            ].join(" ")}
                                         />
                                         {getError("lastName") && (
-                                            <p className="text-xs text-red-dark mt-1">{getError("lastName")}</p>
+                                            <p className="text-xs text-red-500 mt-1">{getError("lastName")}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Subject + Phone */}
                                 <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
+                                    {/* Subject */}
                                     <div className="w-full">
-                                        <label className="block mb-2.5">
-                                            Tiêu đề <span className="text-red-dark">*</span>
+                                        <label className="block mb-2 font-medium text-gray-700">
+                                            Tiêu đề <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -255,18 +264,22 @@ const Contact = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             placeholder="Nhập tiêu đề"
-                                            className={`rounded-md w-full py-2.5 px-5 border 
-                    ${getError("subject") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-                `}
+                                            className={[
+                                                "w-full rounded-md py-2.5 px-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                                getError("subject")
+                                                    ? "border-red-500 focus:ring-red-500"
+                                                    : "border-gray-300 focus:ring-blue-500"
+                                            ].join(" ")}
                                         />
                                         {getError("subject") && (
-                                            <p className="text-xs text-red-dark mt-1">{getError("subject")}</p>
+                                            <p className="text-xs text-red-500 mt-1">{getError("subject")}</p>
                                         )}
                                     </div>
 
+                                    {/* Phone */}
                                     <div className="w-full">
-                                        <label className="block mb-2.5">
-                                            Số điện thoại <span className="text-red-dark">*</span>
+                                        <label className="block mb-2 font-medium text-gray-700">
+                                            Số điện thoại <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -275,20 +288,23 @@ const Contact = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             placeholder="Nhập số điện thoại"
-                                            className={`rounded-md w-full py-2.5 px-5 border 
-                    ${getError("phone") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-                `}
+                                            className={[
+                                                "w-full rounded-md py-2.5 px-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                                getError("phone")
+                                                    ? "border-red-500 focus:ring-red-500"
+                                                    : "border-gray-300 focus:ring-blue-500"
+                                            ].join(" ")}
                                         />
                                         {getError("phone") && (
-                                            <p className="text-xs text-red-dark mt-1">{getError("phone")}</p>
+                                            <p className="text-xs text-red-500 mt-1">{getError("phone")}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Email */}
                                 <div className="mb-5">
-                                    <label className="block mb-2.5">
-                                        Email <span className="text-red-dark">*</span>
+                                    <label className="block mb-2 font-medium text-gray-700">
+                                        Email <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -297,19 +313,22 @@ const Contact = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="Nhập email của bạn"
-                                        className={`rounded-md w-full py-2.5 px-5 border 
-                ${getError("email") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-            `}
+                                        className={[
+                                            "w-full rounded-md py-2.5 px-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                            getError("email")
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-blue-500"
+                                        ].join(" ")}
                                     />
                                     {getError("email") && (
-                                        <p className="text-xs text-red-dark mt-1">{getError("email")}</p>
+                                        <p className="text-xs text-red-500 mt-1">{getError("email")}</p>
                                     )}
                                 </div>
 
                                 {/* Message */}
-                                <div className="mb-7.5">
-                                    <label className="block mb-2.5">
-                                        Nội dung tin nhắn <span className="text-red-dark">*</span>
+                                <div className="mb-7">
+                                    <label className="block mb-2 font-medium text-gray-700">
+                                        Nội dung tin nhắn <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         name="message"
@@ -317,13 +336,16 @@ const Contact = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         rows={5}
-                                        className={`rounded-md w-full p-5 border 
-                ${getError("message") ? "border-red-dark " : "border-gray-3 bg-gray-1"}
-            `}
-                                        placeholder="Nhập nội dung bạn muốn gửi..."
+                                        placeholder="Nội dung bạn muốn gửi..."
+                                        className={[
+                                            "w-full rounded-md p-4 border bg-gray-50 focus:outline-none focus:ring-2 transition",
+                                            getError("message")
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-blue-500"
+                                        ].join(" ")}
                                     />
                                     {getError("message") && (
-                                        <p className="text-xs text-red-dark mt-1">{getError("message")}</p>
+                                        <p className="text-xs text-red-500 mt-1">{getError("message")}</p>
                                     )}
                                 </div>
 
@@ -331,14 +353,17 @@ const Contact = () => {
                                 <button
                                     type="submit"
                                     disabled={!isFormValid}
-                                    className={`inline-flex font-medium text-white py-3 px-7 rounded-md 
-            ${isFormValid ? "bg-blue hover:bg-blue-dark" : "bg-gray-4 cursor-not-allowed"}
-        `}
+                                    className={[
+                                        "inline-flex items-center font-medium text-white py-3 px-7 rounded-md transition",
+                                        isFormValid
+                                            ? "bg-blue-600 hover:bg-blue-700"
+                                            : "bg-gray-400 cursor-not-allowed"
+                                    ].join(" ")}
                                 >
                                     Gửi tin nhắn
                                 </button>
-                            </form>
 
+                            </form>
                         </div>
                     </div>
                 </div>

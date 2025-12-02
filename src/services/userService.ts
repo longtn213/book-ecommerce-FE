@@ -29,8 +29,9 @@ export const uploadAvatarApi = async (file) => {
 
     return res.data;
 };
-export const getUserOrders = async () => {
-    const res = await axiosInstance.get("/orders");
+export const getUserOrders = async (orderStatus?: string) => {
+    const query = orderStatus ? `?status=${orderStatus}` : "";
+    const res = await axiosInstance.get("/orders" + query);
     return res.data.data;
 };
 export const cancelOrderApi = async (orderId: number) => {

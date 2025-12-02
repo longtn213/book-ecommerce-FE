@@ -1,3 +1,4 @@
+// --- FULL CODE MYACCOUNT UI TIKI STYLE ---
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -7,19 +8,21 @@ import Orders from "../Orders";
 import {
     changePasswordApi,
     getCurrentUser,
-    updateUserProfile, uploadAvatarApi,
+    updateUserProfile,
+    uploadAvatarApi,
 } from "@/services/userService";
 
 import { notification, DatePicker } from "antd";
 import dayjs from "dayjs";
-import {useAuthContext} from "@/context/AuthContext";
-import {EyeIcon} from "@/utils/helper";
-import {useRouter, useSearchParams} from "next/navigation";
+import { useAuthContext } from "@/context/AuthContext";
+import { EyeIcon } from "@/utils/helper";
+import { useRouter, useSearchParams } from "next/navigation";
+
+const TIKI_BLUE = "#1570EF";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState("account-details");
-    const { user, setUser,logout } = useAuthContext();
-    // Notification
+    const { user, setUser, logout } = useAuthContext();
     const [api, contextHolder] = notification.useNotification();
     const [showPassword, setShowPassword] = useState({
         old: false,
@@ -28,7 +31,6 @@ const MyAccount = () => {
     });
     const router = useRouter();
 
-    // FORM UPDATE PROFILE
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -38,53 +40,28 @@ const MyAccount = () => {
         avatarUrl: "",
     });
 
+    const searchParams = useSearchParams();
+    const tabFromURL = searchParams.get("tab");
+
     const [passwordErrors, setPasswordErrors] = useState({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
 
-    const validatePasswords = () => {
-        const errors: any = {};
-
-        if (!passwords.oldPassword.trim()) {
-            errors.oldPassword = "Vui lòng nhập mật khẩu cũ";
-        }
-
-        if (!passwords.newPassword.trim()) {
-            errors.newPassword = "Vui lòng nhập mật khẩu mới";
-        } else if (passwords.newPassword.length < 6) {
-            errors.newPassword = "Mật khẩu mới phải ít nhất 6 ký tự";
-        }
-
-        if (!passwords.confirmPassword.trim()) {
-            errors.confirmPassword = "Vui lòng xác nhận mật khẩu mới";
-        } else if (passwords.newPassword !== passwords.confirmPassword) {
-            errors.confirmPassword = "Xác nhận mật khẩu không khớp";
-        }
-
-        setPasswordErrors(errors);
-
-        return Object.keys(errors).length === 0;
-    };
-
-
-    // FORM CHANGE PASSWORD
     const [passwords, setPasswords] = useState({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
 
-    // LOAD USER
+    // ============= LOAD USER =============
     useEffect(() => {
         async function fetchUser() {
             try {
                 const u = await getCurrentUser();
-
                 if (u) {
                     setUser(u);
-
                     setFormData({
                         fullName: u.fullName || "",
                         email: u.email || "",
@@ -97,38 +74,33 @@ const MyAccount = () => {
             } catch (err) {
                 api.error({
                     message: "Không thể tải thông tin tài khoản",
-                    description: "Có lỗi xảy ra khi tải dữ liệu người dùng",
                 });
             }
         }
         fetchUser();
-    }, [api, setUser]);
-    const searchParams = useSearchParams();
-    const tabFromURL = searchParams.get("tab");
+    }, []);
 
+    // ======= ACTIVE TAB FROM URL =======
     useEffect(() => {
-        if (tabFromURL === "orders") {
-            setActiveTab("orders");
+        if (tabFromURL) {
+            setActiveTab(tabFromURL);
         }
     }, [tabFromURL]);
 
-
-    // PROFILE INPUT CHANGE
-    const handleProfileChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
+    // ============================= INPUT =============================
+    const handleProfileChange = (e: any) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
 
-    // SUBMIT UPDATE PROFILE
+    // ============================= UPDATE PROFILE =============================
     const onUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const payload = {
+            await updateUserProfile({
                 fullName: formData.fullName.trim(),
                 email: formData.email.trim(),
                 phone: formData.phone.trim(),
@@ -137,38 +109,48 @@ const MyAccount = () => {
                     ? formData.birthDate.format("YYYY-MM-DD") + "T00:00:00"
                     : null,
                 avatarUrl: formData.avatarUrl,
-            };
-
-            await updateUserProfile(payload);
-
-            api.success({
-                message: "Cập nhật thành công",
-                description: "Thông tin tài khoản đã được cập nhật.",
             });
 
-            setUser((prev: any) => ({
-                ...prev,
-                ...payload,
-            }));
+            api.success({
+                message: "Cập nhật thành công!",
+            });
+
+            setUser((prev: any) => ({ ...prev, ...formData }));
         } catch (err: any) {
             api.error({
                 message: "Cập nhật thất bại",
-                description:
-                    err?.response?.data?.message ||
-                    "Vui lòng kiểm tra lại thông tin.",
+                description: err?.response?.data?.message,
             });
         }
     };
 
-    // PASSWORD INPUT CHANGE
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ============================= PASSWORD =============================
+    const validatePasswords = () => {
+        const errors: any = {};
+        if (!passwords.oldPassword.trim())
+            errors.oldPassword = "Vui lòng nhập mật khẩu cũ";
+
+        if (!passwords.newPassword.trim())
+            errors.newPassword = "Vui lòng nhập mật khẩu mới";
+        else if (passwords.newPassword.length < 6)
+            errors.newPassword = "Mật khẩu mới phải ≥ 6 ký tự";
+
+        if (!passwords.confirmPassword.trim())
+            errors.confirmPassword = "Vui lòng xác nhận mật khẩu";
+        else if (passwords.newPassword !== passwords.confirmPassword)
+            errors.confirmPassword = "Xác nhận không khớp";
+
+        setPasswordErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handlePasswordChange = (e: any) => {
         setPasswords({
             ...passwords,
             [e.target.name]: e.target.value,
         });
     };
 
-    // SUBMIT CHANGE PASSWORD
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -182,413 +164,318 @@ const MyAccount = () => {
 
             api.success({
                 message: "Đổi mật khẩu thành công",
-                description: "Bạn sẽ được đăng xuất để bảo vệ tài khoản.",
             });
 
-            // Reset form
-            setPasswords({
-                oldPassword: "",
-                newPassword: "",
-                confirmPassword: "",
-            });
-
-            setPasswordErrors({
-                oldPassword: "",
-                newPassword: "",
-                confirmPassword: "",
-            });
-
-            // 🔥 GỌI LOGOUT TỪ AUTH PROVIDER
             logout();
-
         } catch (err: any) {
             api.error({
                 message: "Đổi mật khẩu thất bại",
-                description: err?.response?.data?.message || "Mật khẩu cũ sai hoặc có lỗi xảy ra.",
             });
 
-            setPasswordErrors((prev) => ({
-                ...prev,
+            setPasswordErrors({
+                ...passwordErrors,
                 oldPassword: "Mật khẩu cũ không đúng",
-            }));
+            });
         }
     };
 
+    // ================================== UI ==================================
     return (
         <>
             {contextHolder}
+            <Breadcrumb title="Tài Khoản Của Tôi" pages={["my account"]} />
 
-            <Breadcrumb title={"My Account"} pages={["my account"]} />
-
-            <section className="py-20 bg-gray-2 overflow-hidden">
-            <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <section className="py-20 bg-gray-100">
+                <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
                     <div className="flex flex-col xl:flex-row gap-7.5">
 
-                        {/* SIDEBAR */}
-                        <div className="xl:max-w-[370px] w-full bg-white rounded-xl shadow-1">
-                            <div className="flex xl:flex-col">
+                        {/* ============================= SIDEBAR ============================= */}
+                        <div className="xl:max-w-[350px] w-full bg-white rounded-2xl shadow-md overflow-hidden">
 
-                                {/* AVATAR + EDIT giống Facebook */}
-                                <div className="relative flex flex-col items-center py-6 px-4 sm:px-7.5 xl:px-9">
+                            {/* AVATAR */}
+                            <div className="flex flex-col items-center py-10 px-6 relative">
 
-                                    {/* Avatar wrapper */}
-                                    <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden
-                    border-4 border-white shadow-xl group">
-
-                                        {/* Avatar image */}
-                                        <Image
-                                            key={formData.avatarUrl}
-                                            src={formData.avatarUrl || "/images/profile/user-2.jpg"}
-                                            alt="user"
-                                            width={128}
-                                            height={128}
-                                            className="object-cover w-full h-full"
-                                        />
-                                    </div>
-
-                                    {/* CAMERA BUTTON – nằm ngoài avatar */}
-                                    <label
-                                        htmlFor="avatarUpload"
-                                        className="
-                                        absolute top-[110px]
-                                        right-[calc(50%-65px)]
-                                        sm:right-[calc(50%-65px)]
-                                        w-10 h-10
-                                        rounded-full
-                                        bg-[#E4E6EB]
-                                        border border-gray-3
-                                        shadow-lg
-                                        flex items-center justify-center
-                                        cursor-pointer
-                                        hover:bg-gray-3
-                                        transition
-                                    "
-                                    >
-                                        {/* Icon camera */}
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24"
-                                            className="w-5 h-5 text-gray-800"
-                                        >
-                                            <path d="M12 9a3 3 0 100 6 3 3 0 000-6zm7-3h-2.586l-.707-.707A.996.996 0 0015.586 5h-7.17a.996.996 0 00-.707.293L7 6H4a2 2 0 00-2 2v10a2 2 0 002 2h15a2 2 0 002-2V8a2 2 0 00-2-2zm0 12H4V8h3.172l1-1h7.656l1 1H19v10z" />
-                                        </svg>
-                                    </label>
-
-                                    {/* Hidden upload input */}
-                                    <input
-                                        id="avatarUpload"
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
-
-                                            const preview = URL.createObjectURL(file);
-                                            setFormData((prev) => ({ ...prev, avatarUrl: preview }));
-
-                                            try {
-                                                const res = await uploadAvatarApi(file);
-
-                                                if (res.success && res.data) {
-                                                    api.success({
-                                                        message: "Upload ảnh thành công!",
-                                                        description: "Ảnh đại diện đã được cập nhật.",
-                                                    });
-
-                                                    setFormData((prev) => ({ ...prev, avatarUrl: res.data }));
-                                                    setUser((prev: any) => ({ ...prev, avatarUrl: res.data }));
-                                                }
-                                            } catch (error) {
-                                                api.error({
-                                                    message: "Lỗi",
-                                                    description: "Không thể upload ảnh.",
-                                                });
-                                            }
-                                        }}
+                                <div className="relative w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-white">
+                                    <Image
+                                        src={formData.avatarUrl || "/images/profile/user-2.jpg"}
+                                        alt="avatar"
+                                        width={128}
+                                        height={128}
+                                        className="object-cover w-full h-full"
                                     />
-
-                                    {/* USER NAME + EMAIL */}
-                                    <div className="text-center mt-4">
-                                        <p className="font-semibold text-lg">{user?.fullName}</p>
-                                        <p className="text-sm text-gray-5">{user?.email}</p>
-                                    </div>
                                 </div>
 
+                                {/* CAMERA BTN */}
+                                <label
+                                    htmlFor="avatarUpload"
+                                    className="absolute top-[145px] right-[calc(50%_-_75px)] w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 shadow cursor-pointer hover:bg-gray-300 transition"
+                                >
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#333"
+                                    >
+                                        <path d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                                        <path d="M20 8h-3l-1-2H8L7 8H4v12h16z" />
+                                    </svg>
+                                </label>
 
-                                {/* MENU */}
-                                <div className="p-4 sm:p-7.5 xl:p-9">
-                                    <div className="flex flex-wrap xl:flex-nowrap xl:flex-col gap-4">
-                                        <button
-                                            onClick={() => {
-                                                setActiveTab("account-details");
-                                                router.push("/my-account?tab=account-details");
-                                            }}
-                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition hover:bg-blue hover:text-white ${
-                                                activeTab === "account-details"
-                                                    ? "text-white bg-blue"
-                                                    : "text-dark-2 bg-gray-1"
-                                            }`}
-                                        >
-                                            Thông tin cá nhân
-                                        </button>
+                                <input
+                                    type="file"
+                                    id="avatarUpload"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
 
-                                        <button
-                                            onClick={() => {
-                                                setActiveTab("orders");
-                                                router.push("/my-account?tab=orders");
-                                            }}
-                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition hover:bg-blue hover:text-white ${
-                                                activeTab === "orders"
-                                                    ? "text-white bg-blue"
-                                                    : "text-dark-2 bg-gray-1"
-                                            }`}
-                                        >
-                                            Đơn hàng
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setActiveTab("change-password");
-                                                router.push("/my-account?tab=change-password");
-                                            }}
-                                            className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 transition hover:bg-blue hover:text-white ${
-                                                activeTab === "change-password"
-                                                    ? "text-white bg-blue"
-                                                    : "text-dark-2 bg-gray-1"
-                                            }`}
-                                        >
-                                            Đổi mật khẩu
-                                        </button>
+                                        const preview = URL.createObjectURL(file);
+                                        setFormData((prev) => ({ ...prev, avatarUrl: preview }));
+
+                                        try {
+                                            const res = await uploadAvatarApi(file);
+                                            if (res.success && res.data) {
+                                                setFormData((prev) => ({ ...prev, avatarUrl: res.data }));
+                                                setUser((prev: any) => ({ ...prev, avatarUrl: res.data }));
+                                            }
+                                        } catch {}
+                                    }}
+                                />
+
+                                <p className="mt-4 font-semibold text-lg">{user?.fullName}</p>
+                                <p className="text-gray-600 text-sm">{user?.email}</p>
+                            </div>
+
+                            {/* MENU */}
+                            <div className="border-t p-6 space-y-3">
+
+                                <button
+                                    onClick={() => {
+                                        setActiveTab("account-details");
+                                        router.push("/my-account?tab=account-details");
+                                    }}
+                                    className={`w-full text-left px-4 py-3 rounded-lg font-medium transition
+                    ${
+                                        activeTab === "account-details"
+                                            ? "bg-blue-500 text-white"
+                                            : "hover:bg-gray-100"
+                                    }`}
+                                >
+                                    Thông tin cá nhân
+                                </button>
 
 
-                                        <button
-                                            onClick={() => {
-                                                logout();
-                                            }}
-                                            className="flex items-center rounded-md gap-2.5 py-3 px-4.5 text-dark-2 bg-gray-1 hover:bg-blue hover:text-white transition"
-                                        >
-                                            Đăng xuất
-                                        </button>
+                                <button
+                                    onClick={() => {
+                                        setActiveTab("change-password");
+                                        router.push("/my-account?tab=change-password");
+                                    }}
+                                    className={`w-full text-left px-4 py-3 rounded-lg font-medium transition
+                    ${
+                                        activeTab === "change-password"
+                                            ? "bg-blue-500 text-white"
+                                            : "hover:bg-gray-100"
+                                    }`}
+                                >
+                                    Đổi mật khẩu
+                                </button>
 
-                                    </div>
-                                </div>
-
+                                <button
+                                    onClick={() => logout()}
+                                    className="w-full text-left px-4 py-3 rounded-lg font-medium hover:bg-gray-100 text-red-500"
+                                >
+                                    Đăng xuất
+                                </button>
                             </div>
                         </div>
 
-                        {/* ORDERS */}
-                        <div
-                            className={`xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 ${
-                                activeTab === "orders" ? "block" : "hidden"
-                            }`}
-                        >
-                            <Orders />
-                        </div>
+                        {/* =================== PANEL: ACCOUNT DETAILS =================== */}
+                        {activeTab === "account-details" && (
+                            <div className="xl:max-w-[770px] w-full bg-white rounded-2xl shadow-md p-6">
+                                <form onSubmit={onUpdateProfile} className="space-y-6">
 
-                        {/* ACCOUNT DETAILS */}
-                        <div
-                            className={`xl:max-w-[770px] w-full ${
-                                activeTab === "account-details" ? "block" : "hidden"
-                            }`}
-                        >
-                            {/* UPDATE PROFILE FORM */}
-                            <form onSubmit={onUpdateProfile}>
-                                <div className="bg-white shadow-1 rounded-xl p-4 sm:p-8.5">
-
-                                    {/* Full Name */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">
-                                            Họ Và Tên <span className="text-red">*</span>
-                                        </label>
+                                    <div>
+                                        <label className="font-medium mb-1 block">Họ và tên</label>
                                         <input
                                             type="text"
                                             name="fullName"
                                             value={formData.fullName}
                                             onChange={handleProfileChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
+                                            className="input-tiki"
                                         />
                                     </div>
 
-                                    {/* Email */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Email</label>
+                                    <div>
+                                        <label className="font-medium mb-1 block">Email</label>
                                         <input
                                             type="email"
                                             name="email"
                                             value={formData.email}
                                             onChange={handleProfileChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
+                                            className="input-tiki"
                                         />
                                     </div>
 
-                                    {/* Phone */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Số Điện Thoại</label>
+                                    <div>
+                                        <label className="font-medium mb-1 block">Số điện thoại</label>
                                         <input
                                             type="text"
                                             name="phone"
                                             value={formData.phone}
                                             onChange={handleProfileChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
+                                            className="input-tiki"
                                         />
                                     </div>
 
-                                    {/* Gender */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Giới Tính</label>
+                                    <div>
+                                        <label className="font-medium mb-1 block">Giới tính</label>
                                         <select
                                             name="gender"
                                             value={formData.gender}
                                             onChange={handleProfileChange}
-                                            className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5"
+                                            className="input-tiki"
                                         >
-                                            <option value="MALE">Male</option>
-                                            <option value="FEMALE">Female</option>
-                                            <option value="OTHER">Other</option>
+                                            <option value="MALE">Nam</option>
+                                            <option value="FEMALE">Nữ</option>
+                                            <option value="OTHER">Khác</option>
                                         </select>
                                     </div>
 
-                                    {/* Birth Date */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Ngày Sinh</label>
-
+                                    <div>
+                                        <label className="font-medium mb-1 block">Ngày sinh</label>
                                         <DatePicker
                                             value={formData.birthDate}
-                                            onChange={(date) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    birthDate: date,
-                                                })
-                                            }
                                             format="YYYY-MM-DD"
-                                            className="my-input-picker w-full"
+                                            onChange={(d) =>
+                                                setFormData({ ...formData, birthDate: d })
+                                            }
+                                            className="input-tiki"
                                         />
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md"
-                                    >
-                                        Lưu
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                                    <button className="btn-tiki">Lưu thay đổi</button>
+                                </form>
+                            </div>
+                        )}
 
-                        <div
-                            className={`xl:max-w-[770px] w-full ${
-                                activeTab === "change-password" ? "block" : "hidden"
-                            }`}
-                        >
-                            {/* PASSWORD CHANGE */}
-                            <p className="font-medium text-xl mt-10 mb-5">
-                                Thay Đổi Mật Khẩu
-                            </p>
+                        {/* =================== PANEL: CHANGE PASSWORD =================== */}
+                        {activeTab === "change-password" && (
+                            <div className="xl:max-w-[770px] w-full bg-white rounded-2xl shadow-md p-6">
+                                <h3 className="text-xl font-semibold mb-6">Đổi mật khẩu</h3>
 
-                            <form onSubmit={handleChangePassword}>
-                                <div className="bg-white shadow-1 rounded-xl p-4 sm:p-8.5">
+                                <form onSubmit={handleChangePassword} className="space-y-6">
 
-                                    {/* Old Password */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Mật Khẩu Cũ</label>
+                                    {/* OLD PASS */}
+                                    <div>
+                                        <label className="font-medium mb-1 block">
+                                            Mật khẩu cũ
+                                        </label>
+
                                         <div className="relative">
                                             <input
                                                 type={showPassword.old ? "text" : "password"}
                                                 name="oldPassword"
                                                 value={passwords.oldPassword}
                                                 onChange={handlePasswordChange}
-                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                                className="input-tiki pr-12"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    setShowPassword({ ...showPassword, old: !showPassword.old })
+                                                    setShowPassword({
+                                                        ...showPassword,
+                                                        old: !showPassword.old,
+                                                    })
                                                 }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                className="pass-eye-btn"
                                             >
                                                 <EyeIcon isOpen={showPassword.old} />
                                             </button>
                                         </div>
 
                                         {passwordErrors.oldPassword && (
-                                            <p className="text-error">
-                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                            <p className="text-red-500 text-sm mt-1">
                                                 {passwordErrors.oldPassword}
                                             </p>
                                         )}
                                     </div>
 
+                                    {/* NEW PASS */}
+                                    <div>
+                                        <label className="font-medium mb-1 block">
+                                            Mật khẩu mới
+                                        </label>
 
-                                    {/* New Password */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Mật Khẩu Mới</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword.new ? "text" : "password"}
                                                 name="newPassword"
                                                 value={passwords.newPassword}
                                                 onChange={handlePasswordChange}
-                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                                className="input-tiki pr-12"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    setShowPassword({ ...showPassword, new: !showPassword.new })
+                                                    setShowPassword({
+                                                        ...showPassword,
+                                                        new: !showPassword.new,
+                                                    })
                                                 }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                className="pass-eye-btn"
                                             >
                                                 <EyeIcon isOpen={showPassword.new} />
                                             </button>
                                         </div>
 
                                         {passwordErrors.newPassword && (
-                                            <p className="text-error">
-                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                            <p className="text-red-500 text-sm mt-1">
                                                 {passwordErrors.newPassword}
                                             </p>
                                         )}
                                     </div>
 
-                                    {/* Confirm Password */}
-                                    <div className="mb-5">
-                                        <label className="block mb-2.5">Xác Nhận Mật Khẩu Mới</label>
+                                    {/* CONFIRM PASS */}
+                                    <div>
+                                        <label className="font-medium mb-1 block">
+                                            Xác nhận mật khẩu
+                                        </label>
+
                                         <div className="relative">
                                             <input
                                                 type={showPassword.confirm ? "text" : "password"}
                                                 name="confirmPassword"
                                                 value={passwords.confirmPassword}
                                                 onChange={handlePasswordChange}
-                                                className="rounded-md border border-gray-300 bg-gray-100 w-full py-2.5 px-5 pr-12"
+                                                className="input-tiki pr-12"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    setShowPassword({ ...showPassword, confirm: !showPassword.confirm })
+                                                    setShowPassword({
+                                                        ...showPassword,
+                                                        confirm: !showPassword.confirm,
+                                                    })
                                                 }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                className="pass-eye-btn"
                                             >
                                                 <EyeIcon isOpen={showPassword.confirm} />
                                             </button>
                                         </div>
 
                                         {passwordErrors.confirmPassword && (
-                                            <p className="text-error">
-                                                <span style={{ fontSize: "14px" }}>⚠️</span>
+                                            <p className="text-red-500 text-sm mt-1">
                                                 {passwordErrors.confirmPassword}
                                             </p>
                                         )}
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md"
-                                    >
-                                        Change Password
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                                    <button className="btn-tiki">Đổi mật khẩu</button>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

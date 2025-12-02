@@ -1,6 +1,6 @@
 import React from "react";
-import { Wishlist } from "@/components/Wishlist";
 import { Metadata } from "next";
+import {Wishlist} from "@/components/Wishlist";
 
 export const metadata: Metadata = {
     title: "BookCommerce | Book E-commerce",

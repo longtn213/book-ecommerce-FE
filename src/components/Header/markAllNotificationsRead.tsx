@@ -58,7 +58,7 @@ export default function NotificationDropdown({
                 </svg>
 
                 {unread > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-blue text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-blueCustom text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                         {unread}
                     </span>
                 )}

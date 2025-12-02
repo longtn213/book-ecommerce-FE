@@ -259,9 +259,6 @@ const Header = () => {
                         <div className="flex w-full lg:w-auto justify-between items-center gap-5">
                             <div className="flex items-center gap-5">
                                 {!user ? (
-                                    // ================================
-                                    // CHƯA ĐĂNG NHẬP → SHOW SIGN-IN
-                                    // ================================
                                     <Link href="/signin" className="flex items-center gap-2.5">
                                         <svg
                                             width="24"
@@ -287,7 +284,7 @@ const Header = () => {
                                             <span className="block text-2xs text-dark-4 uppercase">
                                                 account
                                             </span>
-                                            <p className="font-medium text-custom-sm text-dark">
+                                            <p className="font-medium text-custom-sm text-darkCustom">
                                                 Sign In
                                             </p>
                                         </div>
@@ -408,7 +405,7 @@ const Header = () => {
                         </svg>
 
                         <span
-                            className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
+                            className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blueCustom w-4.5 h-4.5 rounded-full text-white">
                           {cart.items.length}
                         </span>
                       </span>
@@ -474,7 +471,7 @@ const Header = () => {
                         }`}
                     ></span>
                     <span
-                        className={`block bg-dark rounded-sm ease-in-out duration-200 delay-400 absolute left-0 top-2.5 w-full h-0.5 ${
+                        className={`block bg-blueCustom-dark rounded-sm ease-in-out duration-200 delay-400 absolute left-0 top-2.5 w-full h-0.5 ${
                             !navigationOpen && "!h-0 dealy-200"
                         }`}
                     ></span>
@@ -488,7 +485,7 @@ const Header = () => {
                 {/* <!-- header top end --> */}
             </div>
 
-            <div className="border-t border-gray-3">
+            <div className="border-t border-gray-300">
                 <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
                     <div className="flex items-center justify-between">
                         {/* <!--=== Main Nav Start ===--> */}
@@ -518,12 +515,12 @@ const Header = () => {
                 text-[15px] font-medium text-[#1D1F2C]
                 py-3 xl:py-4 px-2
                 transition-all duration-200
-                hover:text-blue
+                hover:text-blueCustom
                 group
             "
                                             >
                                                 {menuItem.icon && (
-                                                    <span className="text-[#1D1F2C] group-hover:text-blue transition-all flex items-center">
+                                                    <span className="text-[#1D1F2C] group-hover:text-blueCustom transition-all flex items-center">
                     {menuItem.icon}
                 </span>
                                                 )}

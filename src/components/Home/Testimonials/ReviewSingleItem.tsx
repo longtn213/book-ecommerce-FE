@@ -28,7 +28,7 @@ const ReviewSingleItem = ({ testimonial }: { testimonial: Review }) => {
             </div>
 
             {/* Comment */}
-            <p className="text-dark mb-4 italic">{testimonial.comment}</p>
+            <p className="text-darkCustom mb-4 italic">{testimonial.comment}</p>
 
             {/* Date */}
             <p className="text-xs text-gray-500 mb-4">Ngày đánh giá: {formattedDate}</p>
@@ -46,7 +46,7 @@ const ReviewSingleItem = ({ testimonial }: { testimonial: Review }) => {
                 </div>
 
                 <div>
-                    <h3 className="font-medium text-dark">{testimonial.authorName}</h3>
+                    <h3 className="font-medium text-darkCustom">{testimonial.authorName}</h3>
                     <p className="text-custom-sm text-gray-500">{testimonial.authorRole}</p>
                 </div>
             </div>

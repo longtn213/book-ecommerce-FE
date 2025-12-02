@@ -1,45 +1,46 @@
-    "use client";
-    import React from "react";
-    import Image from "next/image";
-    import {Book} from "@/types/book";
-    import {useModalContext} from "@/app/context/QuickViewModalContext";
-    import {updateQuickView} from "@/redux/features/quickView-slice";
-    import {useDispatch} from "react-redux";
-    import {AppDispatch} from "@/redux/store";
-    import Link from "next/link";
-    import {useAuthContext} from "@/context/AuthContext";
-    import {useCart} from "@/hook/useCart";
-    import {useWishlist} from "@/hook/useWishlist";
+"use client";
 
-    const ProductItem = ({ item }: { item: Book }) => {
-        const { openModal } = useModalContext();
-        const dispatch = useDispatch<AppDispatch>();
-        const { user, requireLogin } = useAuthContext();
-        const { addToCart } = useCart();
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Book } from "@/types/book";
+import { useModalContext } from "@/app/context/QuickViewModalContext";
+import { updateQuickView } from "@/redux/features/quickView-slice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { useAuthContext } from "@/context/AuthContext";
+import { useCart } from "@/hook/useCart";
+import { useWishlist } from "@/hook/useWishlist";
 
+const ProductItem = ({ item }: { item: Book }) => {
+    const { openModal } = useModalContext();
+    const dispatch = useDispatch<AppDispatch>();
+    const { user, requireLogin } = useAuthContext();
+    const { addToCart } = useCart();
+    const { isWishlisted, toggle } = useWishlist();
 
-        const handleQuickViewUpdate = () => {
-            dispatch(updateQuickView({ ...item }));
-        };
+    const handleQuickView = () => {
+        dispatch(updateQuickView({ ...item }));
+        openModal();
+    };
 
-        const { isWishlisted, toggle } = useWishlist();
-
-        return (
-            <div className="group">
-                {/* IMAGE */}
-                <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-[#F6F7FB] min-h-[270px] mb-4">
-                    <Image
-                        src={item.images?.[0] || "/images/default-book.png"}
-                        alt={item.title}
-                        width={250}
-                        height={250}
-                    />
+    return (
+        <div className="group bg-white rounded-lg">
+            {/* IMAGE WRAPPER */}
+            <div className="relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden min-h-[260px] mb-4">
+                <Image
+                    src={item.images?.[0] || "/images/default-book.png"}
+                    alt={item.title}
+                    width={240}
+                    height={240}
+                    className="object-contain"
+                />
 
             <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
               <button
                 onClick={() => {
                   openModal();
-                  handleQuickViewUpdate();
+                    handleQuickView();
                 }}
                 id="newOne"
                 aria-label="button for quick view"
@@ -68,15 +69,20 @@
                 </svg>
               </button>
 
-                <button
-                    onClick={() => {
-                        if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
-                        addToCart(item.id, 1);
-                    }}
-                    className="inline-flex py-[7px] px-5 rounded-[5px] bg-blue text-white hover:bg-blue-dark"
-                >
-                    Add to cart
-                </button>
+                    {/* ADD TO CART */}
+                    <button
+                        onClick={() => {
+                            if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
+                            addToCart(item.id, 1);
+                        }}
+                        className="
+                            px-4 py-[7px] text-sm font-medium
+                            rounded-md bg-blueCustom text-white
+                            hover:bg-blueCustom-dark transition
+                        "
+                    >
+                        Thêm vào giỏ
+                    </button>
 
                 {/* ❤️ WISHLIST BUTTON */}
                 <button
@@ -119,36 +125,34 @@
             </div>
           </div>
 
-                {/* RATING */}
-                <div className="flex items-center gap-2.5 mb-2">
-                    <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <Image
-                                key={i}
-                                src="/images/icons/icon-star.svg"
-                                alt="star"
-                                width={14}
-                                height={14}
-                                className={i < Math.round(item.rating) ? "" : "opacity-30"}
-                            />
-                        ))}
-                    </div>
-                    <p className="text-custom-sm">({item.rating})</p>
+            {/* RATING */}
+            <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-[2px]">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <Image
+                            key={i}
+                            src="/images/icons/icon-star.svg"
+                            alt="star"
+                            width={14}
+                            height={14}
+                            className={i < Math.round(item.rating) ? "" : "opacity-30"}
+                        />
+                    ))}
                 </div>
-
-                {/* TITLE */}
-                <h3
-                    className="font-medium text-dark hover:text-blue mb-1.5"
-                >
-                    <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
-                </h3>
-
-                {/* PRICE */}
-                <span className="font-medium text-lg text-dark">
-            {item.price.toLocaleString()} đ
-          </span>
+                <p className="text-xs text-gray-600">({item.rating})</p>
             </div>
-        );
-    };
 
-    export default ProductItem;
+            {/* TITLE */}
+            <h3 className="font-medium text-gray-900 hover:text-blue transition mb-1">
+                <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
+            </h3>
+
+            {/* PRICE */}
+            <p className="font-semibold text-lg text-gray-900">
+                {item.price.toLocaleString()} đ
+            </p>
+        </div>
+    );
+};
+
+export default ProductItem;

@@ -1,68 +1,67 @@
 "use client";
 
-import React, {useState} from "react";
-import {useRouter} from "next/navigation";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import {forgotPasswordApi, loginApi} from "@/services/authService";
-import {notification} from "antd";
-import {useAuth} from "@/hook/useAuth";
-import {EyeIcon} from "@/utils/helper";
+import { forgotPasswordApi, loginApi } from "@/services/authService";
+import { notification } from "antd";
+import { useAuth } from "@/hook/useAuth";
+import { EyeIcon } from "@/utils/helper";
 
 const Signin = () => {
     const router = useRouter();
+    const { login } = useAuth();
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const {login} = useAuth();
+
     const [loginUsernameError, setLoginUsernameError] = useState("");
     const [loginPasswordError, setLoginPasswordError] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
 
-    // ✅ Ant Design notification hook
-    const [api, contextHolder] = notification.useNotification();
+    // Forgot password
     const [openForgot, setOpenForgot] = useState(false);
     const [forgotEmail, setForgotEmail] = useState("");
-    const [sending, setSending] = useState(false);
     const [forgotEmailError, setForgotEmailError] = useState("");
-    const validateEmail = (email: string) => {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    };
+    const [sending, setSending] = useState(false);
+
+    const [api, contextHolder] = notification.useNotification();
+
+    const validateEmail = (email: string) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
     const resetForgotState = () => {
         setForgotEmail("");
         setForgotEmailError("");
         setSending(false);
     };
+
     const handleForgot = async () => {
         setForgotEmailError("");
 
-        if (!forgotEmail) {
-            setForgotEmailError("Vui lòng nhập email");
-            return;
+        if (!forgotEmail.trim()) {
+            return setForgotEmailError("Vui lòng nhập email");
         }
-
         if (!validateEmail(forgotEmail)) {
-            setForgotEmailError("Email không hợp lệ");
-            return;
+            return setForgotEmailError("Email không hợp lệ");
         }
 
         setSending(true);
-
         try {
             const domain = typeof window !== "undefined" ? window.location.origin : "";
-            const email = forgotEmail.trim();
-            const res = await forgotPasswordApi({email, domain});
+            const res = await forgotPasswordApi({ email: forgotEmail.trim(), domain });
 
             if (res.success) {
                 api.success({
-                    message: "Đã gửi email khôi phục",
-                    description: `Vui lòng kiểm tra ${forgotEmail}`,
+                    message: "Đã gửi email đặt lại mật khẩu",
+                    description: `Vui lòng kiểm tra hộp thư: ${forgotEmail}`,
                     placement: "topRight",
                 });
+
                 resetForgotState();
                 setOpenForgot(false);
-                setForgotEmail("");
             } else {
                 api.error({
                     message: "Gửi thất bại",
@@ -70,10 +69,10 @@ const Signin = () => {
                     placement: "topRight",
                 });
             }
-        } catch (error) {
+        } catch (e) {
             api.error({
                 message: "Lỗi máy chủ",
-                description: "Không thể gửi email khôi phục",
+                description: "Không thể gửi email",
                 placement: "topRight",
             });
         } finally {
@@ -81,29 +80,25 @@ const Signin = () => {
         }
     };
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Reset lỗi cũ
         setLoginUsernameError("");
         setLoginPasswordError("");
 
         let hasError = false;
-
         if (!username.trim()) {
             setLoginUsernameError("Vui lòng nhập tên đăng nhập");
             hasError = true;
         }
-
         if (!password.trim()) {
             setLoginPasswordError("Vui lòng nhập mật khẩu");
             hasError = true;
         }
 
         if (hasError) return;
-        setLoading(true);
 
+        setLoading(true);
         try {
             const res = await loginApi(username, password);
 
@@ -114,18 +109,9 @@ const Signin = () => {
                     message: "Đăng nhập thành công 🎉",
                     description: `Chào mừng ${res.data.username}!`,
                     placement: "topRight",
-                    style: {
-                        background: "#f6f8ff",
-                        border: "1px solid #3C50E0",
-                        borderRadius: 10,
-                        boxShadow: "0 4px 10px rgba(60,80,224,0.15)",
-                    },
                 });
 
-                setTimeout(() => {
-                    router.push("/");
-                }, 800);
-
+                setTimeout(() => router.push("/"), 700);
             } else {
                 api.error({
                     message: "Đăng nhập thất bại",
@@ -136,8 +122,7 @@ const Signin = () => {
         } catch (err: any) {
             api.error({
                 message: "Lỗi đăng nhập",
-                description:
-                    err.response?.data?.message || "Đã xảy ra lỗi máy chủ",
+                description: err.response?.data?.message || "Đã xảy ra lỗi máy chủ",
                 placement: "topRight",
             });
         } finally {
@@ -147,116 +132,104 @@ const Signin = () => {
 
     return (
         <>
-            {/* ✅ ContextHolder phải nằm ngay sau open tag */}
             {contextHolder}
+            <Breadcrumb title="Đăng nhập" pages={["Đăng nhập"]} />
 
-            <Breadcrumb title="Đăng nhập" pages={["Đăng nhập"]}/>
+            <section className="py-20 bg-gray-100">
+                <div className="max-w-[1170px] mx-auto px-4 sm:px-8">
+                    <div className="max-w-[500px] mx-auto bg-white rounded-2xl shadow-lg px-6 py-10 sm:px-10">
 
-            <section className="overflow-hidden py-20 bg-gray-2">
-                <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-                    <div className="max-w-[570px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
-                        <div className="text-center mb-11">
-                            <h2 className="font-semibold text-xl sm:text-2xl xl:text-heading-5 text-dark mb-1.5">
-                                Đăng nhập tài khoản của bạn
+                        {/* Title */}
+                        <div className="text-center mb-10">
+                            <h2 className="text-2xl font-bold text-dark mb-1">
+                                Đăng nhập tài khoản
                             </h2>
-                            <p>Nhập thông tin của bạn bên dưới</p>
+                            <p className="text-gray-500 text-sm">
+                                Chào mừng bạn quay trở lại! 👋
+                            </p>
                         </div>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-5">
-                                <label htmlFor="username" className="block mb-2.5">
+                        {/* LOGIN FORM */}
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Username */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
                                     Tên đăng nhập
                                 </label>
                                 <input
                                     type="text"
-                                    id="username"
-                                    placeholder="Tên đăng nhập"
                                     value={username}
                                     onChange={(e) => {
                                         setUsername(e.target.value);
-                                        if (loginUsernameError) setLoginUsernameError("");
+                                        setLoginUsernameError("");
                                     }}
-                                    className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border
-        ${loginUsernameError ? "input-error" : "border-gray-3 bg-gray-1"}`}
-                                    style={{
-                                        borderRadius: "8px",
-                                        borderColor: loginUsernameError ? "#ef4444" : "#d1d5db",
-                                        backgroundColor: loginUsernameError ? "#fef2f2" : "#f3f4f6",
-                                    }}
+                                    placeholder="Nhập tên đăng nhập"
+                                    className={`w-full px-4 py-3 rounded-lg border bg-gray-50 transition 
+                                        focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 
+                                        ${loginUsernameError && "border-red-500 bg-red-50"}
+                                    `}
                                 />
-
                                 {loginUsernameError && (
-                                    <p className="text-error">
-                                        <span style={{ fontSize: "14px" }}>⚠️</span>
-                                        {loginUsernameError}
-                                    </p>
+                                    <p className="mt-1 text-sm text-red-500">{loginUsernameError}</p>
                                 )}
                             </div>
 
-                            <div className="mb-5">
-                                <label htmlFor="password" className="block mb-2.5">
+                            {/* Password */}
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">
                                     Mật khẩu
                                 </label>
-
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
-                                        id="password"
-                                        placeholder="Nhập mật khẩu"
                                         value={password}
                                         onChange={(e) => {
                                             setPassword(e.target.value);
-                                            if (loginPasswordError) setLoginPasswordError("");
+                                            setLoginPasswordError("");
                                         }}
-                                        className={`rounded-lg w-full py-3 px-5 pr-12 outline-none duration-200 border
-                ${loginPasswordError ? "input-error" : "border-gray-3 bg-gray-1"}`}
-                                        style={{
-                                            borderRadius: "8px",
-                                            borderColor: loginPasswordError ? "#ef4444" : "#d1d5db",
-                                            backgroundColor: loginPasswordError ? "#fef2f2" : "#f3f4f6",
-                                        }}
+                                        placeholder="Nhập mật khẩu"
+                                        className={`w-full px-4 py-3 pr-12 rounded-lg border bg-gray-50 transition 
+                                            focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 
+                                            ${loginPasswordError && "border-red-500 bg-red-50"}
+                                        `}
                                     />
-
-                                    {/* 👁 BUTTON SHOW/HIDE PASSWORD */}
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-dark"
                                     >
                                         <EyeIcon isOpen={showPassword} />
                                     </button>
                                 </div>
 
                                 {loginPasswordError && (
-                                    <p className="text-error">
-                                        <span style={{ fontSize: "14px" }}>⚠️</span>
-                                        {loginPasswordError}
-                                    </p>
+                                    <p className="mt-1 text-sm text-red-500">{loginPasswordError}</p>
                                 )}
                             </div>
 
-
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg ease-out duration-200 hover:bg-blue mt-7.5"
+                                className="w-full py-3 rounded-lg bg-blue-400 text-white text-base font-semibold
+                                           hover:bg-blue-600 transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                             >
                                 {loading ? "Đang đăng nhập..." : "Đăng nhập"}
                             </button>
 
-                            <a
+                            {/* Forgot password */}
+                            <button
+                                type="button"
                                 onClick={() => setOpenForgot(true)}
-                                className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark cursor-pointer"
+                                className="w-full text-center text-sm text-blue hover:underline mt-2"
                             >
-                                Bạn quên mật khẩu?
-                            </a>
+                                Quên mật khẩu?
+                            </button>
 
-                            <p className="text-center mt-6">
+                            {/* Signup link */}
+                            <p className="text-center text-sm mt-4">
                                 Bạn chưa có tài khoản?
-                                <Link
-                                    href="/signup"
-                                    className="text-dark ease-out duration-200 hover:text-blue pl-2"
-                                >
+                                <Link href="/signup" className="text-blue-600 font-medium ml-1 hover:underline">
                                     Đăng ký ngay!
                                 </Link>
                             </p>
@@ -264,14 +237,16 @@ const Signin = () => {
                     </div>
                 </div>
             </section>
+
+            {/* FORGOT PASSWORD MODAL */}
             {openForgot && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-xl animate-fadeIn">
-                        <h2 className="text-xl font-semibold text-dark mb-4 text-center">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fadeIn">
+                    <div className="bg-white rounded-xl p-7 w-full max-w-md shadow-xl animate-scaleIn">
+
+                        <h2 className="text-xl font-bold text-center text-dark mb-3">
                             Quên mật khẩu
                         </h2>
-
-                        <p className="text-center text-dark-5 mb-5">
+                        <p className="text-center text-gray-600 mb-6">
                             Nhập email của bạn để nhận liên kết đặt lại mật khẩu.
                         </p>
 
@@ -280,35 +255,34 @@ const Signin = () => {
                                 e.preventDefault();
                                 handleForgot();
                             }}
+                            className="space-y-5"
                         >
                             <input
                                 type="email"
-                                placeholder="Nhập email của bạn"
                                 value={forgotEmail}
                                 onChange={(e) => {
                                     setForgotEmail(e.target.value);
-                                    if (forgotEmailError) setForgotEmailError("");
+                                    setForgotEmailError("");
                                 }}
-                                className={`rounded-lg w-full py-3 px-5 outline-none duration-200 border ${forgotEmailError ? "input-error" : ""}`}
-                                style={{
-                                    borderRadius: "8px",
-                                    borderColor: forgotEmailError ? "#ef4444" : "#d1d5db",
-                                    backgroundColor: forgotEmailError ? "#fef2f2" : "#f3f4f6",
-                                }}
+                                placeholder="Nhập email"
+                                className={`w-full px-4 py-3 rounded-lg border bg-gray-50 transition 
+                                    focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100
+                                    ${forgotEmailError && "border-red-500 bg-red-50"}
+                                `}
                             />
 
                             {forgotEmailError && (
-                                <p className="text-error">⚠️ {forgotEmailError}</p>
+                                <p className="text-red-500 text-sm">{forgotEmailError}</p>
                             )}
 
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex gap-3 pt-2">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         resetForgotState();
                                         setOpenForgot(false);
                                     }}
-                                    className="flex-1 py-3 rounded-lg border border-gray-3 text-dark hover:bg-gray-2"
+                                    className="flex-1 py-3 border rounded-lg hover:bg-gray-100"
                                 >
                                     Hủy
                                 </button>
@@ -316,7 +290,7 @@ const Signin = () => {
                                 <button
                                     type="submit"
                                     disabled={sending}
-                                    className="flex-1 py-3 rounded-lg bg-dark text-white hover:bg-blue duration-150"
+                                    className="flex-1 py-3 rounded-lg bg-blue text-white font-medium hover:bg-blue-600 transition disabled:opacity-60"
                                 >
                                     {sending ? "Đang gửi..." : "Gửi email"}
                                 </button>
