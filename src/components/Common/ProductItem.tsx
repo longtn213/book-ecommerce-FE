@@ -27,14 +27,16 @@ const ProductItem = ({ item }: { item: Book }) => {
     return (
         <div className="group bg-white rounded-lg">
             {/* IMAGE WRAPPER */}
-            <div className="relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden min-h-[260px] mb-4">
-                <Image
-                    src={item.images?.[0] || "/images/default-book.png"}
-                    alt={item.title}
-                    width={240}
-                    height={240}
-                    className="object-contain"
-                />
+            <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+
+                <div className="relative w-[180px] h-[250px] flex items-center justify-center">
+                    <Image
+                        src={item.images?.[0] || "/images/default-book.png"}
+                        alt={item.title}
+                        fill
+                        className="object-contain p-2"
+                    />
+                </div>
 
             <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
               <button

@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import {useCartModalContext} from "@/app/context/CartSidebarModalContext";
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+    const { isCartModalOpen } = useCartModalContext();
 
   // Top: 0 takes us all the way back to the top of the page
   // Behavior: smooth keeps it smooth!
@@ -28,12 +30,16 @@ export default function ScrollToTop() {
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
+
+    // ➤ Khi giỏ hàng mở → tắt chatbot
+    if (isCartModalOpen) return null;
+
   return (
     <>
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className={`items-center justify-center w-10 h-10 rounded-[4px] shadow-lg bg-blue ease-out duration-200 hover:bg-blue-dark fixed bottom-8 right-8 z-999 ${
+          className={`items-center justify-center w-10 h-10 rounded-[4px] shadow-lg bg-blue-600 ease-out duration-200 hover:bg-blueCustom-dark fixed bottom-8 right-8 z-999 ${
             isVisible ? "flex" : "hidden"
           }`}
         >

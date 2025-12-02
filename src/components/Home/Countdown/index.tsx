@@ -8,12 +8,10 @@ const CountDownBook = () => {
     const [minutes, setMinutes] = useState(0);
     const [seconds, setSeconds] = useState(0);
 
-    // ❗ Bạn đổi deadline cho sự kiện sale của bạn
     const deadline = "December 31, 2025 23:59:59";
 
     const getTime = () => {
         const time = Date.parse(deadline) - Date.now();
-
         if (time <= 0) return;
 
         setDays(Math.floor(time / (1000 * 60 * 60 * 24)));
@@ -28,85 +26,78 @@ const CountDownBook = () => {
     }, []);
 
     return (
-        <section className="overflow-hidden py-20">
-            <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-                <div className="relative overflow-hidden z-1 rounded-lg bg-[#F1EDE4] p-4 sm:p-7.5 lg:p-10 xl:p-15">
-                    <div className="max-w-[422px] w-full">
-            <span className="block font-medium text-custom-1 text-blue mb-2.5">
-              Flash Sale Sách Cuối Năm!
+        <section className="overflow-hidden py-16">
+            <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
+
+                {/* MAIN CARD */}
+                <div className="relative rounded-2xl bg-[#F1EDE4] p-6 sm:p-10 lg:p-14 shadow-md overflow-hidden">
+
+                    <div className="relative z-[2] max-w-[450px]">
+                        {/* TITLE */}
+                        <span className="block font-semibold text-blue text-sm sm:text-base tracking-wide mb-2">
+              Flash Sale Cuối Năm 🎉
             </span>
 
-                        <h2 className="font-bold text-dark text-xl lg:text-heading-4 xl:text-heading-3 mb-3">
+                        <h2 className="font-bold text-dark text-2xl lg:text-4xl mb-3 leading-snug">
                             Giảm Đến 50% Toàn Bộ Sách
                         </h2>
 
-                        <p>
-                            Hàng ngàn đầu sách best-seller, mới ra mắt và sách kỹ năng đang chờ bạn.
-                            Đừng bỏ lỡ cơ hội săn deal siêu rẻ!
+                        <p className="text-gray-700 mb-6">
+                            Hàng ngàn đầu sách best-seller, sách kỹ năng, truyện mới nhất đang chờ bạn.
+                            Nhanh tay săn deal cực sốc giá rẻ nhất năm!
                         </p>
 
-                        {/* Countdown */}
-                        <div className="flex flex-wrap gap-6 mt-6">
-                            {/* Days */}
-                            <div>
-                <span className="min-w-[64px] h-14.5 font-semibold text-xl lg:text-3xl text-dark rounded-lg flex items-center justify-center bg-white shadow-2 px-4 mb-2">
-                  {days < 10 ? "0" + days : days}
-                </span>
-                                <span className="block text-custom-sm text-dark text-center">Days</span>
-                            </div>
+                        {/* COUNTDOWN */}
+                        <div className="flex flex-wrap gap-5 mt-4">
 
-                            {/* Hours */}
-                            <div>
-                <span className="min-w-[64px] h-14.5 font-semibold text-xl lg:text-3xl text-dark rounded-lg flex items-center justify-center bg-white shadow-2 px-4 mb-2">
-                  {hours < 10 ? "0" + hours : hours}
-                </span>
-                                <span className="block text-custom-sm text-dark text-center">Hours</span>
-                            </div>
+                            {[
+                                { label: "Days", value: days },
+                                { label: "Hours", value: hours },
+                                { label: "Minutes", value: minutes },
+                                { label: "Seconds", value: seconds },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex flex-col items-center text-center">
+                  <span
+                      className="w-16 h-16 text-2xl font-bold bg-white shadow-lg rounded-xl
+                    flex items-center justify-center border border-gray-200"
+                  >
+                    {item.value < 10 ? "0" + item.value : item.value}
+                  </span>
+                                    <span className="text-sm text-gray-700 mt-1">{item.label}</span>
+                                </div>
+                            ))}
 
-                            {/* Minutes */}
-                            <div>
-                <span className="min-w-[64px] h-14.5 font-semibold text-xl lg:text-3xl text-dark rounded-lg flex items-center justify-center bg-white shadow-2 px-4 mb-2">
-                  {minutes < 10 ? "0" + minutes : minutes}
-                </span>
-                                <span className="block text-custom-sm text-dark text-center">Minutes</span>
-                            </div>
-
-                            {/* Seconds */}
-                            <div>
-                <span className="min-w-[64px] h-14.5 font-semibold text-xl lg:text-3xl text-dark rounded-lg flex items-center justify-center bg-white shadow-2 px-4 mb-2">
-                  {seconds < 10 ? "0" + seconds : seconds}
-                </span>
-                                <span className="block text-custom-sm text-dark text-center">Seconds</span>
-                            </div>
                         </div>
 
+                        {/* BUTTON */}
                         <a
                             href="/shop?sortType=1"
-                            className="inline-flex font-medium text-custom-sm text-white bg-blue py-3 px-9.5 rounded-md hover:bg-blue-dark mt-7.5"
+                            className="inline-flex font-medium text-sm text-white bg-blue-600 py-3 px-8 rounded-lg hover:bg-blueCustom-dark transition mt-7 shadow-md"
                         >
                             Khám phá ngay!
                         </a>
                     </div>
 
-          {/* <!-- bg shapes --> */}
-          <Image
-            src="/images/countdown/countdown-bg.png"
-            alt="bg shapes"
-            className="hidden sm:block absolute right-0 bottom-0 -z-1"
-            width={737}
-            height={482}
-          />
-          <Image
-            src="/images/countdown/countdown-01.png"
-            alt="product"
-            className="hidden lg:block absolute right-4 xl:right-5 bottom-4 xl:bottom-28 -z-1"
-            width={680}
-            height={600}
-          />
-        </div>
-      </div>
-    </section>
-  );
+                    {/* DECOR IMAGES (Không che chữ) */}
+                    <Image
+                        src="/images/countdown/countdown-bg.png"
+                        alt="bg"
+                        width={750}
+                        height={450}
+                        className="hidden sm:block absolute right-0 bottom-0 opacity-80 z-[1]"
+                    />
+
+                    <Image
+                        src="/images/countdown/countdown-01.png"
+                        alt="book"
+                        width={650}
+                        height={600}
+                        className="hidden lg:block absolute right-6 bottom-25 z-[1] drop-shadow-xl"
+                    />
+                </div>
+            </div>
+        </section>
+    );
 };
 
 export default CountDownBook;

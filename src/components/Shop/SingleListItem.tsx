@@ -20,28 +20,22 @@ const SingleListItem = ({ item }: any) => {
     const { addToCart } = useCart();
     const { isWishlisted, toggle } = useWishlist();
 
-    // IMAGE
     const previewImg =
         item.images?.[0] || "/images/placeholder/book-placeholder.png";
 
-    // PRICES
     const originalPrice = item.price ?? 0;
     const discountedPrice = item.discountedPrice ?? originalPrice;
 
-    // ⭐ QuickView
     const handleQuickView = () => {
         dispatch(updateQuickView({ ...item }));
         openModal();
     };
 
-    // 🛒 Add to Cart
     const handleAddToCart = () => {
         if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
-
         addToCart(item.id, 1);
     };
 
-    // ❤️ Wishlist Toggle
     const handleToggleWishlist = () => {
         toggle({
             id: item.id,
@@ -53,25 +47,24 @@ const SingleListItem = ({ item }: any) => {
     };
 
     return (
-        <div className="group rounded-lg bg-white shadow-1">
+        <div className="group rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100">
             <div className="flex">
-                {/* LEFT IMAGE */}
-                <div className="shadow-list relative overflow-hidden flex items-center justify-center max-w-[270px] w-full sm:min-h-[270px] p-4">
+                {/* IMAGE SIDE */}
+                <div className="relative overflow-hidden flex items-center justify-center w-[260px] sm:min-h-[260px] p-4 bg-gray-50 rounded-l-xl">
                     <Image
                         src={previewImg}
                         alt={item.title}
-                        width={250}
-                        height={250}
-                        className="object-cover"
+                        width={260}
+                        height={260}
+                        className="object-contain transition-transform duration-300 group-hover:scale-105"
                     />
 
-                    {/* HOVER BUTTONS */}
-                    <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
-
+                    {/* ACTION BAR */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-3">
                         {/* QUICK VIEW */}
                         <button
                             onClick={handleQuickView}
-                            className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-blue"
+                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-md text-gray-700 hover:bg-blue-600 hover:text-white transition"
                         >
                             <svg
                                 className="fill-current"
@@ -99,17 +92,20 @@ const SingleListItem = ({ item }: any) => {
                         {/* ADD TO CART */}
                         <button
                             onClick={handleAddToCart}
-                            className="inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white hover:bg-blue-dark"
+                            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition shadow-md"
                         >
-                            Add to cart
+                            Thêm vào giỏ
                         </button>
 
                         {/* WISHLIST */}
                         <button
                             onClick={handleToggleWishlist}
-                            className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 bg-white 
-                            ${isWishlisted(item.id) ? "text-red-500" : "text-dark"} 
-                            hover:text-blue`}
+                            className={`w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-md transition 
+                ${
+                                isWishlisted(item.id)
+                                    ? "text-red-500"
+                                    : "text-gray-700 hover:bg-blue-600 hover:text-white"
+                            }`}
                         >
                             {isWishlisted(item.id) ? (
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="red">
@@ -124,43 +120,42 @@ const SingleListItem = ({ item }: any) => {
                     </div>
                 </div>
 
-                {/* RIGHT CONTENT */}
-                <div className="w-full flex flex-col gap-5 sm:flex-row sm:items-center justify-center sm:justify-between py-5 px-4 sm:px-7.5 lg:pl-11 lg:pr-12">
+                {/* CONTENT */}
+                <div className="flex flex-col justify-between w-full py-5 px-6">
+                    {/* TITLE + PRICE */}
                     <div>
-                        <h3 className="font-medium text-dark hover:text-blue mb-1.5">
+                        <h3 className="font-semibold text-gray-900 text-lg hover:text-blue-600 transition mb-2">
                             <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
                         </h3>
 
-                        {/* PRICE */}
-                        <span className="flex items-center gap-2 font-medium text-lg">
-                            <span className="text-dark">
-                                {discountedPrice.toLocaleString()}₫
-                            </span>
+                        <div className="flex items-center gap-2 text-lg font-medium">
+                            <span className="text-gray-900">{discountedPrice.toLocaleString()}₫</span>
 
                             {discountedPrice !== originalPrice && (
-                                <span className="text-gray-400 line-through">
-                                    {originalPrice.toLocaleString()}₫
-                                </span>
+                                <span className="line-through text-gray-400 text-base">
+                  {originalPrice.toLocaleString()}₫
+                </span>
                             )}
-                        </span>
+                        </div>
                     </div>
 
                     {/* RATING */}
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2 mt-3">
+                        <div className="flex gap-0.5">
                             {Array.from({ length: 5 }).map((_, i) => (
                                 <Image
                                     key={i}
                                     src="/images/icons/icon-star.svg"
                                     alt="star"
-                                    width={15}
-                                    height={15}
+                                    width={16}
+                                    height={16}
                                     className={i < Math.round(item.rating) ? "opacity-100" : "opacity-30"}
                                 />
                             ))}
                         </div>
-
-                        <p className="text-custom-sm">({item.rating?.toFixed(1)})</p>
+                        <span className="text-sm text-gray-600">
+              ({item.rating?.toFixed(1)})
+            </span>
                     </div>
                 </div>
             </div>

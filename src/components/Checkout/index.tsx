@@ -21,9 +21,10 @@ const Checkout = () => {
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
 
-    const { code: couponCodeApplied, discountAmount } = useAppSelector(
-        (state) => state.couponSliceReducer
-    );
+    const {
+        code: couponCodeApplied,
+        discountAmount,
+    } = useAppSelector((state) => state.couponSliceReducer);
 
     const { clearCart } = useCart();
     const { user } = useAuthContext();
@@ -31,10 +32,8 @@ const Checkout = () => {
     const [shippingAddress, setShippingAddress] = useState("");
     const [note, setNote] = useState("");
 
-    // ⚠ State Lỗi
     const [shippingAddressError, setShippingAddressError] = useState("");
 
-    // Modal state
     const [openSuccess, setOpenSuccess] = useState(false);
     const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
 
@@ -43,23 +42,17 @@ const Checkout = () => {
     const shippingFee = isFreeShip ? 0 : BASE_SHIP_FEE;
     const finalTotal = totalAmount - (discountAmount || 0) + shippingFee;
 
-    // Confetti
     const fireConfetti = () => {
         confetti({
-            particleCount: 180,
-            spread: 70,
+            particleCount: 140,
+            spread: 60,
             origin: { y: 0.6 },
-            zIndex: 99999,
         });
     };
 
-    // Handle Checkout
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // ------------------------------
-        // 🔥 VALIDATION
-        // ------------------------------
         let hasError = false;
 
         if (!shippingAddress.trim()) {
@@ -94,28 +87,28 @@ const Checkout = () => {
 
             setTimeout(() => {
                 router.push("/my-orders");
-            }, 3000);
+            }, 2800);
 
         } catch (error) {
             console.error(error);
-            // bạn có thể thêm error UI nếu muốn
         }
     };
 
+    // Nếu user chưa login
     if (!user) {
         return (
             <>
-                <Breadcrumb title={"Thanh toán"} pages={["checkout"]} />
+                <Breadcrumb title="Thanh toán" pages={["checkout"]} />
                 <section className="bg-gray-100 py-20">
                     <div className="max-w-[650px] mx-auto px-4">
-                        <div className="bg-white border border-gray-2 rounded-xl shadow-md p-10 text-center">
-                            <h2 className="text-2xl font-semibold text-gray-7 mb-4">
+                        <div className="bg-white border rounded-xl shadow-lg p-10 text-center">
+                            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
                                 Bạn chưa đăng nhập
                             </h2>
 
                             <button
                                 onClick={() => router.push("/signin")}
-                                className="px-10 py-3 bg-blue text-white text-lg rounded-lg font-medium hover:bg-blue-dark transition"
+                                className="px-10 py-3 bg-blue text-white text-lg rounded-lg font-medium hover:bg-blue-dark"
                             >
                                 Đăng nhập ngay
                             </button>
@@ -128,12 +121,13 @@ const Checkout = () => {
 
     return (
         <>
-            <Breadcrumb title={"Thanh toán"} pages={["checkout"]} />
+            <Breadcrumb title="Thanh toán" pages={["checkout"]} />
 
-            <section className="py-10 bg-gray-1">
+            <section className="py-10 bg-gray-100">
                 <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
+
                     {/* FREESHIP BAR */}
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-3 mb-4">
                         <FreeShipProgress totalAmount={totalAmount} />
                     </div>
 
@@ -141,7 +135,7 @@ const Checkout = () => {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* SHIPPING ADDRESS */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
+                        <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
                             <h3 className="text-lg font-semibold mb-4">Địa chỉ giao hàng</h3>
 
                             <input
@@ -152,39 +146,37 @@ const Checkout = () => {
                                     setShippingAddress(e.target.value);
                                     if (shippingAddressError) setShippingAddressError("");
                                 }}
-                                className={`w-full border rounded px-4 py-3 bg-gray-5 ${
-                                    shippingAddressError ? "border-red" : ""
-                                }`}
+                                className={`w-full border rounded-lg px-4 py-3 bg-gray-50 focus:ring-2 focus:ring-blue-300 
+                                    ${shippingAddressError ? "border-red-600" : "border-gray-300"}`}
                             />
 
-                            {/* ⭐ Lỗi dưới input */}
                             {shippingAddressError && (
-                                <p className="text-sm text-red mt-2">{shippingAddressError}</p>
+                                <p className="text-sm text-red-600 mt-2">{shippingAddressError}</p>
                             )}
                         </div>
 
                         {/* NOTE */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
+                        <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
                             <h3 className="text-lg font-semibold mb-4">Ghi chú</h3>
                             <textarea
                                 rows={5}
                                 placeholder="Ghi chú thêm cho đơn hàng..."
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
-                                className="w-full border rounded px-4 py-3 bg-gray-5"
-                            ></textarea>
+                                className="w-full border rounded-lg px-4 py-3 bg-gray-50 border-gray-300 focus:ring-2 focus:ring-blue/40"
+                            />
                         </div>
 
                         {/* COUPON */}
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
+                        <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
                             <h3 className="text-lg font-semibold mb-4">Mã giảm giá</h3>
 
                             {couponCodeApplied ? (
-                                <div className="flex justify-between items-center p-3 border rounded bg-green-light-5 border-green-light-3">
-                                    <p className="font-medium text-green-dark">{couponCodeApplied}</p>
+                                <div className="flex justify-between items-center p-3 border rounded-lg bg-green-50 border-green-300">
+                                    <p className="font-semibold text-green-700">{couponCodeApplied}</p>
                                     <button
                                         onClick={() => dispatch(clearCoupon())}
-                                        className="text-sm text-red-dark hover:underline"
+                                        className="text-sm text-red-600 hover:underline"
                                     >
                                         Xóa mã
                                     </button>
@@ -195,16 +187,18 @@ const Checkout = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT SIDE */}
+                    {/* RIGHT – ORDER SUMMARY */}
                     <div className="space-y-6">
-                        <div className="bg-white rounded-lg shadow p-6 border border-gray-2">
+                        <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
                             <h3 className="text-lg font-semibold pb-4 border-b">Đơn hàng của bạn</h3>
 
                             {/* Items */}
                             <div className="divide-y">
                                 {cartItems.map((item) => (
-                                    <div key={item.bookId} className="py-4 flex justify-between">
-                                        <p>{item.title} × {item.quantity}</p>
+                                    <div key={item.bookId} className="py-4 flex justify-between text-gray-700">
+                                        <p className="w-2/3">
+                                            {item.title} × {item.quantity}
+                                        </p>
                                         <p className="font-medium">
                                             {(item.unitPriceSnapshot * item.quantity).toLocaleString()} đ
                                         </p>
@@ -212,33 +206,30 @@ const Checkout = () => {
                                 ))}
                             </div>
 
-                            {/* Discount */}
                             {discountAmount > 0 && (
-                                <div className="pt-4 mt-4 border-t flex justify-between text-green-dark font-medium">
+                                <div className="pt-4 mt-4 border-t flex justify-between text-green-700 font-medium">
                                     <p>Giảm giá:</p>
                                     <p>- {discountAmount.toLocaleString()} đ</p>
                                 </div>
                             )}
 
-                            {/* Ship */}
-                            <div className="pt-4 mt-4 border-t flex justify-between text-gray-7">
+                            <div className="pt-4 mt-4 border-t flex justify-between text-gray-700">
                                 <p>Phí vận chuyển:</p>
-                                <p className={isFreeShip ? "text-green-dark font-semibold" : ""}>
+                                <p className={isFreeShip ? "text-green-700 font-semibold" : ""}>
                                     {isFreeShip ? "0đ (FREESHIP)" : `${shippingFee.toLocaleString()} đ`}
                                 </p>
                             </div>
 
-                            {/* Total */}
                             <div className="pt-4 mt-4 border-t flex justify-between">
                                 <p className="text-lg font-semibold">Tổng thanh toán</p>
-                                <p className="text-lg font-semibold text-blue">
+                                <p className="text-lg font-bold text-blue-600">
                                     {finalTotal.toLocaleString()} đ
                                 </p>
                             </div>
 
                             <button
                                 onClick={handlePlaceOrder}
-                                className="w-full mt-6 py-3 bg-blue text-white text-lg rounded-md hover:bg-blue-dark"
+                                className="w-full mt-6 py-3 bg-blue-600 text-white text-lg rounded-lg font-medium hover:bg-blueCustom-dark transition"
                             >
                                 Đặt hàng
                             </button>
@@ -249,23 +240,23 @@ const Checkout = () => {
 
             {/* SUCCESS MODAL */}
             {openSuccess && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-                    <div className="bg-white rounded-xl p-8 shadow-xl max-w-sm w-full text-center">
-                        <h2 className="text-2xl font-semibold text-green-dark mb-3">
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+                    <div className="bg-white rounded-xl p-8 shadow-2xl max-w-sm w-full text-center animate-fadeIn">
+                        <h2 className="text-2xl font-bold text-green-700 mb-3">
                             🎉 Đặt hàng thành công!
                         </h2>
 
-                        <p className="text-gray-7 mb-4">
+                        <p className="text-gray-600 mb-4">
                             Mã đơn hàng: <strong>#{createdOrderId}</strong>
                         </p>
 
-                        <p className="text-gray-5 mb-6">
-                            Bạn sẽ được chuyển đến trang đơn hàng trong giây lát...
+                        <p className="text-gray-500 mb-6">
+                            Bạn sẽ được chuyển tới trang đơn hàng trong giây lát...
                         </p>
 
                         <button
-                            onClick={() => router.push("/my-account?tab=orders")}
-                            className="px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue-dark"
+                            onClick={() => router.push("/my-orders")}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blueCustom-dark"
                         >
                             Xem đơn hàng
                         </button>

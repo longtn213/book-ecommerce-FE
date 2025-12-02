@@ -26,23 +26,23 @@ const OrderSummary = () => {
     return (
         <div className="lg:max-w-[455px] w-full">
             <div className="bg-white shadow-1 rounded-[10px]">
-                <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
-                    <h3 className="font-medium text-xl text-dark">Tóm tắt đơn hàng</h3>
+                <div className="border-b border-b-gray-300 py-5 px-4 sm:px-8.5">
+                    <h3 className="font-medium text-xl text-darkCustom">Tóm tắt đơn hàng</h3>
                 </div>
 
                 <div className="pt-2.5 pb-8.5 px-4 sm:px-8.5">
 
                     {/* HEADER */}
-                    <div className="flex items-center justify-between py-5 border-b border-gray-3">
-                        <h4 className="font-medium text-dark">Sản phẩm</h4>
-                        <h4 className="font-medium text-dark">Tổng phụ</h4>
+                    <div className="flex items-center justify-between py-5 border-b border-b-gray-300">
+                        <h4 className="font-medium text-darkCustom">Sản phẩm</h4>
+                        <h4 className="font-medium text-darkCustom">Tổng phụ</h4>
                     </div>
 
                     {/* LIST SẢN PHẨM */}
                     {cartItems.map((item) => (
                         <div
                             key={item.bookId}
-                            className="flex items-center justify-between py-5 border-b border-gray-3"
+                            className="flex items-center justify-between py-5 border-b border-b-gray-300"
                         >
                             <p>{item.title}</p>
                             <p>{(item.unitPriceSnapshot * item.quantity).toLocaleString()} đ</p>
@@ -57,12 +57,12 @@ const OrderSummary = () => {
 
                     {/* DISCOUNT */}
                     {discountAmount > 0 && (
-                        <div className="flex items-center justify-between pt-3 text-green-dark">
+                        <div className="flex items-center justify-between pt-3 text-green-600">
                             <p className="flex items-center gap-2">
                                 Giảm giá ({code})
                                 <button
                                     onClick={() => dispatch(clearCoupon())}
-                                    className="text-red-500 underline text-sm hover:text-red-dark"
+                                    className="text-red-500 underline text-sm hover:text-red-600"
                                 >
                                     <Trash2Icon/>
                                 </button>
@@ -74,13 +74,16 @@ const OrderSummary = () => {
 
                     {/* FINAL */}
                     <div className="flex items-center justify-between pt-5">
-                        <p className="font-semibold text-xl text-dark">Tổng</p>
-                        <p className="font-semibold text-xl text-dark">
+                        <p className="font-semibold text-xl text-darkCustom">Tổng</p>
+                        <p className="font-semibold text-xl text-darkCustom">
                             {finalAmount.toLocaleString()} đ
                         </p>
                     </div>
 
-                    <button className="w-full bg-blue text-white py-3 rounded-md mt-6 hover:bg-blue-dark" onClick={handleCheckout}>
+                    <button
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg mt-6 font-medium hover:bg-blueCustom-dark transition"
+                        onClick={handleCheckout}
+                    >
                         Tiếp tục thanh toán
                     </button>
                 </div>

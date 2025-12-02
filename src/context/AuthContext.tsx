@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                                 setAuthModalOpen(false);
                                 router.push("/signin");
                             }}
-                            className="w-full bg-blue text-white py-2 rounded-lg mb-2 hover:bg-blue-dark"
+                            className="w-full bg-blueCustom text-white py-2 rounded-lg mb-2 hover:bg-blueCustom-dark"
                         >
                             Đi đến trang đăng nhập
                         </button>

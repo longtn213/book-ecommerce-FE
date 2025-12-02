@@ -20,27 +20,22 @@ const SingleGridItem = ({ item }) => {
     const { addToCart } = useCart();
     const { isWishlisted, toggle } = useWishlist();
 
-    // IMAGE
     const imageUrl =
         item.images?.[0] || "/images/placeholder/book-placeholder.png";
 
-    // PRICE
     const originalPrice = item.price ?? 0;
     const discountedPrice = item.discountedPrice ?? originalPrice;
 
-    // ⭐ QuickView
     const handleQuickView = () => {
         dispatch(updateQuickView(item));
         openModal();
     };
 
-    // 🛒 Add to cart
     const handleAddToCart = () => {
         if (!user) return requireLogin("thêm sản phẩm vào giỏ hàng");
         addToCart(item.id, 1);
     };
 
-    // ❤️ Wishlist toggle
     const handleToggleWishlist = () => {
         toggle({
             id: item.id,
@@ -52,25 +47,25 @@ const SingleGridItem = ({ item }) => {
     };
 
     return (
-        <div className="group">
-            {/* IMAGE */}
-            <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-white shadow-1 min-h-[270px] mb-4">
+        <div className="group rounded-xl bg-white p-3 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+
+            {/* IMAGE WRAPPER */}
+            <div className="relative w-full aspect-[3/4] bg-white rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center">
+
                 <Image
                     src={imageUrl}
                     alt={item.title}
-                    width={250}
-                    height={250}
-                    className="object-contain"
+                    fill      // quan trọng: dùng fill + object-contain
+                    className="object-contain transition-transform duration-300 group-hover:scale-105 p-3"
                 />
 
-                {/* HOVER BUTTONS */}
-                <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
+                {/* ACTION BUTTONS */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-3">
 
                     {/* QUICK VIEW */}
                     <button
                         onClick={handleQuickView}
-                        aria-label="button for quick view"
-                        className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-blue"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-md text-gray-700 hover:bg-blue-600 hover:text-white transition"
                     >
                         <svg
                             className="fill-current"
@@ -98,18 +93,20 @@ const SingleGridItem = ({ item }) => {
                     {/* ADD TO CART */}
                     <button
                         onClick={handleAddToCart}
-                        className="inline-flex py-[7px] px-5 rounded-[5px] bg-blue text-white font-medium text-custom-sm hover:bg-blue-dark"
+                        className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-md transition"
                     >
-                        Add to cart
+                        Thêm vào giỏ
                     </button>
 
                     {/* ❤️ WISHLIST */}
                     <button
                         onClick={handleToggleWishlist}
-                        aria-label="button for wishlist"
-                        className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 bg-white 
-                            ${isWishlisted(item.id) ? "text-red-500" : "text-dark"} 
-                            hover:text-blue`}
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-md transition 
+              ${
+                            isWishlisted(item.id)
+                                ? "text-red-500"
+                                : "text-gray-700 hover:bg-blue-600 hover:text-white"
+                        }`}
                     >
                         {isWishlisted(item.id) ? (
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="red">
@@ -125,8 +122,8 @@ const SingleGridItem = ({ item }) => {
             </div>
 
             {/* RATING */}
-            <div className="flex items-center gap-2.5 mb-2">
-                <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 mt-4">
+                <div className="flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
                         <Image
                             key={i}
@@ -138,24 +135,26 @@ const SingleGridItem = ({ item }) => {
                         />
                     ))}
                 </div>
-                <p className="text-custom-sm">({item.rating?.toFixed(1)})</p>
+                <span className="text-sm text-gray-600">({item.rating?.toFixed(1)})</span>
             </div>
 
             {/* TITLE */}
-            <h3 className="font-medium text-dark hover:text-blue mb-1.5">
+            <h3 className="mt-2 font-semibold text-gray-900 hover:text-blue-600 transition line-clamp-2 min-h-[48px]">
                 <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
             </h3>
 
             {/* PRICE */}
-            <span className="flex items-center gap-2 font-medium text-lg">
-                <span className="text-dark">{discountedPrice.toLocaleString()}₫</span>
+            <div className="mt-2 flex items-center gap-2 font-semibold text-lg">
+        <span className="text-gray-900">
+          {discountedPrice.toLocaleString()}₫
+        </span>
 
                 {discountedPrice !== originalPrice && (
-                    <span className="text-gray-400 line-through">
-                        {originalPrice.toLocaleString()}₫
-                    </span>
+                    <span className="line-through text-gray-400 text-base">
+            {originalPrice.toLocaleString()}₫
+          </span>
                 )}
-            </span>
+            </div>
         </div>
     );
 };

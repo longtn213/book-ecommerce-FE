@@ -233,7 +233,7 @@ const Shop = () => {
     return (
         <>
             <Breadcrumb
-                title={"Explore All Products"}
+                title={"Khám phá thế giới sách"}
                 pages={["shop"]}
             />
 
@@ -265,6 +265,17 @@ const Shop = () => {
                                             </button>
                                         </div>
                                     </div>
+                                    {/* PRICE RANGE FILTER */}
+                                    <PriceDropdown
+                                        minPrice={filters.minPrice}
+                                        maxPrice={filters.maxPrice}
+                                        onPriceChange={(min, max) =>
+                                            updateFilters({
+                                                minPrice: min,
+                                                maxPrice: max,
+                                            })
+                                        }
+                                    />
 
                                     {/* CATEGORY FILTER */}
                                     <CategoryDropdown
@@ -293,17 +304,6 @@ const Shop = () => {
                                         }
                                     />
 
-                                    {/* PRICE RANGE FILTER */}
-                                    <PriceDropdown
-                                        minPrice={filters.minPrice}
-                                        maxPrice={filters.maxPrice}
-                                        onPriceChange={(min, max) =>
-                                            updateFilters({
-                                                minPrice: min,
-                                                maxPrice: max,
-                                            })
-                                        }
-                                    />
                                 </div>
                             </form>
                         </div>
@@ -335,9 +335,9 @@ const Shop = () => {
                                                   aria-label="button for product grid tab"
                                                   className={`${
                                                     productStyle === "grid"
-                                                      ? "bg-blue border-blue text-white"
-                                                      : "text-dark bg-gray-1 border-gray-3"
-                                                  } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                                                      ? "bg-blue-600 border-blue-600 text-white"
+                                                      : "text-darkCustom bg-gray-100 border-gray-300"
+                                                  } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white`}
                                                 >
                                                   <svg
                                                     className="fill-current"
@@ -379,9 +379,9 @@ const Shop = () => {
                                                       aria-label="button for product list tab"
                                                       className={`${
                                                         productStyle === "list"
-                                                          ? "bg-blue border-blue text-white"
-                                                          : "text-dark bg-gray-1 border-gray-3"
-                                                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                                                          ? "bg-blue-600 border-blue-600 text-white"
+                                                          : "text-darkCustom bg-gray-100 border-gray-300"
+                                                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white`}
                                                     >
                                                       <svg
                                                         className="fill-current"
@@ -427,74 +427,65 @@ const Shop = () => {
                             </div>
 
               {/* <!-- Products Pagination Start --> */}
-                            {/* PRODUCTS PAGINATION - dynamic from BE */}
-                            <div className="flex justify-center mt-15">
-                                <div className="bg-white shadow-1 rounded-md p-2">
-                                    <ul className="flex items-center gap-1">
+                            <div className="flex justify-center mt-12">
+                                <nav className="bg-white shadow-md rounded-xl px-4 py-3">
+                                    <ul className="flex items-center gap-2">
 
                                         {/* PREV BUTTON */}
                                         <li>
                                             <button
-                                                aria-label="button for pagination left"
-                                                type="button"
                                                 disabled={pageInfo.page === 0}
                                                 onClick={() =>
                                                     setPageInfo((p) => ({ ...p, page: Math.max(0, p.page - 1) }))
                                                 }
-                                                className="flex items-center justify-center w-8 h-9 ease-out duration-200 rounded-[3px] disabled:text-gray-4"
+                                                className={`w-10 h-10 flex items-center justify-center rounded-lg 
+            transition-all border 
+            ${
+                                                    pageInfo.page === 0
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        : "bg-white hover:bg-blue-50 hover:border-blue-500"
+                                                }`}
                                             >
-                                                <svg
-                                                    className="fill-current"
-                                                    width="18"
-                                                    height="18"
-                                                    viewBox="0 0 18 18"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path d="M12.1782 16.1156..." fill="" />
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                                                    <path d="M11.7 15.3L6.4 9.9c-.2-.2-.4-.5-.4-.9s.1-.7.4-.9l5.3-5.4L10.6 1 5 6.7c-.8.8-.8 2 0 2.8l5.6 5.7 1.1-.9z"/>
                                                 </svg>
                                             </button>
                                         </li>
 
-                                        {/* PAGE NUMBERS */}
-                                        {Array.from({ length: pageInfo.totalPages }, (_, i) => i)
-                                            .filter((i) => {
-                                                // only show range around current page
+                                        {/* PAGE BUTTONS WITH "..." */}
+                                        {Array.from({ length: pageInfo.totalPages }, (_, page) => page)
+                                            .filter((page) => {
                                                 const current = pageInfo.page;
                                                 return (
-                                                    i === 0 ||
-                                                    i === pageInfo.totalPages - 1 ||
-                                                    Math.abs(i - current) <= 2
+                                                    page === 0 ||
+                                                    page === pageInfo.totalPages - 1 ||
+                                                    Math.abs(page - current) <= 2
                                                 );
                                             })
-                                            .map((i, idx, arr) => {
-                                                const isGap =
-                                                    idx > 0 && arr[idx] - arr[idx - 1] > 1;
+                                            .map((page, idx, arr) => {
+                                                const isGap = idx > 0 && arr[idx] - arr[idx - 1] > 1;
 
                                                 return (
-                                                    <React.Fragment key={i}>
-                                                        {/* GAP */}
+                                                    <React.Fragment key={page}>
                                                         {isGap && (
-                                                            <li>
-                  <span className="flex py-1.5 px-3.5 rounded-[3px]">
-                    ...
-                  </span>
+                                                            <li className="px-2 text-gray-500 font-medium select-none">
+                                                                ...
                                                             </li>
                                                         )}
 
-                                                        {/* PAGE BUTTON */}
                                                         <li>
                                                             <button
                                                                 onClick={() =>
-                                                                    setPageInfo((p) => ({ ...p, page: i }))
+                                                                    setPageInfo((p) => ({ ...p, page }))
                                                                 }
-                                                                className={`flex py-1.5 px-3.5 duration-200 rounded-[3px] ${
-                                                                    pageInfo.page === i
-                                                                        ? "bg-blue text-white"
-                                                                        : "hover:text-white hover:bg-blue"
+                                                                className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all
+                    ${
+                                                                    pageInfo.page === page
+                                                                        ? "bg-blue-600 text-white border-blue-600 shadow"
+                                                                        : "bg-white text-gray-700 hover:bg-blue-50 hover:border-blue-500"
                                                                 }`}
                                                             >
-                                                                {i + 1}
+                                                                {page + 1}
                                                             </button>
                                                         </li>
                                                     </React.Fragment>
@@ -504,8 +495,6 @@ const Shop = () => {
                                         {/* NEXT BUTTON */}
                                         <li>
                                             <button
-                                                aria-label="button for pagination right"
-                                                type="button"
                                                 disabled={pageInfo.page >= pageInfo.totalPages - 1}
                                                 onClick={() =>
                                                     setPageInfo((p) => ({
@@ -513,22 +502,21 @@ const Shop = () => {
                                                         page: Math.min(p.totalPages - 1, p.page + 1),
                                                     }))
                                                 }
-                                                className="flex items-center justify-center w-8 h-9 ease-out duration-200 rounded-[3px] hover:text-white hover:bg-blue disabled:text-gray-4"
+                                                className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all border
+            ${
+                                                    pageInfo.page >= pageInfo.totalPages - 1
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        : "bg-white hover:bg-blue-50 hover:border-blue-500"
+                                                }`}
                                             >
-                                                <svg
-                                                    className="fill-current"
-                                                    width="18"
-                                                    height="18"
-                                                    viewBox="0 0 18 18"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path d="M5.82197 16.1156..." fill="" />
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                                                    <path d="M6.3 2.7l5.3 5.4c.2.2.4.5.4.9s-.1.7-.4.9l-5.3 5.4 1.1 1.1 5.6-5.7c.8-.8.8-2 0-2.8L7.4 1.6 6.3 2.7z"/>
                                                 </svg>
                                             </button>
                                         </li>
+
                                     </ul>
-                                </div>
+                                </nav>
                             </div>
 
                             {/* <!-- Products Pagination End --> */}

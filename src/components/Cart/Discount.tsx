@@ -131,7 +131,7 @@ const Discount = () => {
                                     value={code}
                                     onChange={(e) => setCode(e.target.value)}
                                     disabled={!!appliedCode}
-                                    className={`rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 
+                                    className={`rounded-md border border-b-gray-300 bg-gray-100 placeholder:text-darkCustom-5 
             w-full py-2.5 px-5 outline-none duration-200
             ${appliedCode ? "opacity-60 cursor-not-allowed" : ""}
         `}
@@ -143,7 +143,7 @@ const Discount = () => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="inline-flex font-medium text-white bg-blue py-3 px-8 rounded-md hover:bg-blue-dark"
+                                    className="inline-flex font-medium text-white bg-blue-600 py-3 px-8 rounded-md hover:bg-blueCustom-dark"
                                 >
                                     {loading ? "Đang kiểm tra..." : "Áp dụng"}
                                 </button>
@@ -165,7 +165,7 @@ const Discount = () => {
 
                         {/* LỖI */}
                         {errorMessage && (
-                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red text-red text-sm px-3 py-2 rounded-md">
+                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-600 text-red-600 text-sm px-3 py-2 rounded-md">
                                 <MailWarning/>
                                 <span>{errorMessage}</span>
                             </div>
@@ -173,7 +173,7 @@ const Discount = () => {
 
                         {/* THÀNH CÔNG */}
                         {successMessage && (
-                            <p className="text-green-dark text-sm mt-2">{successMessage}</p>
+                            <p className="text-greenCustom-dark text-sm mt-2">{successMessage}</p>
                         )}
                     </div>
                 </div>

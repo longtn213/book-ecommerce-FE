@@ -4,100 +4,96 @@ import { useState } from "react";
 
 const CategoryItem = ({ category, selectedId, onSelect }) => {
     const isSelected = String(selectedId) === String(category.id);
-
+    const handleClick = () => {
+        if (isSelected) {
+            onSelect(""); // bỏ chọn
+        } else {
+            onSelect(category.id); // chọn
+        }
+    };
     return (
         <button
-            className={`${
-                isSelected && "text-blue"
-            } group flex items-center justify-between ease-out duration-200 hover:text-blue`}
-            onClick={() => onSelect(category.id)}
+            onClick={handleClick}
+            className={`flex items-center justify-between py-1.5 text-sm transition-all 
+          ${isSelected ? "text-blue-600 font-medium" : "text-gray-700"} 
+          hover:text-blue-600`}
         >
             <div className="flex items-center gap-2">
-                {/* Circle checkbox */}
+                {/* Custom Checkbox */}
                 <div
-                    className={`cursor-pointer flex items-center justify-center rounded w-4 h-4 border ${
-                        isSelected ? "border-blue bg-blue" : "bg-white border-gray-3"
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition
+            ${
+                        isSelected
+                            ? "border-blue-600 bg-blue-600"
+                            : "border-gray-300 bg-white"
                     }`}
                 >
-                    <svg
-                        className={isSelected ? "block" : "hidden"}
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M8.33317 2.5L3.74984 7.08333L1.6665 5"
-                            stroke="white"
-                            strokeWidth="1.94437"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
+                    {isSelected && (
+                        <svg
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            className="text-white"
+                        >
+                            <path
+                                d="M8.33317 2.5L3.74984 7.08333L1.6665 5"
+                                stroke="white"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    )}
                 </div>
 
                 <span>{category.name}</span>
             </div>
-
-            {/* Vì API không có số lượng nên bỏ badge */}
-            {/* <span className="bg-gray-2 text-xs px-2 rounded-full">12</span> */}
         </button>
     );
 };
 
 const CategoryDropdown = ({ categories, selectedId, onSelect }) => {
-    const [toggleDropdown, setToggleDropdown] = useState(true);
+    const [open, setOpen] = useState(false);
 
     return (
-        <div className="bg-white shadow-1 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            {/* HEADER */}
             <div
-                onClick={(e) => {
-                    e.preventDefault();
-                    setToggleDropdown(!toggleDropdown);
-                }}
-                className={`cursor-pointer flex items-center justify-between py-3 pl-6 pr-5.5 ${
-                    toggleDropdown && "shadow-filter"
-                }`}
+                onClick={() => setOpen(!open)}
+                className="cursor-pointer flex items-center justify-between py-3 px-5 border-b border-gray-100"
             >
-                <p className="text-dark">Category</p>
+                <p className="text-gray-900 font-medium">Category</p>
 
                 <button
-                    aria-label="button for category dropdown"
-                    className={`text-dark ease-out duration-200 ${
-                        toggleDropdown && "rotate-180"
+                    className={`transition-transform text-gray-600 ${
+                        open ? "rotate-180" : ""
                     }`}
                 >
                     <svg
-                        className="fill-current"
-                        width="24"
-                        height="24"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
+                        className="fill-current"
                     >
-                        <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M4.43057 8.51192C4.70014 8.19743 5.17361 8.161 5.48811 8.43057L12 14.0122L18.5119 8.43057C18.8264 8.16101 19.2999 8.19743 19.5695 8.51192C19.839 8.82642 19.8026 9.29989 19.4881 9.56946L12.4881 15.5695C12.2072 15.8102 11.7928 15.8102 11.5119 15.5695L4.51192 9.56946C4.19743 9.29989 4.161 8.82641 4.43057 8.51192Z"
-                        />
+                        <path d="M6.3 9.3L12 15l5.7-5.7"></path>
                     </svg>
                 </button>
             </div>
 
-            <div
-                className={`flex-col gap-3 py-6 pl-6 pr-5.5 ${
-                    toggleDropdown ? "flex" : "hidden"
-                }`}
-            >
-                {categories.map((category) => (
-                    <CategoryItem
-                        key={category.id}
-                        category={category}
-                        selectedId={selectedId}
-                        onSelect={onSelect}
-                    />
-                ))}
-            </div>
+            {/* CONTENT */}
+            {open && (
+                <div className="flex flex-col gap-2 py-4 px-5">
+                    {categories.map((cat) => (
+                        <CategoryItem
+                            key={cat.id}
+                            category={cat}
+                            selectedId={selectedId}
+                            onSelect={onSelect}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

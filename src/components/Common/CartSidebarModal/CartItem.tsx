@@ -5,73 +5,60 @@ import { useCart } from "@/hook/useCart";
 
 const CartItem = ({ item }) => {
     const { updateQuantity, removeItems, loadingMap } = useCart();
-
-    const isLoading = loadingMap[item.bookId] === true;
+    const isLoading = loadingMap[item.bookId];
 
     return (
-        <div className="flex items-start justify-between gap-4 p-3 rounded-lg border border-gray-2 hover:shadow-md transition-all">
+        <div className="flex gap-4 border rounded-xl p-4 hover:shadow-md transition bg-white">
 
-            {/* IMAGE */}
-            <div className="w-[80px] h-[100px] flex-shrink-0 rounded-md overflow-hidden bg-gray-2 shadow-sm">
+            {/* Image */}
+            <div className="w-[78px] h-[100px] bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
                     src={item.cartItemUrl?.[0] || "/images/default-book.png"}
                     alt={item.title}
                     width={100}
                     height={120}
-                    className="object-cover w-full h-full"
+                    className="w-full h-full object-cover"
                 />
             </div>
 
-            {/* CONTENT */}
+            {/* Content */}
             <div className="flex flex-col flex-grow">
-                <h3 className="font-semibold text-dark text-[15px] leading-tight line-clamp-2 mb-1">
-                    {item.title}
-                </h3>
+                <h3 className="text-[15px] font-medium text-gray-800 line-clamp-2 mb-1">{item.title}</h3>
 
-                {/* PRICE */}
-                <p className="text-[14px] text-gray-6 mb-2">
-                    Price:
-                    <span className="font-semibold text-dark ml-1">
-                        {item.unitPriceSnapshot.toLocaleString()} đ
-                    </span>
+                <p className="text-[13px] text-gray-500 mb-2">
+                    Giá:
+                    <span className="font-semibold text-gray-900 ml-1">
+            {item.unitPriceSnapshot.toLocaleString()} đ
+          </span>
                 </p>
 
-                {/* QUANTITY */}
-                <div className="flex items-center gap-2">
+                {/* Quantity */}
+                <div className="flex items-center gap-2 mt-auto">
                     <button
                         disabled={item.quantity <= 1 || isLoading}
                         onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
-                        className={`w-8 h-8 flex items-center justify-center border rounded 
-                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-1 border-gray-3"}
-                        `}
+                        className="w-8 h-8 border rounded-md flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
                     >
                         −
                     </button>
 
-                    <span className="w-8 text-center font-medium">
-                        {isLoading ? "…" : item.quantity}
-                    </span>
+                    <span className="w-8 text-center font-medium">{isLoading ? "…" : item.quantity}</span>
 
                     <button
                         disabled={isLoading}
                         onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
-                        className={`w-8 h-8 flex items-center justify-center border rounded 
-                            ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-1 border-gray-3"}
-                        `}
+                        className="w-8 h-8 border rounded-md flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
                     >
                         +
                     </button>
                 </div>
             </div>
 
-            {/* DELETE */}
+            {/* Remove */}
             <button
                 disabled={isLoading}
                 onClick={() => removeItems([item.bookId])}
-                className={`flex items-center justify-center w-10 h-10 rounded-md 
-                    bg-red-50 border border-red-light-2 text-red-dark hover:bg-red-light hover:border-red-light-3
-                    transition-all ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
-                `}
+                className="w-9 h-9 text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center"
             >
                 <svg
                     className="fill-current"

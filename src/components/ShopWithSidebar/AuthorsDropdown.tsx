@@ -3,79 +3,75 @@
 import React, { useState } from "react";
 
 const AuthorItem = ({ author, selectedId, onSelect }) => {
-    const isSelected = selectedId === author.id;
+    const isSelected = String(selectedId) === String(author.id);
+
+    const handleClick = () => {
+        if (isSelected) {
+            onSelect(""); // bỏ chọn
+        } else {
+            onSelect(author.id); // chọn
+        }
+    };
 
     return (
-        <label
-            className={`cursor-pointer select-none flex items-center rounded-md ${
+        <button
+            onClick={handleClick}
+            className={`
+        px-3.5 py-1.5 text-sm rounded-full border transition-all 
+        ${
                 isSelected
-                    ? "bg-blue text-white"
-                    : "bg-gray-2 text-dark hover:bg-blue hover:text-white"
-            }`}
+                    ? "border-blue-600 text-blue-600 bg-blue-50"
+                    : "border-gray-300 text-gray-700 hover:bg-blue-50 hover:border-blue-400"
+            }
+      `}
         >
-            <input
-                type="radio"
-                name="author"
-                className="sr-only"
-                checked={isSelected}
-                onChange={() => onSelect(author.id)}
-            />
-            <div className="text-custom-sm py-[5px] px-3.5 rounded-[5px]">
-                {author.name}
-            </div>
-        </label>
+            {author.name}
+        </button>
     );
 };
 
+
 const AuthorsDropdown = ({ authors, selectedId, onSelect }) => {
-    const [toggleDropdown, setToggleDropdown] = useState(true);
+    const [open, setOpen] = useState(false);
 
     return (
-        <div className="bg-white shadow-1 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
             {/* HEADER */}
             <div
-                onClick={() => setToggleDropdown(!toggleDropdown)}
-                className={`cursor-pointer flex items-center justify-between py-3 pl-6 pr-5.5 ${
-                    toggleDropdown && "shadow-filter"
-                }`}
+                onClick={() => setOpen(!open)}
+                className="cursor-pointer flex items-center justify-between py-3 px-5 border-b border-gray-100"
             >
-                <p className="text-dark">Authors</p>
+                <p className="text-gray-900 font-medium">Authors</p>
+
                 <button
-                    aria-label="button for size dropdown"
-                    className={`text-dark ease-out duration-200 ${
-                        toggleDropdown && "rotate-180"
+                    className={`text-gray-600 transition-transform ${
+                        open ? "rotate-180" : ""
                     }`}
                 >
                     <svg
-                        className="fill-current"
-                        width="24"
-                        height="24"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
+                        className="fill-current"
                     >
-                        <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M4.43057 8.51192C4.70014 8.19743 5.17361 8.161 5.48811 8.43057L12 14.0122L18.5119 8.43057C18.8264 8.16101 19.2999 8.19743 19.5695 8.51192C19.839 8.82642 19.8026 9.29989 19.4881 9.56946L12.4881 15.5695C12.2072 15.8102 11.7928 15.8102 11.5119 15.5695L4.51192 9.56946C4.19743 9.29989 4.161 8.82641 4.43057 8.51192Z"
-                        />
+                        <path d="M6 9l6 6 6-6" />
                     </svg>
                 </button>
             </div>
 
-            {/* DROPDOWN CONTENT */}
-            <div
-                className={`flex-wrap gap-2.5 p-6 ${
-                    toggleDropdown ? "flex" : "hidden"
-                }`}
-            >
-                {authors.map((author) => (
-                    <AuthorItem
-                        key={author.id}
-                        author={author}
-                        selectedId={selectedId}
-                        onSelect={onSelect}
-                    />
-                ))}
-            </div>
+            {/* TAGS AREA */}
+            {open && (
+                <div className="flex flex-wrap gap-2 px-5 py-4">
+                    {authors.map((author) => (
+                        <AuthorItem
+                            key={author.id}
+                            author={author}
+                            selectedId={selectedId}
+                            onSelect={onSelect}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

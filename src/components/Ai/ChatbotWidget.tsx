@@ -4,16 +4,20 @@ import { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import Chatbot from "./Chatbot";
 import {useAuthContext} from "@/context/AuthContext";
+import {useCartModalContext} from "@/app/context/CartSidebarModalContext";
 
 const ChatbotWidget = () => {
     const [open, setOpen] = useState(false);
     const { user, loading } = useAuthContext();
-
+    const { isCartModalOpen } = useCartModalContext();
     // ⛔ KHÔNG render gì khi chưa sẵn sàng
     if (loading) return null;
 
     // ⭐ User chưa login → Không render chatbot
     if (!user) return null;
+
+    // ➤ Khi giỏ hàng mở → tắt chatbot
+    if (isCartModalOpen) return null;
     return (
         <>
             {/* Floating Button */}
