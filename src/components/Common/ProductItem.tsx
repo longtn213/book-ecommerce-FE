@@ -99,7 +99,7 @@ const ProductItem = ({ item }: { item: Book }) => {
                     }
                     aria-label="wishlist button"
                     className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 bg-white 
-                  ${isWishlisted(item.id) ? "text-red-500" : "text-dark"} 
+                  ${isWishlisted(item.id) ? "text-red-500" : "text-darkCustom-5"} 
                   hover:text-blue duration-200`}
                 >
                     {/* Icon filled nếu đã wishlist */}
@@ -145,7 +145,7 @@ const ProductItem = ({ item }: { item: Book }) => {
             </div>
 
             {/* TITLE */}
-            <h3 className="font-medium text-gray-900 hover:text-blue transition mb-1">
+            <h3 className="font-medium text-gray-900 hover:text-blue-600 transition mb-1">
                 <Link href={`/shop-details/${item.id}`}>{item.title}</Link>
             </h3>
 

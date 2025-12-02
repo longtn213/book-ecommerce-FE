@@ -13,7 +13,7 @@ import { formatReviewDate } from "@/utils/helper";
 const ReviewSection = ({ bookId }: { bookId: number }) => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
-    const sliderRef = useRef(null);
+    const sliderRef = useRef<any>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -27,6 +27,7 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
                     rating: r.rating,
                     createdAt: new Date(r.createdAt),
                 }));
+
                 setReviews(mapped);
             } catch (error) {
                 console.error("Review error:", error);
@@ -42,40 +43,32 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
     const handleNext = () => sliderRef.current?.swiper.slideNext();
 
     return (
-        <section className="overflow-hidden mt-16 pb-10">
+        <section className="mt-20 pb-10">
             <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
 
                 {/* Header */}
                 <div className="mb-8 flex items-center justify-between">
                     <div>
-                        <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
-                            <Image
-                                src="/images/icons/icon-08.svg"
-                                alt="icon"
-                                width={17}
-                                height={17}
-                            />
-                            Đánh giá & Nhận xét
-                        </span>
-                        <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-                            Người dùng nói gì về sách?
+                        <h2 className="font-semibold text-xl xl:text-2xl text-gray-900">
+                            Đánh giá từ người dùng
                         </h2>
+                        <p className="text-gray-600 mt-1 text-sm">
+                            Xem mọi người nói gì về cuốn sách này
+                        </p>
                     </div>
 
+                    {/* Navigation Buttons */}
                     <div className="flex items-center gap-3">
-                        <button onClick={handlePrev} className="
-        w-9 h-9 flex items-center justify-center
-        border border-gray-300
-        rounded-lg bg-white
-        hover:border-blue-500 hover:text-blue-600
-        transition
-    ">
-                            <svg
-                                className="fill-current"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                            >
+                        <button
+                            onClick={handlePrev}
+                            className="
+                                w-10 h-10 flex items-center justify-center
+                                rounded-full border border-gray-300
+                                bg-white shadow-sm
+                                hover:border-blue-500 hover:text-blue-600 transition
+                            "
+                        >
+                            <svg width="22" height="22" viewBox="0 0 24 24">
                                 <path
                                     fillRule="evenodd"
                                     clipRule="evenodd"
@@ -84,19 +77,16 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
                             </svg>
                         </button>
 
-                        <button onClick={handleNext} className="
-        w-9 h-9 flex items-center justify-center
-        border border-gray-300
-        rounded-lg bg-white
-        hover:border-blue-500 hover:text-blue-600
-        transition
-    ">
-                            <svg
-                                className="fill-current"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                            >
+                        <button
+                            onClick={handleNext}
+                            className="
+                                w-10 h-10 flex items-center justify-center
+                                rounded-full border border-gray-300
+                                bg-white shadow-sm
+                                hover:border-blue-500 hover:text-blue-600 transition
+                            "
+                        >
+                            <svg width="22" height="22" viewBox="0 0 24 24">
                                 <path
                                     fillRule="evenodd"
                                     clipRule="evenodd"
@@ -109,7 +99,7 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
 
                 {/* Swiper */}
                 {loading ? (
-                    <p>Đang tải đánh giá...</p>
+                    <p className="text-gray-600">Đang tải đánh giá...</p>
                 ) : reviews.length === 0 ? (
                     <p className="text-gray-500">Chưa có đánh giá nào.</p>
                 ) : (
@@ -123,9 +113,10 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
                             1200: { slidesPerView: 3 },
                         }}
                     >
-                        {reviews.map((review) => (
-                            <SwiperSlide key={review.id}>
-                                <div className="bg-white p-6 rounded-xl shadow">
+                        {reviews.map((review, idx) => (
+                            <SwiperSlide key={idx}>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+
                                     {/* Rating */}
                                     <div className="flex items-center gap-1 mb-3">
                                         {Array.from({ length: 5 }).map((_, i) => (
@@ -140,17 +131,17 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
                                         ))}
                                     </div>
 
-                                    {/* Avatar + User */}
-                                    <div className="flex items-center gap-3 mb-4">
+                                    {/* User Info */}
+                                    <div className="flex items-center gap-4 mb-4">
                                         <Image
                                             src={review.authorImg}
                                             alt="avatar"
-                                            width={45}
-                                            height={45}
-                                            className="rounded-full object-cover"
+                                            width={50}
+                                            height={50}
+                                            className="rounded-full border object-cover"
                                         />
                                         <div>
-                                            <p className="font-semibold text-dark">
+                                            <p className="font-semibold text-gray-900">
                                                 {review.authorName}
                                             </p>
                                             <span className="text-gray-500 text-sm">
@@ -159,8 +150,8 @@ const ReviewSection = ({ bookId }: { bookId: number }) => {
                                         </div>
                                     </div>
 
-                                    {/* Comment */}
-                                    <p className="text-gray-700 leading-relaxed">
+                                    {/* Comment bubble */}
+                                    <p className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-800 leading-relaxed">
                                         {review.comment}
                                     </p>
                                 </div>
