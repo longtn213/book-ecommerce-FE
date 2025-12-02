@@ -41,10 +41,22 @@ export const fetchUserReview = async () => {
     }
 };
 export const createReviewAPI = async (body: {
-    bookId: number;
+    orderItemId: number;
     rating: number;
     comment: string;
 }) => {
-    const res = await axiosInstance.post("/reviews/book", body);
+    const res = await axiosInstance.post("/reviews/order", body);
+    return res.data?.data;
+};
+export const updateReviewAPI = async (body: {
+    reviewId: number;
+    rating: number;
+    comment: string;
+}) => {
+    const res = await axiosInstance.put("/reviews/order", body);
+    return res.data?.data;
+};
+export const deleteReviewAPI = async (reviewId: number) => {
+const res = await axiosInstance.delete(`/reviews/order/${reviewId}`,);
     return res.data?.data;
 };

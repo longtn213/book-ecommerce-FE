@@ -6,6 +6,8 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import { Modal, notification, Pagination } from "antd";
 import { cancelOrderApi, getUserOrders } from "@/services/userService";
 import { OrderStatusDropdown } from "@/components/OrdersUser/OrderStatusDropdown";
+import {router} from "next/client";
+import {useRouter} from "next/navigation";
 
 // ==============================
 // 🔵 STATUS UI MAPPING
@@ -51,7 +53,7 @@ const OrdersList = () => {
 
     const [statusFilter, setStatusFilter] = useState("");
     const [api, contextHolder] = notification.useNotification();
-
+    const  router = useRouter();
     // ==============================
     // 🔵 Fetch Orders
     // ==============================
@@ -59,7 +61,6 @@ const OrdersList = () => {
         try {
             setLoading(true);
             const res = await getUserOrders(statusFilter);
-
             const mapped = res.map((o: any) => ({
                 ...o,
                 createdAt: o.createdAt?.replace("T", " ").slice(0, 19),
@@ -275,15 +276,37 @@ const OrdersList = () => {
                                                 className="rounded object-cover border"
                                             />
 
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-gray-700">{item.bookTitle}</p>
-                                                <p className="text-sm text-gray-500 mt-1">Số lượng: {item.quantity}</p>
-                                                <p className="text-sm text-gray-500">
-                                                    Giá: {item.price.toLocaleString()} đ
-                                                </p>
-                                                <p className="text-sm font-semibold text-gray-700 mt-2">
-                                                    Thành tiền: {item.total.toLocaleString()} đ
-                                                </p>
+                                            <div className="flex-1 flex flex-col justify-between">
+
+                                                {/* INFO */}
+                                                <div>
+                                                    <p className="font-semibold text-gray-700">{item.bookTitle}</p>
+                                                    <p className="text-sm text-gray-500 mt-1">Số lượng: {item.quantity}</p>
+                                                    <p className="text-sm text-gray-500">Giá: {item.price.toLocaleString()} đ</p>
+                                                    <p className="text-sm font-semibold text-gray-700 mt-2">
+                                                        Thành tiền: {item.total.toLocaleString()} đ
+                                                    </p>
+                                                </div>
+
+                                                {/* REVIEW ACTION */}
+                                                {selectedOrder.status === "COMPLETED" && (
+                                                    <div className="mt-3">
+                                                        {!item.reviewed ? (
+                                                            <button
+                                                                onClick={() =>
+                                                                    router.push(`/my-reviews/write/${item.id}`)
+                                                                }
+                                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs hover:bg-blueCustom-dark transition"
+                                                            >
+                                                                Viết đánh giá
+                                                            </button>
+                                                        ) : (
+                                                            <span className="inline-block px-3 py-1 text-xs bg-green-100 text-green-700 border border-green-300 rounded-md">
+                    Đã đánh giá
+                </span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
