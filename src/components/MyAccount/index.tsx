@@ -1,24 +1,17 @@
 // --- FULL CODE MYACCOUNT UI TIKI STYLE ---
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Image from "next/image";
-import Orders from "../Orders";
-import {
-    changePasswordApi,
-    getCurrentUser,
-    updateUserProfile,
-    uploadAvatarApi,
-} from "@/services/userService";
+import {changePasswordApi, getCurrentUser, updateUserProfile, uploadAvatarApi,} from "@/services/userService";
 
-import { notification, DatePicker } from "antd";
+import {DatePicker, notification} from "antd";
 import dayjs from "dayjs";
-import { useAuthContext } from "@/context/AuthContext";
-import { EyeIcon } from "@/utils/helper";
-import { useRouter, useSearchParams } from "next/navigation";
+import {useAuthContext} from "@/context/AuthContext";
+import {EyeIcon} from "@/utils/helper";
+import {useRouter, useSearchParams} from "next/navigation";
 
-const TIKI_BLUE = "#1570EF";
 
 const MyAccount = () => {
     const [activeTab, setActiveTab] = useState("account-details");

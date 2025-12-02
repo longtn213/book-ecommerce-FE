@@ -193,7 +193,7 @@ const Contact = () => {
 
                             {bookTitle && (
                                 <div className="mb-5 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm">
-                                    Bạn đang đặt sách theo yêu cầu: <strong>"{bookTitle}"</strong>
+                                    Bạn đang đặt sách theo yêu cầu: <strong>&#34;{bookTitle}&#34;</strong>
                                 </div>
                             )}
 
