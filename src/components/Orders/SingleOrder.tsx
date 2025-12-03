@@ -61,11 +61,11 @@ export const Actions = ({ orderItem, refreshOrders }: any) => {
         try {
             const res = await cancelOrderApi(orderId);
             api.success({
-                message:res.message || "Hủy đơn hàng thành công!",
+                title:res.message || "Hủy đơn hàng thành công!",
             });
         } catch (e: any) {
             api.error({
-                message: "Hủy đơn thất bại!",
+                title: "Hủy đơn thất bại!",
                 description: e?.response?.data?.message|| "Vui lòng thử lại.",
                 placement: "topRight",
             });

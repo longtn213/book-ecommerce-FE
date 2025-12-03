@@ -55,7 +55,7 @@ const Signin = () => {
 
             if (res.success) {
                 api.success({
-                    message: "Đã gửi email đặt lại mật khẩu",
+                    title: "Đã gửi email đặt lại mật khẩu",
                     description: `Vui lòng kiểm tra hộp thư: ${forgotEmail}`,
                     placement: "topRight",
                 });
@@ -64,14 +64,14 @@ const Signin = () => {
                 setOpenForgot(false);
             } else {
                 api.error({
-                    message: "Gửi thất bại",
+                    title: "Gửi thất bại",
                     description: res.message || "Không thể gửi email",
                     placement: "topRight",
                 });
             }
         } catch (e) {
             api.error({
-                message: "Lỗi máy chủ",
+                title: "Lỗi máy chủ",
                 description: "Không thể gửi email",
                 placement: "topRight",
             });
@@ -106,7 +106,7 @@ const Signin = () => {
                 await login(res.data.token);
 
                 api.success({
-                    message: "Đăng nhập thành công 🎉",
+                    title: "Đăng nhập thành công 🎉",
                     description: `Chào mừng ${res.data.username}!`,
                     placement: "topRight",
                 });
@@ -114,14 +114,14 @@ const Signin = () => {
                 setTimeout(() => router.push("/"), 700);
             } else {
                 api.error({
-                    message: "Đăng nhập thất bại",
+                    title: "Đăng nhập thất bại",
                     description: res.message || "Sai thông tin đăng nhập!",
                     placement: "topRight",
                 });
             }
         } catch (err: any) {
             api.error({
-                message: "Lỗi đăng nhập",
+                title: "Lỗi đăng nhập",
                 description: err.response?.data?.message || "Đã xảy ra lỗi máy chủ",
                 placement: "topRight",
             });
@@ -221,7 +221,7 @@ const Signin = () => {
                             <button
                                 type="button"
                                 onClick={() => setOpenForgot(true)}
-                                className="w-full text-center text-sm text-blue hover:underline mt-2"
+                                className="w-full text-center text-sm text-blue-600 hover:underline mt-2"
                             >
                                 Quên mật khẩu?
                             </button>
@@ -290,7 +290,7 @@ const Signin = () => {
                                 <button
                                     type="submit"
                                     disabled={sending}
-                                    className="flex-1 py-3 rounded-lg bg-blue text-white font-medium hover:bg-blue-600 transition disabled:opacity-60"
+                                    className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blueCustom-dark transition disabled:opacity-60"
                                 >
                                     {sending ? "Đang gửi..." : "Gửi email"}
                                 </button>

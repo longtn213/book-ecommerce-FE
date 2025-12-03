@@ -48,7 +48,7 @@ const Contact = () => {
         e.preventDefault();
 
         if (!form.firstName || !form.lastName) {
-            api.error({ message: "Vui lòng nhập đầy đủ họ và tên" });
+            api.error({ title: "Vui lòng nhập đầy đủ họ và tên" });
             return;
         }
 
@@ -56,7 +56,7 @@ const Contact = () => {
             const res = await sendMessage(form);
 
             api.success({
-                message: res.message || "Gửi yêu cầu thành công!",
+                title: res.message || "Gửi yêu cầu thành công!",
             });
 
             // ⭐ RESET VỀ FORM MẶC ĐỊNH KHÔNG LIÊN QUAN ĐẶT SÁCH
@@ -81,7 +81,7 @@ const Contact = () => {
             router.replace("/contact", { scroll: false });
 
         } catch (err: any) {
-            api.error({ message: err.message || "Gửi tin nhắn thất bại!" });
+            api.error({ title: err.message || "Gửi tin nhắn thất bại!" });
         }
     };
 

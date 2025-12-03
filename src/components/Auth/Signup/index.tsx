@@ -92,7 +92,7 @@ const Signup = () => {
                 await login(res.data.token);
 
                 api.success({
-                    message: "Đăng ký thành công 🎉",
+                    title: "Đăng ký thành công 🎉",
                     description: "Bạn đã được đăng nhập tự động!",
                     placement: "topRight",
                 });
@@ -100,14 +100,14 @@ const Signup = () => {
                 setTimeout(() => router.push("/"), 800);
             } else {
                 api.error({
-                    message: "Đăng ký thất bại",
+                    title: "Đăng ký thất bại",
                     description: res.message || "Vui lòng thử lại.",
                     placement: "topRight",
                 });
             }
         } catch (err: any) {
             api.error({
-                message: "Lỗi máy chủ",
+                title: "Lỗi máy chủ",
                 description: err.response?.data?.message || "Đã xảy ra lỗi!",
                 placement: "topRight",
             });

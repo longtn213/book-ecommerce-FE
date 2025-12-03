@@ -66,7 +66,7 @@ const MyAccount = () => {
                 }
             } catch (err) {
                 api.error({
-                    message: "Không thể tải thông tin tài khoản",
+                    title: "Không thể tải thông tin tài khoản",
                 });
             }
         }
@@ -105,13 +105,13 @@ const MyAccount = () => {
             });
 
             api.success({
-                message: "Cập nhật thành công!",
+                title: "Cập nhật thành công!",
             });
 
             setUser((prev: any) => ({ ...prev, ...formData }));
         } catch (err: any) {
             api.error({
-                message: "Cập nhật thất bại",
+                title: "Cập nhật thất bại",
                 description: err?.response?.data?.message,
             });
         }
@@ -156,13 +156,13 @@ const MyAccount = () => {
             });
 
             api.success({
-                message: "Đổi mật khẩu thành công",
+                title: "Đổi mật khẩu thành công",
             });
 
             logout();
         } catch (err: any) {
             api.error({
-                message: "Đổi mật khẩu thất bại",
+                title: "Đổi mật khẩu thất bại",
             });
 
             setPasswordErrors({

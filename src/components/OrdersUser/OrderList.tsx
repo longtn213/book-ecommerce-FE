@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import { Modal, notification, Pagination } from "antd";
+import {Modal, notification, Pagination, Popconfirm} from "antd";
 import { cancelOrderApi, getUserOrders } from "@/services/userService";
 import { OrderStatusDropdown } from "@/components/OrdersUser/OrderStatusDropdown";
 import {router} from "next/client";
@@ -83,11 +83,11 @@ const OrdersList = () => {
     const handleCancel = async (id: number) => {
         try {
             const res = await cancelOrderApi(id);
-            api.success({ message: "Hủy đơn hàng thành công!", description: res.message });
+            api.success({ title: "Hủy đơn hàng thành công!", description: res.message });
             fetchOrders();
         } catch (e: any) {
             api.error({
-                message: "Hủy đơn thất bại!",
+                title: "Hủy đơn thất bại!",
                 description: e?.response?.data?.message,
             });
         }
@@ -219,6 +219,7 @@ const OrdersList = () => {
                 onCancel={() => setDetailModalOpen(false)}
                 footer={null}
                 centered
+                style={{ top: 60 }}
                 width={650}
             >
                 {selectedOrder && (
@@ -317,12 +318,31 @@ const OrdersList = () => {
                         {/* FOOTER */}
                         {selectedOrder.status === "PENDING" && (
                             <div className="bg-gray-50 px-6 py-4 border-t flex justify-end">
-                                <button
-                                    onClick={() => handleCancel(selectedOrder.id)}
-                                    className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                                <Popconfirm
+                                    title="Xác nhận hủy đơn hàng"
+                                    description="Hành động này không thể hoàn tác."
+                                    okText="Đồng ý"
+                                    cancelText="Không"
+                                    placement="topRight"
+                                    okButtonProps={{
+                                        className:
+                                            "bg-blue-500 text-white rounded-md px-4 py-1 hover:!bg-blue-600 focus:!bg-blue-600 active:!bg-blue-700 border-none shadow-none"
+                                    }}
+                                    cancelButtonProps={{
+                                        className:
+                                            "rounded-md px-4 py-1 hover:!bg-gray-100"
+                                    }}
+                                    onConfirm={async () => {
+                                        await handleCancel(selectedOrder.id);
+                                        setDetailModalOpen(false);
+                                    }}
                                 >
-                                    Hủy đơn hàng
-                                </button>
+                                    <button
+                                        className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                                    >
+                                        Hủy đơn hàng
+                                    </button>
+                                </Popconfirm>
                             </div>
                         )}
                     </div>

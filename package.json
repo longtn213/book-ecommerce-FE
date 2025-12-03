@@ -16,7 +16,7 @@
     "@mui/material": "^7.3.5",
     "@reduxjs/toolkit": "^2.6.1",
     "@stomp/stompjs": "^7.2.1",
-    "antd": "^5.28.1",
+    "antd": "^6.0.1",
     "autoprefixer": "10.4.15",
     "axios": "^1.13.2",
     "canvas-confetti": "^1.9.4",

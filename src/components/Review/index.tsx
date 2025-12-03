@@ -53,12 +53,12 @@ export const MyReview = () => {
     const submitUpdate = async () => {
         try {
             await updateReviewAPI(editData);
-            api.success({ message: "Cập nhật review thành công!" });
+            api.success({ title: "Cập nhật review thành công!" });
 
             setEditOpen(false);
             await loadReviews();
         } catch (err) {
-            api.error({ message: "Lỗi cập nhật review!" });
+            api.error({ title: "Lỗi cập nhật review!" });
         }
     };
 
@@ -73,11 +73,11 @@ export const MyReview = () => {
         if (!deleteId) return;
         try {
             await deleteReviewAPI(deleteId);
-            api.success({ message: "Xóa review thành công!" });
+            api.success({ title: "Xóa review thành công!" });
             setDeleteOpen(false);
             loadReviews();
         } catch (err) {
-            api.error({ message: "Không thể xoá review!" });
+            api.error({ title: "Không thể xoá review!" });
         }
     };
 

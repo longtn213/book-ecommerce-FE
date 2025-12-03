@@ -22,13 +22,13 @@ export default function WriteReviewPage() {
             await createReviewAPI({ orderItemId, rating, comment });
 
             api.success({
-                message: "Gửi đánh giá thành công!",
+                title: "Gửi đánh giá thành công!",
             });
 
             router.push("/my-reviews");
         } catch (err: any) {
             api.error({
-                message: "Không thể gửi đánh giá!",
+                title: "Không thể gửi đánh giá!",
                 description: err?.response?.data?.message || "",
             });
         }
