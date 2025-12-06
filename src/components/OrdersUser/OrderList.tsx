@@ -13,6 +13,7 @@ import {useRouter} from "next/navigation";
 // ==============================
 const STATUS_LABEL: Record<string, string> = {
     PENDING: "Chờ xác nhận",
+    PENDING_PAYMENT: "Chờ xác nhận thanh toán",
     PAID: "Đã thanh toán",
     SHIPPING: "Đang giao hàng",
     COMPLETED: "Hoàn tất",
@@ -21,6 +22,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_STYLES: Record<string, string> = {
     PENDING: "text-yellow-600 border-yellow-400 bg-yellow-50",
+    PENDING_PAYMENT: "text-purple-600 border-purple-400 bg-purple-50", // ⭐ MỚI
     PAID: "text-blue-600 border-blue-400 bg-blue-50",
     SHIPPING: "text-orange-600 border-orange-400 bg-orange-50",
     COMPLETED: "text-green-600 border-green-400 bg-green-50",
@@ -182,7 +184,7 @@ const OrdersList = () => {
                                                 Xem chi tiết
                                             </button>
 
-                                            {order.status === "PENDING" && (
+                                            {(order.status === "PENDING" || order.status === "PENDING_PAYMENT") && (
                                                 <button
                                                     onClick={() => {
                                                         setOrderToCancel(order.id);
@@ -315,7 +317,7 @@ const OrdersList = () => {
                         </div>
 
                         {/* FOOTER */}
-                        {selectedOrder.status === "PENDING" && (
+                        {(selectedOrder.status === "PENDING" || selectedOrder.status === "PENDING_PAYMENT") && (
                             <div className="bg-gray-50 px-6 py-4 border-t flex justify-end">
                                 <Popconfirm
                                     title="Xác nhận hủy đơn hàng"
