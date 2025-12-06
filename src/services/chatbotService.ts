@@ -27,3 +27,8 @@ export async function sendChatFeedback(
         comment,
     });
 }
+
+export const getAiRecommend = async () => {
+    const res = await axiosInstance.get(`/ai/recommend`);
+    return res.data.data;
+};

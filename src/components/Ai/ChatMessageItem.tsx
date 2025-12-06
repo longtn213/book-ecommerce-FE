@@ -25,7 +25,6 @@ const ChatMessageItem = ({ message, onFeedback }: Props) => {
                 <p className="whitespace-pre-line break-words">{message.content}</p>
 
                 {/* GỢI Ý SÁCH */}
-                {/* GỢI Ý SÁCH */}
                 {message.books && message.books.length > 0 && (
                     <div className="mt-3 space-y-4">
 

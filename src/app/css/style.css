@@ -338,3 +338,12 @@ input[type='search']::-webkit-search-results-decoration {
 .pass-eye-btn {
     @apply absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black cursor-pointer;
 }
+/* Hide scrollbar - Chrome, Edge, Safari */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar - Firefox */
+.scrollbar-hide {
+    scrollbar-width: none;
+}

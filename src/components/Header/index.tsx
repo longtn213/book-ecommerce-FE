@@ -342,17 +342,6 @@ const Header = () => {
                                                     <button
                                                         onClick={() => {
                                                             setActiveDropdown(null);
-                                                            router.push("/my-account?tab=orders");
-                                                        }}
-                                                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-                                                    >
-                                                        <span className="text-lg">🛒</span>
-                                                        <span className="text-sm">Đơn hàng của tôi</span>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => {
-                                                            setActiveDropdown(null);
                                                             logout()
                                                             router.push("/signin");
                                                         }}

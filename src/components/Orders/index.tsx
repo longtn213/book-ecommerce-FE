@@ -42,11 +42,10 @@ const Orders = () => {
         {
             title: "Mã đơn",
             dataIndex: "orderCode",
-            width: 110,
             render: (code: string) => (
-                <span className="font-semibold text-blue-dark">
-                    #{code.slice(-7)}
-                </span>
+                <span className="font-semibold text-blue-dark whitespace-nowrap">
+            #{code}
+        </span>
             ),
         },
         {

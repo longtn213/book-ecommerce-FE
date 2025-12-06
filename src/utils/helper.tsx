@@ -110,3 +110,9 @@ export const normalizeToBook = (item: any): Book => ({
     reviewCount: 0,
     inDatabase: item.inDatabase,
 });
+
+export function generateOrderCode() {
+    const time = Date.now();
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `ORD-${time}-${random}`;
+}

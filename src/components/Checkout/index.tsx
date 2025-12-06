@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import { clearCoupon } from "@/redux/features/couponSlice";
 import Discount from "../Cart/Discount";
 import FreeShipProgress from "@/components/Common/FreeShipProgress";
-import { BASE_SHIP_FEE, FREESHIP_MIN_AMOUNT } from "@/utils/helper";
+import {BASE_SHIP_FEE, FREESHIP_MIN_AMOUNT, generateOrderCode} from "@/utils/helper";
 import confetti from "canvas-confetti";
 
 const Checkout = () => {
@@ -35,12 +35,14 @@ const Checkout = () => {
     const [shippingAddressError, setShippingAddressError] = useState("");
 
     const [openSuccess, setOpenSuccess] = useState(false);
-    const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
+    const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
     // FreeShip logic
     const isFreeShip = totalAmount >= FREESHIP_MIN_AMOUNT;
     const shippingFee = isFreeShip ? 0 : BASE_SHIP_FEE;
     const finalTotal = totalAmount - (discountAmount || 0) + shippingFee;
+    const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
+    const orderCode = generateOrderCode();
 
     const fireConfetti = () => {
         confetti({
@@ -64,6 +66,7 @@ const Checkout = () => {
 
         try {
             const body = {
+                orderCode,
                 shippingAddress,
                 items: cartItems.map((item) => ({
                     bookId: item.bookId,
@@ -71,6 +74,7 @@ const Checkout = () => {
                 })),
                 couponCode: couponCodeApplied || "",
                 note: note || "",
+                paymentMethod,
             };
 
             const res = await checkout(body);
@@ -78,7 +82,7 @@ const Checkout = () => {
             await clearCart();
             dispatch(clearCoupon());
 
-            setCreatedOrderId(res.orderCode);
+            setCreatedOrderId(orderCode);
             setShippingAddress("");
             setNote("");
             setOpenSuccess(true);
@@ -154,6 +158,62 @@ const Checkout = () => {
                                 <p className="text-sm text-red-600 mt-2">{shippingAddressError}</p>
                             )}
                         </div>
+                        {/* PAYMENT METHOD */}
+                        <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4">Phương thức thanh toán</h3>
+
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="COD"
+                                        checked={paymentMethod === "COD"}
+                                        onChange={() => setPaymentMethod("COD")}
+                                    />
+                                    <span>Thanh toán khi nhận hàng (COD)</span>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="ONLINE"
+                                        checked={paymentMethod === "ONLINE"}
+                                        onChange={() => setPaymentMethod("ONLINE")}
+                                    />
+                                    <span>Thanh toán Online (chuyển khoản)</span>
+                                </label>
+                            </div>
+                        </div>
+                        {paymentMethod === "ONLINE" && (
+                            <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
+                                <h3 className="text-lg font-semibold mb-4 text-green-600">Thanh toán qua QR</h3>
+
+                                {/* QR code cho chuyển khoản */}
+                                <div className="flex flex-col items-center">
+                                    <img
+                                        src={`https://img.vietqr.io/image/BIDV-4800677847-compact.png?amount=${finalTotal}&addInfo=${orderCode}`}
+                                        alt="QR Code thanh toán"
+                                        className="w-56 h-56 rounded-lg border shadow"
+                                    />
+
+                                    <p className="text-gray-600 mt-3 text-sm">
+                                        Quét mã để thanh toán đúng với nội dung:
+                                    </p>
+                                    <p className="font-semibold text-blue-600 text-lg"> {orderCode} </p>
+
+                                    <p className="text-sm mt-3 text-gray-500">
+                                        Số tiền: <strong>{finalTotal.toLocaleString()}đ</strong>
+                                    </p>
+
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        *Sau khi thanh toán thành công, đơn hàng sẽ tự động được xác nhận.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
 
                         {/* NOTE */}
                         <div className="bg-white rounded-xl shadow p-6 border border-gray-200">

@@ -144,7 +144,7 @@ const OrdersList = () => {
                                             <p className="text-sm text-gray-600">
                                                 Mã đơn:{" "}
                                                 <span className="font-semibold text-blue-600">
-                          #{order.orderCode.slice(-7)}
+                          #{order.orderCode}
                         </span>
                                             </p>
                                             <p className="text-xs text-gray-400 mt-1">

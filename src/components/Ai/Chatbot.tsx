@@ -2,10 +2,11 @@
 
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { ChatMessage } from "@/types/chatbot";
-import { chatWithAI, sendChatFeedback } from "@/services/chatbotService";
+import {chatWithAI, getAiRecommend, sendChatFeedback} from "@/services/chatbotService";
 import ChatMessageItem from "./ChatMessageItem";
 import { Loader2, SendHorizonal } from "lucide-react";
 import { normalizeToBook } from "@/utils/helper";
+import ChatbotRecommendList from "@/components/Ai/ChatbotRecommendList";
 
 interface ChatbotProps {
     variant?: "widget" | "full";
@@ -96,6 +97,27 @@ const Chatbot = ({ variant = "full", onClose }: ChatbotProps) => {
             setShowRatingModal(true);
         }
     };
+    const [systemRecommendMsg, setSystemRecommendMsg] = useState<ChatMessage | null>(null);
+
+    useEffect(() => {
+        fetchRecommendBooks();
+    }, []);
+
+    const fetchRecommendBooks = async () => {
+        try {
+            const books = await getAiRecommend();  // Trả ra đúng list Book
+
+            setSystemRecommendMsg({
+                id: "system-recommend",
+                role: "assistant",
+                content: "📚 Gợi ý dành riêng cho bạn",
+                books, // GIỮ NGUYÊN KHÔNG CHUYỂN ĐỔI
+            });
+        } catch (e) {
+            console.error("Recommend fetch error:", e);
+        }
+    };
+
 
     // 🎨 STYLE
     const containerClass =
@@ -150,6 +172,15 @@ const Chatbot = ({ variant = "full", onClose }: ChatbotProps) => {
                     ref={scrollRef}
                     className={`flex-1 overflow-y-auto px-4 py-4 bg-gray-50 space-y-3 ${chatBoxHeight}`}
                 >
+                    {systemRecommendMsg && (
+                        <div className="px-4">
+                            <ChatbotRecommendList
+                                books={systemRecommendMsg.books}
+                                onClose={onClose}   // truyền prop xuống
+                            />
+                        </div>
+                    )}
+
                     {messages.map((m) => (
                         <ChatMessageItem
                             key={m.id}

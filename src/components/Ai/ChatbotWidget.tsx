@@ -65,7 +65,11 @@ const ChatbotWidget = () => {
 
                 {/* Content */}
                 <div className="h-[480px] overflow-hidden rounded-b-2xl bg-gray-50">
-                    <Chatbot variant="widget" />
+                    <Chatbot
+                        variant="widget"
+                        onClose={() => setOpen(false)}
+                    />
+
                 </div>
             </div>
         </>
