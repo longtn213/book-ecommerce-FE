@@ -347,3 +347,46 @@ input[type='search']::-webkit-search-results-decoration {
 .scrollbar-hide {
     scrollbar-width: none;
 }
+
+/* ===============================
+   PAY AGAIN QR MODAL
+================================ */
+.payagain-modal {
+    top: 0;
+}
+
+/* content */
+.payagain-content {
+    text-align: center;
+    padding: 16px;
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+    .payagain-modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .payagain-modal .ant-modal-content {
+        border-radius: 16px 16px 0 0;
+        margin-top: 72px; /* chiều cao header */
+        min-height: calc(100vh - 72px);
+        overflow-y: auto;
+    }
+
+    .payagain-content canvas {
+        width: 200px !important;
+        height: 200px !important;
+    }
+}
+
+/* DESKTOP */
+@media (min-width: 641px) {
+    .payagain-modal {
+        top: 80px;
+    }
+}
+

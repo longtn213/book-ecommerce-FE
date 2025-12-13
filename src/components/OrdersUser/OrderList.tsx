@@ -7,6 +7,9 @@ import {Modal, notification, Pagination, Popconfirm} from "antd";
 import {cancelOrderApi, getUserOrders} from "@/services/userService";
 import {OrderStatusDropdown} from "@/components/OrdersUser/OrderStatusDropdown";
 import {useRouter} from "next/navigation";
+import QRCode from "qrcode";
+import { QRCodeCanvas } from "qrcode.react";
+import {getOrderId, payAgain} from "@/services/orderService";
 
 // ==============================
 // 🔵 STATUS UI MAPPING
@@ -55,6 +58,12 @@ const OrdersList = () => {
     const [statusFilter, setStatusFilter] = useState("");
     const [api, contextHolder] = notification.useNotification();
     const  router = useRouter();
+    const [payAgainModalOpen, setPayAgainModalOpen] = useState(false);
+    const [payAgainQr, setPayAgainQr] = useState<string | null>(null);
+    const [payAgainOrder, setPayAgainOrder] = useState<any>(null);
+    const [payAgainQrImg, setPayAgainQrImg] = useState<string | null>(null);
+    const [payAgainLoading, setPayAgainLoading] = useState(false);
+
     // ==============================
     // 🔵 Fetch Orders
     // ==============================
@@ -77,6 +86,73 @@ const OrdersList = () => {
     useEffect(() => {
         fetchOrders();
     }, [statusFilter]);
+
+    const handlePayAgain = async (order: any) => {
+        try {
+            setPayAgainLoading(true);
+
+            const res = await payAgain(order.id);
+            console.log("PayAgain response:", res);
+
+            // ✅ PHẢI await
+            const qrImg = QRCode.toDataURL(res.qrCode, {
+                width: 300,
+                margin: 2,
+            });
+
+            setPayAgainOrder(res.orderDto ?? order);
+            setPayAgainQr(res.qrCode);
+            setPayAgainQrImg(qrImg);
+            setPayAgainModalOpen(true);
+        } catch (e: any) {
+            api.error({
+                title: "Không thể thanh toán lại",
+                description: e?.response?.data?.message || "Vui lòng thử lại",
+            });
+        } finally {
+            setPayAgainLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!payAgainOrder || !payAgainModalOpen) return;
+
+        let retry = 0;
+
+        const interval = setInterval(async () => {
+            try {
+                retry++;
+
+                const updated = await getOrderId(payAgainOrder.id);
+
+                console.log("Polling order status:", updated.status);
+
+                if (updated.status === "PAID") {
+                    clearInterval(interval);
+
+                    setPayAgainModalOpen(false);
+                    setPayAgainOrder(null);
+                    setPayAgainQr(null);
+
+                    await fetchOrders(); // 🔥 reload list
+
+                    api.success({
+                        title: "Thanh toán thành công 🎉",
+                        description: "Đơn hàng đã được xác nhận",
+                    });
+                }
+
+                // ⛔ timeout an toàn
+                if (retry >= 40) {
+                    clearInterval(interval);
+                }
+            } catch (err) {
+                console.error("Polling error", err);
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [payAgainOrder, payAgainModalOpen]);
 
     // ==============================
     // 🔵 Cancel Order Handler
@@ -195,6 +271,17 @@ const OrdersList = () => {
                                                     Hủy đơn
                                                 </button>
                                             )}
+                                            {order.status === "PENDING_PAYMENT" && (
+                                                <button
+                                                    disabled={payAgainLoading}
+                                                    onClick={() => handlePayAgain(order)}
+                                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition"
+                                                >
+                                                    {payAgainLoading ? "Đang tạo QR..." : "Thanh toán lại"}
+                                                </button>
+
+                                            )}
+
                                         </div>
                                     </div>
                                 </div>
@@ -239,23 +326,25 @@ const OrdersList = () => {
                         </div>
 
                         {/* BODY */}
+                        {/* BODY */}
                         <div className="px-6 py-5 space-y-6">
-                            {/* STATUS */}
-                            <div>
-                                <h3 className="text-sm font-semibold text-gray-700 mb-1">
-                                    Trạng thái đơn hàng
-                                </h3>
-                                <Badge status={selectedOrder.status} />
-                            </div>
 
-                            {/* TOTAL */}
-                            <div>
-                                <h3 className="text-sm font-semibold text-gray-700 mb-1">
-                                    Tổng tiền
-                                </h3>
-                                <p className="text-lg font-bold text-red-600">
-                                    {selectedOrder.totalAmount.toLocaleString()} đ
-                                </p>
+                            {/* STATUS + TOTAL CARD */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border bg-gray-50">
+
+                                {/* STATUS */}
+                                <div>
+                                    <p className="text-xs text-gray-500 mb-1">Trạng thái đơn hàng</p>
+                                    <Badge status={selectedOrder.status} />
+                                </div>
+
+                                {/* TOTAL */}
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-500 mb-1">Tổng tiền</p>
+                                    <p className="text-xl font-bold text-red-600">
+                                        {selectedOrder.totalAmount.toLocaleString()} đ
+                                    </p>
+                                </div>
                             </div>
 
                             {/* ITEMS */}
@@ -264,33 +353,37 @@ const OrdersList = () => {
                                     Sản phẩm ({selectedOrder.items.length})
                                 </h3>
 
-                                <div className="space-y-4 overflow-y-auto pr-2" style={{ maxHeight: "200px" }}>
+                                <div
+                                    className="space-y-4 overflow-y-auto pr-2"
+                                    style={{ maxHeight: "240px" }}
+                                >
                                     {selectedOrder.items.map((item: any) => (
                                         <div
                                             key={item.id}
-                                            className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow transition"
+                                            className="flex gap-4 p-4 border border-gray-200 rounded-xl hover:shadow transition"
                                         >
                                             <Image
                                                 src={item.images?.[0] || "/images/book-default.jpg"}
-                                                width={70}
-                                                height={70}
+                                                width={80}
+                                                height={80}
                                                 alt="product"
-                                                className="rounded object-cover border"
+                                                className="rounded-lg object-cover border"
                                             />
 
-                                            <div className="flex-1 flex flex-col justify-between">
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-800">
+                                                    {item.bookTitle}
+                                                </p>
 
-                                                {/* INFO */}
-                                                <div>
-                                                    <p className="font-semibold text-gray-700">{item.bookTitle}</p>
-                                                    <p className="text-sm text-gray-500 mt-1">Số lượng: {item.quantity}</p>
-                                                    <p className="text-sm text-gray-500">Giá: {item.price.toLocaleString()} đ</p>
-                                                    <p className="text-sm font-semibold text-gray-700 mt-2">
+                                                <div className="mt-1 text-sm text-gray-500 space-y-1">
+                                                    <p>Số lượng: {item.quantity}</p>
+                                                    <p>Giá: {item.price.toLocaleString()} đ</p>
+                                                    <p className="font-semibold text-gray-700">
                                                         Thành tiền: {item.total.toLocaleString()} đ
                                                     </p>
                                                 </div>
 
-                                                {/* REVIEW ACTION */}
+                                                {/* REVIEW */}
                                                 {selectedOrder.status === "COMPLETED" && (
                                                     <div className="mt-3">
                                                         {!item.reviewed ? (
@@ -298,14 +391,14 @@ const OrdersList = () => {
                                                                 onClick={() =>
                                                                     router.push(`/my-reviews/write/${item.id}`)
                                                                 }
-                                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs hover:bg-blueCustom-dark transition"
+                                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 transition"
                                                             >
                                                                 Viết đánh giá
                                                             </button>
                                                         ) : (
                                                             <span className="inline-block px-3 py-1 text-xs bg-green-100 text-green-700 border border-green-300 rounded-md">
                     Đã đánh giá
-                </span>
+                  </span>
                                                         )}
                                                     </div>
                                                 )}
@@ -317,33 +410,37 @@ const OrdersList = () => {
                         </div>
 
                         {/* FOOTER */}
-                        {(selectedOrder.status === "PENDING" || selectedOrder.status === "PENDING_PAYMENT") && (
-                            <div className="bg-gray-50 px-6 py-4 border-t flex justify-end">
+                        {(selectedOrder.status === "PENDING" ||
+                            selectedOrder.status === "PENDING_PAYMENT") && (
+                            <div className="bg-gray-50 px-6 py-4 border-t flex flex-col sm:flex-row sm:justify-end gap-3">
+
                                 <Popconfirm
                                     title="Xác nhận hủy đơn hàng"
                                     description="Hành động này không thể hoàn tác."
                                     okText="Đồng ý"
                                     cancelText="Không"
                                     placement="topRight"
-                                    okButtonProps={{
-                                        className:
-                                            "bg-blue-500 text-white rounded-md px-4 py-1 hover:!bg-blue-600 focus:!bg-blue-600 active:!bg-blue-700 border-none shadow-none"
-                                    }}
-                                    cancelButtonProps={{
-                                        className:
-                                            "rounded-md px-4 py-1 hover:!bg-gray-100"
-                                    }}
                                     onConfirm={async () => {
                                         await handleCancel(selectedOrder.id);
                                         setDetailModalOpen(false);
                                     }}
                                 >
-                                    <button
-                                        className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
-                                    >
+                                    <button className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">
                                         Hủy đơn hàng
                                     </button>
                                 </Popconfirm>
+
+                                {selectedOrder.status === "PENDING_PAYMENT" && (
+                                    <button
+                                        onClick={() => {
+                                            setDetailModalOpen(false);
+                                            handlePayAgain(selectedOrder);
+                                        }}
+                                        className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-semibold"
+                                    >
+                                        Thanh toán lại
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -389,6 +486,44 @@ const OrdersList = () => {
                     </div>
                 </div>
             </Modal>
+            <Modal
+                open={payAgainModalOpen}
+                onCancel={() => setPayAgainModalOpen(false)}
+                footer={null}
+                centered={false}
+                className="payagain-modal"
+                width={420}
+                style={{ top: 200 }}
+            >
+                {payAgainOrder && payAgainQr && (
+                    <div className="payagain-content">
+                        <QRCodeCanvas
+                            value={payAgainQr}
+                            size={240}
+                            bgColor="#ffffff"
+                            fgColor="#000000"
+                            level="M"
+                            includeMargin
+                        />
+
+                        <p className="mt-3 text-sm text-gray-600">
+                            Quét mã QR để thanh toán
+                        </p>
+
+                        <p className="mt-2 font-semibold text-blue-600">
+                            {payAgainOrder.orderCode}
+                        </p>
+
+                        <p className="mt-1 text-gray-700">
+                            Số tiền:{" "}
+                            <span className="font-bold text-red-600">
+          {payAgainOrder.totalAmount.toLocaleString()} đ
+        </span>
+                        </p>
+                    </div>
+                )}
+            </Modal>
+
         </>
     );
 };

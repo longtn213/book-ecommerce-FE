@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hook/useCart";
-import { checkout } from "@/services/orderService";
+import {checkout, getOrderId} from "@/services/orderService";
 import { useAuthContext } from "@/context/AuthContext";
 import { useDispatch } from "react-redux";
 import { clearCoupon } from "@/redux/features/couponSlice";
@@ -13,6 +13,8 @@ import Discount from "../Cart/Discount";
 import FreeShipProgress from "@/components/Common/FreeShipProgress";
 import {BASE_SHIP_FEE, FREESHIP_MIN_AMOUNT, generateOrderCode} from "@/utils/helper";
 import confetti from "canvas-confetti";
+import QRCode from "qrcode";
+import Image from "next/image";
 
 const Checkout = () => {
     const router = useRouter();
@@ -20,6 +22,8 @@ const Checkout = () => {
 
     const cartItems = useAppSelector((state) => state.cartReducer.items);
     const totalAmount = useAppSelector((state) => state.cartReducer.totalAmount);
+    const [qrRaw, setQrRaw] = useState<string | null>(null);
+    const [qrImage, setQrImage] = useState<string | null>(null);
 
     const {
         code: couponCodeApplied,
@@ -43,6 +47,7 @@ const Checkout = () => {
     const finalTotal = totalAmount - (discountAmount || 0) + shippingFee;
     const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD");
     const orderCode = generateOrderCode();
+    const [orderInfo, setOrderInfo] = useState<any>(null);
 
     const fireConfetti = () => {
         confetti({
@@ -55,14 +60,10 @@ const Checkout = () => {
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        let hasError = false;
-
         if (!shippingAddress.trim()) {
             setShippingAddressError("Vui lòng nhập địa chỉ giao hàng");
-            hasError = true;
+            return;
         }
-
-        if (hasError) return;
 
         try {
             const body = {
@@ -79,24 +80,73 @@ const Checkout = () => {
 
             const res = await checkout(body);
 
+            // ===============================
+            // 🟣 1) CASE ONLINE PAYMENT (PAYOS)
+            // ===============================
+            if (paymentMethod === "ONLINE") {
+                const emv = res.qrCode;
+
+                if (!emv) {
+                    alert("Không nhận được mã QR từ PayOS");
+                    return;
+                }
+
+                await clearCart();
+                dispatch(clearCoupon());
+                setQrRaw(emv);
+                setOrderInfo(res.orderDto);
+
+                // Convert EMV → QR Image
+                const qrImg = await QRCode.toDataURL(emv);
+                setQrImage(qrImg);
+
+                return; // NGỪNG các logic khác
+            }
+
+            // ===============================
+            // 🟢 2) CASE COD (giữ logic cũ)
+            // ===============================
             await clearCart();
             dispatch(clearCoupon());
 
             setCreatedOrderId(orderCode);
-            setShippingAddress("");
-            setNote("");
             setOpenSuccess(true);
-
             fireConfetti();
 
-            setTimeout(() => {
-                router.push("/my-orders");
-            }, 2800);
+            setTimeout(() => router.push("/my-orders"), 2000);
 
         } catch (error) {
             console.error(error);
         }
     };
+    useEffect(() => {
+        if (!orderInfo) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await getOrderId(orderInfo.id)
+                console.log("res", res)
+
+                // Nếu đơn đã thanh toán
+                if (res.status === "PAID") {
+                    clearInterval(interval);
+                    router.push("/my-orders");
+                }
+
+                // Nếu đơn hết hạn / bị huỷ
+                if (res.status === "CANCELLED") {
+                    clearInterval(interval);
+                    alert("Mã QR đã hết hạn hoặc đơn hàng bị hủy. Vui lòng đặt lại.");
+                }
+
+            } catch (err) {
+                console.error("Polling error:", err);
+            }
+        }, 3000); // CHECK MỖI 3 GIÂY
+
+        return () => clearInterval(interval);
+    }, [orderInfo]);
+
 
     // Nếu user chưa login
     if (!user) {
@@ -186,34 +236,6 @@ const Checkout = () => {
                                 </label>
                             </div>
                         </div>
-                        {paymentMethod === "ONLINE" && (
-                            <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
-                                <h3 className="text-lg font-semibold mb-4 text-green-600">Thanh toán qua QR</h3>
-
-                                {/* QR code cho chuyển khoản */}
-                                <div className="flex flex-col items-center">
-                                    <img
-                                        src={`https://img.vietqr.io/image/BIDV-4800677847-compact.png?amount=${finalTotal}&addInfo=${orderCode}`}
-                                        alt="QR Code thanh toán"
-                                        className="w-56 h-56 rounded-lg border shadow"
-                                    />
-
-                                    <p className="text-gray-600 mt-3 text-sm">
-                                        Quét mã để thanh toán đúng với nội dung:
-                                    </p>
-                                    <p className="font-semibold text-blue-600 text-lg"> {orderCode} </p>
-
-                                    <p className="text-sm mt-3 text-gray-500">
-                                        Số tiền: <strong>{finalTotal.toLocaleString()}đ</strong>
-                                    </p>
-
-                                    <p className="text-xs text-gray-400 mt-2">
-                                        *Sau khi thanh toán thành công, đơn hàng sẽ tự động được xác nhận.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
 
                         {/* NOTE */}
                         <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
@@ -249,6 +271,7 @@ const Checkout = () => {
 
                     {/* RIGHT – ORDER SUMMARY */}
                     <div className="space-y-6">
+                        {!qrImage && (
                         <div className="bg-white rounded-xl shadow p-6 border border-gray-200">
                             <h3 className="text-lg font-semibold pb-4 border-b">Đơn hàng của bạn</h3>
 
@@ -287,13 +310,45 @@ const Checkout = () => {
                                 </p>
                             </div>
 
-                            <button
-                                onClick={handlePlaceOrder}
-                                className="w-full mt-6 py-3 bg-blue-600 text-white text-lg rounded-lg font-medium hover:bg-blueCustom-dark transition"
-                            >
-                                Đặt hàng
-                            </button>
+                            {!qrImage && (
+                                <button
+                                    onClick={handlePlaceOrder}
+                                    className="w-full mt-6 py-3 bg-blue-600 text-white text-lg rounded-lg"
+                                >
+                                    Đặt hàng
+                                </button>
+                            )}
                         </div>
+                        )}
+                        {qrImage && orderInfo && (
+                            <div className="bg-white rounded-xl shadow p-6 border border-gray-200 mt-4">
+                                <h3 className="text-lg font-semibold mb-4 text-green-600">Thanh toán Online</h3>
+
+                                <div className="flex flex-col items-center">
+                                    <img
+                                        src={qrImage}
+                                        alt="PayOS QR"
+                                        className="w-60 h-60 rounded-lg border shadow"
+                                    />
+
+                                    <p className="text-gray-600 mt-3 text-sm">Quét mã QR để thanh toán</p>
+
+                                    <p className="font-semibold text-blue-600 text-lg">
+                                        {orderInfo.orderCode}
+                                    </p>
+
+                                    <p className="text-sm mt-3 text-gray-500">
+                                        Số tiền:{" "}
+                                        <strong>{orderInfo.totalAmount.toLocaleString()}đ</strong>
+                                    </p>
+
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        *Đơn hàng sẽ tự động cập nhật sau khi PayOS xác nhận giao dịch.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </section>
