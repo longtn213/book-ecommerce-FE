@@ -2,19 +2,18 @@
 
 import React, {useEffect, useState} from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import { useAppSelector } from "@/redux/store";
-import { useRouter } from "next/navigation";
-import { useCart } from "@/hook/useCart";
+import {useAppSelector} from "@/redux/store";
+import {useRouter} from "next/navigation";
+import {useCart} from "@/hook/useCart";
 import {checkout, getOrderId} from "@/services/orderService";
-import { useAuthContext } from "@/context/AuthContext";
-import { useDispatch } from "react-redux";
-import { clearCoupon } from "@/redux/features/couponSlice";
+import {useAuthContext} from "@/context/AuthContext";
+import {useDispatch} from "react-redux";
+import {clearCoupon} from "@/redux/features/couponSlice";
 import Discount from "../Cart/Discount";
 import FreeShipProgress from "@/components/Common/FreeShipProgress";
 import {BASE_SHIP_FEE, FREESHIP_MIN_AMOUNT, generateOrderCode} from "@/utils/helper";
 import confetti from "canvas-confetti";
 import QRCode from "qrcode";
-import Image from "next/image";
 
 const Checkout = () => {
     const router = useRouter();

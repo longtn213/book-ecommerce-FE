@@ -326,7 +326,6 @@ const OrdersList = () => {
                         </div>
 
                         {/* BODY */}
-                        {/* BODY */}
                         <div className="px-6 py-5 space-y-6">
 
                             {/* STATUS + TOTAL CARD */}
@@ -396,11 +395,20 @@ const OrdersList = () => {
                                                                 Viết đánh giá
                                                             </button>
                                                         ) : (
-                                                            <span className="inline-block px-3 py-1 text-xs bg-green-100 text-green-700 border border-green-300 rounded-md">
-                    Đã đánh giá
-                  </span>
+                                                            <span className="inline-block px-3 py-1 text-xs bg-green-100 text-green-700 border border-green-300 rounded-md">Đã đánh giá</span>
                                                         )}
                                                     </div>
+                                                )}
+
+                                                {item.ebook && (
+                                                    <button
+                                                        onClick={() =>
+                                                            router.push(`/ebook/${item.bookId}/discussion`)
+                                                        }
+                                                        className="px-4 mt-4 py-2 bg-purple-600 text-white rounded-lg text-xs hover:bg-purple-700 transition flex items-center gap-1"
+                                                    >
+                                                        🤖 Thảo luận với AI
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
