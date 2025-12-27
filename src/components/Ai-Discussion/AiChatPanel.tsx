@@ -1,93 +1,162 @@
 "use client";
 
-interface Props {
-    open: boolean;
-    onClose: () => void;
-}
+import { useState } from "react";
+import { AiDiscussionResult } from "@/types/ai";
+import { discussWithAi } from "@/services/aiService";
 
-export default function AiChatPanel({ open, onClose }: Props) {
-    if (!open) return null;
+type ChatItem = {
+    role: "user" | "ai";
+    content: string;
+    citations?: AiDiscussionResult["citations"];
+};
+
+export default function AiChatPanel({
+                                        ebookId,
+                                        onOpenChunk,
+                                    }: {
+    ebookId: number;
+    onOpenChunk: (excerpt: string) => void;
+}) {
+    const [question, setQuestion] = useState("");
+    const [messages, setMessages] = useState<ChatItem[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const handleAsk = async () => {
+        if (!question.trim() || loading) return;
+
+        const userQuestion = question;
+
+        // 1️⃣ Push câu hỏi của user vào chat
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", content: userQuestion },
+        ]);
+
+        // 2️⃣ Clear input ngay
+        setQuestion("");
+        setLoading(true);
+
+        // 3️⃣ Gọi API
+        const res = await discussWithAi(ebookId, userQuestion);
+
+        // 4️⃣ Push câu trả lời của AI
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "ai",
+                content: res.answer,
+                citations: res.citations,
+            },
+        ]);
+
+        setLoading(false);
+    };
 
     return (
         <div className="h-full w-full flex flex-col bg-white">
             {/* ================= Header ================= */}
-            <div className="h-14 flex items-center justify-between px-4 border-b shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                <div className="flex items-center gap-2 font-semibold">
-                    <span className="text-lg">🤖</span>
-                    <span>Thảo luận AI</span>
-                </div>
-                <button
-                    onClick={onClose}
-                    className="text-white/80 hover:text-white text-lg"
-                >
-                    ✕
-                </button>
+            <div className="h-14 flex items-center px-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                🤖 <span className="ml-2 font-semibold">Thảo luận AI</span>
             </div>
 
             {/* ================= Content ================= */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Context card */}
-                <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 text-sm">
-                    <p className="font-medium text-blue-900 mb-2">
-                        📘 Bạn đang đọc nội dung này
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 rounded-full bg-white border text-xs font-medium text-blue-700">
-                            Tóm tắt
-                        </span>
-                        <span className="px-3 py-1 rounded-full bg-white border text-xs font-medium text-blue-700">
-                            Giải thích
-                        </span>
-                        <span className="px-3 py-1 rounded-full bg-white border text-xs font-medium text-blue-700">
-                            Phân tích sâu
-                        </span>
+                {messages.length === 0 && (
+                    <div className="text-center text-gray-400 py-12">
+                        💬 Hỏi AI để hiểu sâu hơn nội dung bạn đang đọc
                     </div>
-                </div>
+                )}
 
-                {/* Empty chat state */}
-                <div className="flex flex-col items-center justify-center text-center text-gray-400 py-12">
-                    <div className="text-4xl mb-3">💬</div>
-                    <p className="text-sm">
-                        Hỏi AI để hiểu sâu hơn nội dung bạn đang đọc
-                    </p>
-                </div>
+                {messages.map((msg, index) => (
+                    <div key={index}>
+                        {/* ===== USER MESSAGE ===== */}
+                        {msg.role === "user" && (
+                            <div className="flex justify-end">
+                                <div className="max-w-[80%] rounded-2xl bg-blue-600 text-white px-4 py-2 text-sm">
+                                    {msg.content}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ===== AI MESSAGE ===== */}
+                        {msg.role === "ai" && (
+                            <div className="space-y-3">
+                                <div className="max-w-[85%] rounded-2xl bg-indigo-50 px-4 py-3 text-sm text-gray-800">
+                                    <p className="font-semibold mb-1">🤖 AI trả lời</p>
+                                    <p className="whitespace-pre-line">{msg.content}</p>
+                                </div>
+
+                                {/* ===== CITATIONS ===== */}
+                                {Array.isArray(msg.citations) &&
+                                    msg.citations.length > 0 && (
+                                        <div className="space-y-2 pl-2">
+                                            <p className="font-semibold text-sm">
+                                                📖 Dẫn chứng từ sách
+                                            </p>
+
+                                            {msg.citations.map((c) => (
+                                                <div
+                                                    key={c.chunkId}
+                                                    className="border rounded-lg p-3 bg-white"
+                                                >
+                                                    <div className="flex justify-between text-xs mb-1">
+                            <span className="font-medium">
+                              {c.chapter ?? "Nguồn trong sách"}
+                            </span>
+                                                        <span className="text-gray-500">
+                              {(c.confidence * 100).toFixed(0)}%
+                            </span>
+                                                    </div>
+
+                                                    <p className="italic text-sm line-clamp-3 text-gray-700">
+                                                        “{c.excerpt}”
+                                                    </p>
+
+                                                    <button
+                                                        onClick={() => onOpenChunk(c.excerpt)}
+                                                        className="mt-2 text-xs text-blue-600 hover:underline"
+                                                    >
+                                                        Xem trong sách →
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {loading && (
+                    <div className="text-sm text-gray-400 italic">
+                        🤖 AI đang suy nghĩ...
+                    </div>
+                )}
             </div>
 
             {/* ================= Input ================= */}
-            {/* ================= Input ================= */}
-            <div className="border-t p-3 bg-white shrink-0">
-    <textarea
-        placeholder="Hỏi AI về đoạn bạn đang đọc..."
-        rows={2}
-        className="
-            w-full resize-none rounded-xl border
-            px-4 py-2 text-sm
-            focus:outline-none focus:ring-2 focus:ring-blue-500
-        "
-    />
+            <div className="border-t p-3">
+        <textarea
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Hỏi AI về đoạn bạn đang đọc..."
+            rows={2}
+            className="w-full rounded-xl border px-4 py-2 text-sm"
+            onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAsk();
+                }
+            }}
+        />
 
-                <div className="mt-2 flex items-center justify-between gap-2">
-                    <select
-                        className="
-                rounded-lg border px-3 py-1.5 text-sm
-                bg-gray-50 focus:outline-none
-            "
-                    >
-                        <option>Giải thích</option>
-                        <option>Tóm tắt</option>
-                        <option>Phân tích sâu</option>
-                    </select>
-
+                <div className="mt-2 flex justify-end">
                     <button
-                        className="
-                px-5 py-2 rounded-lg
-                bg-blue-600 hover:bg-blue-700
-                text-white text-sm font-medium
-                shadow-sm
-            "
+                        onClick={handleAsk}
+                        disabled={loading}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
                     >
-                        Gửi
+                        {loading ? "Đang hỏi..." : "Gửi"}
                     </button>
                 </div>
             </div>
