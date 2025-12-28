@@ -1,15 +1,9 @@
 "use client";
 
-import React, {
-    forwardRef,
-    useEffect,
-    useImperativeHandle,
-    useRef,
-} from "react";
+import React, {forwardRef, useEffect, useImperativeHandle, useRef,} from "react";
 
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
-import { TextLayerBuilder, EventBus } from "pdfjs-dist/web/pdf_viewer";
-import {findPageWrapper} from "@/utils/helper";
+import {EventBus, TextLayerBuilder} from "pdfjs-dist/web/pdf_viewer";
 
 export interface PdfViewerHandle {
     scrollToExcerpt: (excerpt: string) => void;

@@ -116,13 +116,3 @@ export function generateOrderCode() {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     return `ORD-${time}-${random}`;
 }
-
-export function findPageWrapper(node: Node | null): HTMLElement | null {
-    while (node && node instanceof HTMLElement) {
-        if (node.classList.contains("pdf-page-wrapper")) {
-            return node;
-        }
-        node = node.parentElement;
-    }
-    return null;
-}
