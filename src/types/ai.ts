@@ -6,8 +6,17 @@ export type Citation = {
     confidence: number;
 };
 
-export type AiDiscussionResult = {
+export type AiDiscussionHistoryItem = {
+    messageId: string;
+    actionType: "QUESTION" | "SUMMARY" | "EXPLAIN";
     question: string;
     answer: string;
-    citations: Citation[];
+    citations: Citation[] | null;
+
+    selection: {
+        text: string;
+        charCount: number;
+    } | null;
+
+    createdAt: string;
 };

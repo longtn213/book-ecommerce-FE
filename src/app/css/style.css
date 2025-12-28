@@ -390,3 +390,6 @@ input[type='search']::-webkit-search-results-decoration {
     }
 }
 
+.pdf-selection-highlight {
+    transition: opacity 0.15s ease;
+}

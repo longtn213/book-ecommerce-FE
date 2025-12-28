@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AiDiscussionResult } from "@/types/ai";
-import { discussWithAi } from "@/services/aiService";
+import {askAiOnSelection, discussWithAi} from "@/services/aiService";
 
 type ChatItem = {
     role: "user" | "ai";
@@ -13,9 +13,13 @@ type ChatItem = {
 export default function AiChatPanel({
                                         ebookId,
                                         onOpenChunk,
+                                        selectedText,
+                                        onClearSelection
                                     }: {
     ebookId: number;
     onOpenChunk: (excerpt: string) => void;
+    selectedText?: string | null;
+    onClearSelection: () => void;
 }) {
     const [question, setQuestion] = useState("");
     const [messages, setMessages] = useState<ChatItem[]>([]);
@@ -26,20 +30,27 @@ export default function AiChatPanel({
 
         const userQuestion = question;
 
-        // 1️⃣ Push câu hỏi của user vào chat
+        // 1️⃣ Push user message
         setMessages((prev) => [
             ...prev,
             { role: "user", content: userQuestion },
         ]);
 
-        // 2️⃣ Clear input ngay
+        // 2️⃣ Clear input
         setQuestion("");
         setLoading(true);
 
-        // 3️⃣ Gọi API
-        const res = await discussWithAi(ebookId, userQuestion);
+        // 3️⃣ Call API
+        const res = selectedText
+            ? await askAiOnSelection({
+                ebookId,
+                action: "SUMMARY",
+                question: userQuestion,
+                selectedText
+            })
+            : await discussWithAi(ebookId, userQuestion);
 
-        // 4️⃣ Push câu trả lời của AI
+        // 4️⃣ Push AI message
         setMessages((prev) => [
             ...prev,
             {
@@ -48,6 +59,10 @@ export default function AiChatPanel({
                 citations: res.citations,
             },
         ]);
+
+        onClearSelection();
+        // 5️⃣ Clear selection
+        window.getSelection()?.removeAllRanges();
 
         setLoading(false);
     };
