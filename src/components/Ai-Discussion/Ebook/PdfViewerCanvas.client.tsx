@@ -1,9 +1,13 @@
 "use client";
 
-import React, {forwardRef, useEffect, useImperativeHandle, useRef,} from "react";
-
+import React, {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+} from "react";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
-import {EventBus, TextLayerBuilder} from "pdfjs-dist/web/pdf_viewer";
+import { EventBus, TextLayerBuilder } from "pdfjs-dist/web/pdf_viewer";
 
 export interface PdfViewerHandle {
     scrollToExcerpt: (excerpt: string) => void;
@@ -34,7 +38,7 @@ const PdfViewerCanvas = forwardRef<PdfViewerHandle, Props>(
                 ) as HTMLElement[];
 
                 for (const page of pages) {
-                    const pageText = (page.getAttribute("data-text") || "")
+                    const pageText = (page.dataset.text || "")
                         .toLowerCase()
                         .replace(/\s+/g, " ");
 
@@ -48,65 +52,64 @@ const PdfViewerCanvas = forwardRef<PdfViewerHandle, Props>(
                             .querySelectorAll(".pdf-highlight-overlay")
                             .forEach((el) => el.remove());
 
-                        page.classList.add(
-                            "ring-4",
-                            "ring-blue-600",
-                            "shadow-2xl"
-                        );
-
                         const overlay = document.createElement("div");
                         overlay.className =
                             "pdf-highlight-overlay absolute inset-0 bg-blue-300/30 pointer-events-none rounded";
+
+                        page.classList.add("ring-4", "ring-blue-600");
                         page.appendChild(overlay);
 
                         setTimeout(() => {
+                            overlay.remove();
                             page.classList.remove(
                                 "ring-4",
-                                "ring-blue-600",
-                                "shadow-2xl"
+                                "ring-blue-600"
                             );
-                            overlay.remove();
-                        }, 3000);
+                        }, 2500);
 
                         break;
                     }
                 }
             },
+
             clearHighlights() {
                 document
-                    .querySelectorAll(".pdf-selection-highlight")
+                    .querySelectorAll(".pdf-highlight-overlay")
                     .forEach((el) => el.remove());
             },
         }));
 
         /* ===================== RENDER PDF ===================== */
         useEffect(() => {
-            const run = async () => {
+            let cancelled = false;
+
+            const render = async () => {
                 pdfjsLib.GlobalWorkerOptions.workerSrc =
                     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
 
                 const pdf = await pdfjsLib.getDocument(fileUrl).promise;
+                if (!containerRef.current || cancelled) return;
 
-                if (!containerRef.current) return;
                 containerRef.current.innerHTML = "";
-                const eventBus = new EventBus();
 
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
                     const viewport = page.getViewport({ scale: 1.4 });
 
                     /* ===== PAGE WRAPPER ===== */
                     const wrapper = document.createElement("div");
                     wrapper.className =
-                        "relative mb-6 bg-white rounded-lg shadow transition-all duration-300";
+                        "relative mb-6 bg-white rounded-lg shadow";
+                    wrapper.style.width = `${viewport.width}px`;
+                    wrapper.style.height = `${viewport.height}px`;
 
                     /* ===== CANVAS ===== */
                     const canvas = document.createElement("canvas");
                     const ctx = canvas.getContext("2d")!;
                     canvas.width = viewport.width;
                     canvas.height = viewport.height;
-
                     wrapper.appendChild(canvas);
+
                     containerRef.current.appendChild(wrapper);
 
                     await page.render({
@@ -114,36 +117,45 @@ const PdfViewerCanvas = forwardRef<PdfViewerHandle, Props>(
                         viewport,
                     }).promise;
 
-                    /* ================= TEXT LAYER (CHO PHÉP BÔI & COPY) ================= */
+                    /* ===== TEXT LAYER ===== */
                     const textContent = await page.getTextContent();
 
                     const textLayerDiv = document.createElement("div");
-                    textLayerDiv.className =
-                        "textLayer absolute inset-0 select-text";
+                    textLayerDiv.className = "textLayer";
+                    textLayerDiv.style.position = "absolute";
+                    textLayerDiv.style.top = "0";
+                    textLayerDiv.style.left = "0";
+                    textLayerDiv.style.width = `${viewport.width}px`;
+                    textLayerDiv.style.height = `${viewport.height}px`;
+
                     wrapper.appendChild(textLayerDiv);
 
+                    const eventBus = new EventBus();
                     const textLayer = new TextLayerBuilder({
                         textLayerDiv,
                         eventBus,
-                        pageIndex: i - 1,
+                        pageIndex: pageNum - 1,
                         viewport,
                     });
 
                     textLayer.setTextContent(textContent);
                     textLayer.render();
 
-                    /* ================= TEXT FOR AI SEARCH ================= */
+                    /* ===== TEXT FOR AI SEARCH ===== */
                     const text = textContent.items
                         .map((i: any) => i.str)
                         .join(" ");
-                    wrapper.setAttribute("data-text", text);
+                    wrapper.dataset.text = text;
                 }
             };
 
-            run();
+            render();
+
+            return () => {
+                cancelled = true;
+            };
         }, [fileUrl]);
 
-        /* ===================== TEXT SELECTION ===================== */
         /* ===================== TEXT SELECTION ===================== */
         useEffect(() => {
             const el = containerRef.current;
@@ -153,30 +165,19 @@ const PdfViewerCanvas = forwardRef<PdfViewerHandle, Props>(
                 const sel = window.getSelection();
                 if (!sel || sel.rangeCount === 0) return;
 
-                // ✅ Chỉ nhận selection nếu nó nằm trong PDF container
-                const anchorNode = sel.anchorNode;
-                const focusNode = sel.focusNode;
-                if (!anchorNode || !focusNode) return;
-                if (!el.contains(anchorNode) || !el.contains(focusNode)) return;
+                const anchor = sel.anchorNode;
+                const focus = sel.focusNode;
+                if (!anchor || !focus) return;
+                if (!el.contains(anchor) || !el.contains(focus)) return;
 
-                // ✅ Snapshot text NGAY
-                const selectedText = sel.toString().trim();
-                if (!selectedText) return;
+                const text = sel.toString().trim();
+                if (!text) return;
 
-                console.log("[PDF] selectedText:", selectedText.slice(0, 80));
-
-                // (Tuỳ bạn) clear selection UI
-                // sel.removeAllRanges();
-
-                onTextSelected?.(selectedText);
+                onTextSelected?.(text);
             };
 
-            // dùng capture để chắc chắn ăn event trước khi focus chuyển chỗ khác
             el.addEventListener("mouseup", handleMouseUp, true);
-
-            return () => {
-                el.removeEventListener("mouseup", handleMouseUp, true);
-            };
+            return () => el.removeEventListener("mouseup", handleMouseUp, true);
         }, [onTextSelected]);
 
         return (

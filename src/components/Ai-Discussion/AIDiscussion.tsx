@@ -17,7 +17,6 @@ export const AIDiscussion = ({ bookId }: { bookId: number }) => {
     const pdfRef = useRef<PdfViewerHandle>(null);
     const [selectedText, setSelectedText] = useState<string | null>(null);
     const MAX_CHARS = 15000;
-    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         fetchEBookById(bookId).then(setEbook);
@@ -28,8 +27,6 @@ export const AIDiscussion = ({ bookId }: { bookId: number }) => {
     }
 
     return (
-        <>
-            {contextHolder}
             <div className="w-full h-full bg-neutral-200">
                 <div className="flex w-full h-full overflow-hidden">
                     {/* PDF */}
@@ -39,8 +36,9 @@ export const AIDiscussion = ({ bookId }: { bookId: number }) => {
                             fileUrl={ebook.fileUrl}
                             onTextSelected={(text) => {
                                 console.log("SELECTED:", text);
+                                console.log("text.length",text.length)
                                 if (text.length > MAX_CHARS) {
-                                    api.error({
+                                    notification.error({
                                         title: "Không thể chọn thêm!",
                                         description: `Chỉ được chọn tối đa ${MAX_CHARS} ký tự`,
                                         placement: "topRight",
@@ -69,6 +67,5 @@ export const AIDiscussion = ({ bookId }: { bookId: number }) => {
                     </div>
                 </div>
             </div>
-        </>
     );
 };

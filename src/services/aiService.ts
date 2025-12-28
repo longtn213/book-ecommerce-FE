@@ -1,10 +1,10 @@
 import axiosInstance from "@/services/axiosInstance";
-import {AiDiscussionResult} from "@/types/ai";
+import {AiDiscussionHistoryItem} from "@/types/ai";
 
 export async function discussWithAi(
     ebookId:  number,
     question: string,
-): Promise<AiDiscussionResult> {
+): Promise<AiDiscussionHistoryItem> {
     const res = await axiosInstance.post(`/ai/discuss`, {
         ebookId,question
     });
@@ -20,11 +20,11 @@ export interface AiSelectionRequest {
 
 export async function askAiOnSelection(
     req: AiSelectionRequest
-): Promise<AiDiscussionResult> {
+): Promise<AiDiscussionHistoryItem> {
     const res = await axiosInstance.post(`/ai/selection`, req);
     return res.data?.data || [];
 }
-export async function getHistoryAiDiscussion(ebookId: number): Promise<AiDiscussionResult[]> {
+export async function getHistoryAiDiscussion(ebookId: number): Promise<AiDiscussionHistoryItem[]> {
     const res = await axiosInstance.get(`/ai/${ebookId}/discussions`,);
     return res.data?.data || [];
 }
