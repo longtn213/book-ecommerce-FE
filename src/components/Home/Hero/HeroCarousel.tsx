@@ -5,6 +5,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import Image from "next/image";
 import "swiper/css";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 export default function HeroCarousel() {
     return (
@@ -44,12 +45,15 @@ export default function HeroCarousel() {
                             Quyển sách truyền cảm hứng mạnh mẽ giúp bạn hiểu mình hơn và theo đuổi ước mơ đến cùng.
                         </p>
 
-                        <button className="
-                            bg-[#007bff] hover:bg-[#0064d1] text-white
-                            px-10 py-3 text-lg rounded-xl shadow-md transition w-max
-                        ">
-                            Mua Ngay
-                        </button>
+                        <Link href="/shop" className="w-max">
+                            <button className="
+        bg-[#007bff] hover:bg-[#0064d1] text-white
+        px-10 py-3 text-lg rounded-xl shadow-md transition
+    ">
+                                Mua Ngay
+                            </button>
+                        </Link>
+
                     </div>
 
                     {/* IMAGE */}
@@ -89,12 +93,15 @@ export default function HeroCarousel() {
                             Cuốn sách giúp thay đổi tư duy, hình thành thói quen tốt và nâng cao chất lượng cuộc sống.
                         </p>
 
-                        <button className="
-                            bg-[#007bff] hover:bg-[#0064d1] text-white
-                            px-10 py-3 text-lg rounded-xl shadow-md transition w-max
-                        ">
-                            Xem Chi Tiết
-                        </button>
+                        <Link href="/shop" className="w-max">
+                            <button className="
+        bg-[#007bff] hover:bg-[#0064d1] text-white
+        px-10 py-3 text-lg rounded-xl shadow-md transition
+    ">
+                                Xem Chi Tiết
+                            </button>
+                        </Link>
+
                     </div>
 
                     {/* IMAGE */}
